@@ -1,0 +1,3 @@
+[submodule "libprio"]
+	path = libprio
+	url = https://github.com/mozilla/libprio.git
