@@ -95,6 +95,41 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
+class SECStatus_ptr(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, SECStatus_ptr, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, SECStatus_ptr, name)
+    __repr__ = _swig_repr
+
+    def __init__(self):
+        this = _prio.new_SECStatus_ptr()
+        try:
+            self.this.append(this)
+        except __builtin__.Exception:
+            self.this = this
+    __swig_destroy__ = _prio.delete_SECStatus_ptr
+    __del__ = lambda self: None
+
+    def assign(self, value):
+        return _prio.SECStatus_ptr_assign(self, value)
+
+    def value(self):
+        return _prio.SECStatus_ptr_value(self)
+
+    def cast(self):
+        return _prio.SECStatus_ptr_cast(self)
+    if _newclass:
+        frompointer = staticmethod(_prio.SECStatus_ptr_frompointer)
+    else:
+        frompointer = _prio.SECStatus_ptr_frompointer
+SECStatus_ptr_swigregister = _prio.SECStatus_ptr_swigregister
+SECStatus_ptr_swigregister(SECStatus_ptr)
+
+def SECStatus_ptr_frompointer(t):
+    return _prio.SECStatus_ptr_frompointer(t)
+SECStatus_ptr_frompointer = _prio.SECStatus_ptr_frompointer
+
 CURVE25519_KEY_LEN = _prio.CURVE25519_KEY_LEN
 CURVE25519_KEY_LEN_HEX = _prio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _prio.PRIO_SERVER_A
@@ -124,16 +159,16 @@ def PrioConfig_newTest(n_fields):
     return _prio.PrioConfig_newTest(n_fields)
 PrioConfig_newTest = _prio.PrioConfig_newTest
 
-def Keypair_new(pvtkey, pubkey):
-    return _prio.Keypair_new(pvtkey, pubkey)
+def Keypair_new():
+    return _prio.Keypair_new()
 Keypair_new = _prio.Keypair_new
 
-def PublicKey_import(pk, data, dataLen):
-    return _prio.PublicKey_import(pk, data, dataLen)
+def PublicKey_import(data, dataLen):
+    return _prio.PublicKey_import(data, dataLen)
 PublicKey_import = _prio.PublicKey_import
 
-def PublicKey_import_hex(pk, hex_data, dataLen):
-    return _prio.PublicKey_import_hex(pk, hex_data, dataLen)
+def PublicKey_import_hex(hex_data, dataLen):
+    return _prio.PublicKey_import_hex(hex_data, dataLen)
 PublicKey_import_hex = _prio.PublicKey_import_hex
 
 def PublicKey_export(pk, data):
