@@ -76,7 +76,7 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
 // Note: In Python 3, strings are handled as unicode and need to be encoded as UTF-8
 // to work properly when matched against these function signature snippets.
 //
-%typemap(in) (const unsigned char * batch_id, unsigned int batch_id_len) {
+%typemap(in) (const unsigned char *, unsigned int) {
     if (!PyString_Check($input)) {
         PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
         SWIG_fail;
@@ -85,10 +85,9 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
     $2 = (unsigned int) PyString_Size($input);
 }
 
-// The parameters need to be named when using multi-argument typemaps.
 // http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_multi_argument_typemaps
-//
-%apply (const unsigned char * batch_id, unsigned int batch_id_len) {
+%apply (const unsigned char *, unsigned int) {
+    (const unsigned char * batch_id, unsigned int batch_id_len),
     (const unsigned char *data, unsigned int dataLen),
     (const unsigned char *hex_data, unsigned int dataLen)
 }
