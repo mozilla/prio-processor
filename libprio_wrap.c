@@ -3448,15 +3448,17 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
   PublicKey *arg2 = (PublicKey *) 0 ;
   void *tmp1 ;
   void *tmp2 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   SECStatus result;
   
+  if (!PyArg_ParseTuple(args,(char *)"OO:Keypair_new",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PrivateKey*)&tmp1;
   }
   {
     arg2 = (PublicKey*)&tmp2;
   }
-  if (!PyArg_ParseTuple(args,(char *)":Keypair_new")) SWIG_fail;
   result = Keypair_new(arg1,arg2);
   resultobj = SWIG_NewPointerObj((SECStatus *)memcpy((SECStatus *)calloc(1,sizeof(SECStatus)),&result,sizeof(SECStatus)), SWIGTYPE_p_SECStatus, SWIG_POINTER_OWN |  0 );
   {
@@ -3478,19 +3480,20 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
   unsigned int arg3 ;
   void *tmp1 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   SECStatus result;
   
+  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_import",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PublicKey*)&tmp1;
   }
-  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj0)) {
+    if (!PyString_Check(obj1)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj0);
-    arg3 = (unsigned int) PyString_Size(obj0);
+    arg2 = (unsigned char*) PyString_AsString(obj1);
+    arg3 = (unsigned int) PyString_Size(obj1);
   }
   result = PublicKey_import(arg1,(unsigned char const *)arg2,arg3);
   resultobj = SWIG_NewPointerObj((SECStatus *)memcpy((SECStatus *)calloc(1,sizeof(SECStatus)),&result,sizeof(SECStatus)), SWIGTYPE_p_SECStatus, SWIG_POINTER_OWN |  0 );
@@ -3510,19 +3513,20 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
   unsigned int arg3 ;
   void *tmp1 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   SECStatus result;
   
+  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_import_hex",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PublicKey*)&tmp1;
   }
-  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import_hex",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj0)) {
+    if (!PyString_Check(obj1)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj0);
-    arg3 = (unsigned int) PyString_Size(obj0);
+    arg2 = (unsigned char*) PyString_AsString(obj1);
+    arg3 = (unsigned int) PyString_Size(obj1);
   }
   result = PublicKey_import_hex(arg1,(unsigned char const *)arg2,arg3);
   resultobj = SWIG_NewPointerObj((SECStatus *)memcpy((SECStatus *)calloc(1,sizeof(SECStatus)),&result,sizeof(SECStatus)), SWIGTYPE_p_SECStatus, SWIG_POINTER_OWN |  0 );
@@ -3714,6 +3718,9 @@ SWIGINTERN PyObject *_wrap_PrioPRGSeed_randomize(PyObject *SWIGUNUSEDPARM(self),
   arg1 = (PrioPRGSeed *)(argp1);
   result = PrioPRGSeed_randomize((unsigned char (*)[AES_128_KEY_LENGTH])arg1);
   resultobj = SWIG_NewPointerObj((SECStatus *)memcpy((SECStatus *)calloc(1,sizeof(SECStatus)),&result,sizeof(SECStatus)), SWIGTYPE_p_SECStatus, SWIG_POINTER_OWN |  0 );
+  {
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyLong_FromVoidPtr(arg1));
+  }
   return resultobj;
 fail:
   return NULL;
@@ -3751,7 +3758,7 @@ SWIGINTERN PyObject *_wrap_PrioServer_new(PyObject *SWIGUNUSEDPARM(self), PyObje
     arg3 = (PrivateKey)PyLong_AsVoidPtr(obj2);
   }
   {
-    arg4 = *(const PrioPRGSeedHandle)PyLong_AsVoidPtr(obj3);
+    arg4 = *(PrioPRGSeedHandle)PyLong_AsVoidPtr(obj3);
   }
   result = (PrioServer)PrioServer_new((struct prio_config const *)arg1,arg2,arg3,(unsigned char const (*))arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_prio_server, 0 |  0 );

@@ -9,17 +9,18 @@
 // https://stackoverflow.com/questions/26567457/swig-wrapping-typedef-struct
 //
 %define OPAQUE_POINTER(T)
-    // Cast the pointer handle (PyLong) into the appropriate input type.
     %typemap(in) T {
         $1 = (T)PyLong_AsVoidPtr($input);
     }
 
-    // Ignore the argument in the wrapper
-    %typemap(in,numinputs=0) T* (void* tmp) {
+    %typemap(in) const T {
+        $1 = (const T)PyLong_AsVoidPtr($input);
+    }
+
+    %typemap(in) T* (void *tmp) {
         $1 = (T*)&tmp;
     }
 
-    // Append the modified reference to the result list
     %typemap(argout) T* {
         $result = SWIG_Python_AppendOutput($result,PyLong_FromVoidPtr(*$1));
     }
@@ -54,12 +55,16 @@ OPAQUE_POINTER(PrivateKey)
     }
 }
 
-// The new type shares syntax with the other typedefs.
+// The new type shares most syntax with the other typedefs.
 OPAQUE_POINTER(PrioPRGSeedHandle)
+
+%typemap(argout) PrioPRGSeed * {
+    $result = SWIG_Python_AppendOutput($result,PyLong_FromVoidPtr($1));
+}
 
 // Get the original value from the handle when used as an argument
 %typemap(in) const PrioPRGSeed {
-    $1 = *(const PrioPRGSeedHandle)PyLong_AsVoidPtr($input);
+    $1 = *(PrioPRGSeedHandle)PyLong_AsVoidPtr($input);
 }
 
 
