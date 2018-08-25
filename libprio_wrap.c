@@ -3813,29 +3813,22 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_set_data(PyObject *SWIGUNUSEDPARM(self),
   PrioVerifier arg1 = (PrioVerifier) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
   unsigned int arg3 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  unsigned int val3 ;
-  int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioVerifier_set_data",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:PrioVerifier_set_data",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PrioVerifier)PyLong_AsVoidPtr(obj0);
   }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioVerifier_set_data" "', argument " "2"" of type '" "unsigned char *""'"); 
+  {
+    if (!PyByteArray_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+      SWIG_fail;
+    }
+    arg2 = (unsigned char*) PyByteArray_AsString(obj1);
+    arg3 = (unsigned int) PyByteArray_Size(obj1);
   }
-  arg2 = (unsigned char *)(argp2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "PrioVerifier_set_data" "', argument " "3"" of type '" "unsigned int""'");
-  } 
-  arg3 = (unsigned int)(val3);
   result = PrioVerifier_set_data(arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj((SECStatus *)memcpy((SECStatus *)calloc(1,sizeof(SECStatus)),&result,sizeof(SECStatus)), SWIGTYPE_p_SECStatus, SWIG_POINTER_OWN |  0 );
   return resultobj;

@@ -184,8 +184,8 @@ def PrioVerifier_clear(v):
     return _prio.PrioVerifier_clear(v)
 PrioVerifier_clear = _prio.PrioVerifier_clear
 
-def PrioVerifier_set_data(v, data, dataLen):
-    return _prio.PrioVerifier_set_data(v, data, dataLen)
+def PrioVerifier_set_data(v, data):
+    return _prio.PrioVerifier_set_data(v, data)
 PrioVerifier_set_data = _prio.PrioVerifier_set_data
 
 def PrioPacketVerify1_new():

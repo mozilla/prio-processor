@@ -72,6 +72,7 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
 }
 
 
+// Read constant data into data-structures. These are mostly shared-key related.
 // Note: In Python 3, strings are handled as unicode and need to be encoded as UTF-8
 // to work properly when matched against these function signature snippets.
 //
@@ -90,6 +91,20 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
 %apply (const unsigned char * batch_id, unsigned int batch_id_len) {
     (const unsigned char *data, unsigned int dataLen),
     (const unsigned char *hex_data, unsigned int dataLen)
+}
+
+
+// Handle the data encoding routines
+// TOOD: PrioClient_encode
+
+// PrioVerifier_set_data
+%typemap(in) (unsigned char * data, unsigned int dataLen) {
+    if (!PyByteArray_Check($input)) {
+        PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+        SWIG_fail;
+    }
+    $1 = (unsigned char*) PyByteArray_AsString($input);
+    $2 = (unsigned int) PyByteArray_Size($input);
 }
 
 %include "libprio/include/mprio.h"
