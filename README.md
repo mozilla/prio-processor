@@ -13,6 +13,17 @@ $ cd ..
 $ make
 ```
 
+## Running examples
+
+The `wrapper_example.py` is based off of the `libprio/browser-test` module.
+
+To drop into a REPL with state already set up:
+```bash
+pipenv run python -i wrapper_example.py
+```
+
+This environment helps observe the behavior of SWIG typemaps against the mprio library.
+
 ## Notes
 
 * The statically linked libraries must be compiled with `-fPIC` since Python build a shared library.
