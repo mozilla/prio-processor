@@ -24,17 +24,16 @@ _, server_secret = prio.PrioPRGSeed_randomize(server_secret)
 sA = prio.PrioServer_new(cfg, prio.PRIO_SERVER_A, skA, server_secret)
 sB = prio.PrioServer_new(cfg, prio.PRIO_SERVER_B, skA, server_secret)
 
-# TODO: segfault
 vA = prio.PrioVerifier_new(sA)
 vB = prio.PrioVerifier_new(sB)
 
 tA = prio.PrioTotalShare_new()
 tB = prio.PrioTotalShare_new()
 
-p1A = PrioPacketVerify1_new()
-p1B = PrioPacketVerify2_new()
-p2A = PrioPacketVerify1_new()
-p2B = PrioPacketVerify2_new()
+p1A = prio.PrioPacketVerify1_new()
+p1B = prio.PrioPacketVerify2_new()
+p2A = prio.PrioPacketVerify1_new()
+p2B = prio.PrioPacketVerify2_new()
 
 # TODO: set random boolean arrays as input
 for_server_a = []

@@ -13,12 +13,16 @@
         $1 = (T)PyLong_AsVoidPtr($input);
     }
 
-    %typemap(in) const T {
-        $1 = (const T)PyLong_AsVoidPtr($input);
+    %typemap(in) const_ ## T {
+        $1 = (const_ ## T)PyLong_AsVoidPtr($input);
     }
 
     %typemap(in) T* (void *tmp) {
         $1 = (T*)&tmp;
+    }
+
+    %typemap(out) T {
+        $result = PyLong_FromVoidPtr($1);
     }
 
     %typemap(argout) T* {
