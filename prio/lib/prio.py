@@ -95,6 +95,14 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
+
+def PrioPRGSeed_new():
+    return _prio.PrioPRGSeed_new()
+PrioPRGSeed_new = _prio.PrioPRGSeed_new
+
+def PrioPRGSeed_cleanup(seed):
+    return _prio.PrioPRGSeed_cleanup(seed)
+PrioPRGSeed_cleanup = _prio.PrioPRGSeed_cleanup
 CURVE25519_KEY_LEN = _prio.CURVE25519_KEY_LEN
 CURVE25519_KEY_LEN_HEX = _prio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _prio.PRIO_SERVER_A

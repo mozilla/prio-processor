@@ -34,6 +34,34 @@ OPAQUE_POINTER(PrioTotalShare)
 OPAQUE_POINTER(PublicKey)
 OPAQUE_POINTER(PrivateKey)
 
+%inline {
+    // This is the original definition of the fixed sized buffer for the
+    // random seed.
+    //
+    //      typedef unsigned char PrioPRGSeed[]
+    //
+    // We treat all new complex types as opaque pointers managed on the heap.
+    // By convention, the pointer referencing the original type is called the
+    // handle.
+    typedef PrioPRGSeed * PrioPRGSeedHandle;
+
+    PrioPRGSeedHandle PrioPRGSeed_new() {
+        return (PrioPRGSeedHandle) malloc(sizeof(PrioPRGSeed));
+    }
+
+    void PrioPRGSeed_cleanup(PrioPRGSeedHandle seed) {
+        free(seed);
+    }
+}
+
+// The new type shares syntax with the other typedefs.
+OPAQUE_POINTER(PrioPRGSeedHandle)
+
+// Get the original value from the handle when used as an argument
+%typemap(in) const PrioPRGSeed {
+    $1 = *(const PrioPRGSeedHandle)PyLong_AsVoidPtr($input);
+}
+
 
 // Note: In Python 3, strings are handled as unicode and need to be encoded as UTF-8
 // to work properly when matched against these function signature snippets.
