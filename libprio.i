@@ -95,7 +95,31 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
 
 
 // Handle the data encoding routines
-// TOOD: PrioClient_encode
+// PrioClient_encode
+%typemap(in) const bool * {
+    if (!PyByteArray_Check($input)) {
+        PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+        SWIG_fail;
+    }
+    $1 = (bool*) PyByteArray_AsString($input);
+}
+
+%typemap(in,numinputs=0) (unsigned char **, unsigned int *) (unsigned char *data = NULL, unsigned int len = 0) {
+    $1 = &data;
+    $2 = &len;
+}
+
+%typemap(argout) (unsigned char **, unsigned int *) {
+    $result = SWIG_Python_AppendOutput(
+        $result, PyByteArray_FromStringAndSize((const char *)*$1, *$2));
+    // Free malloc'ed data from within PrioClient_encode
+    if (*$1) free(*$1);
+}
+
+%apply (unsigned char **, unsigned int *) {
+    (unsigned char **for_server_a, unsigned int *aLen),
+    (unsigned char **for_server_b, unsigned int *bLen)
+}
 
 // PrioVerifier_set_data
 %typemap(in) (unsigned char * data, unsigned int dataLen) {

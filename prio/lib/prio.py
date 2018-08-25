@@ -160,8 +160,8 @@ def PrivateKey_clear(pvtkey):
     return _prio.PrivateKey_clear(pvtkey)
 PrivateKey_clear = _prio.PrivateKey_clear
 
-def PrioClient_encode(cfg, data_in, for_server_a, aLen, for_server_b, bLen):
-    return _prio.PrioClient_encode(cfg, data_in, for_server_a, aLen, for_server_b, bLen)
+def PrioClient_encode(cfg, data_in):
+    return _prio.PrioClient_encode(cfg, data_in)
 PrioClient_encode = _prio.PrioClient_encode
 
 def PrioPRGSeed_randomize(seed):

@@ -3635,55 +3635,47 @@ SWIGINTERN PyObject *_wrap_PrioClient_encode(PyObject *SWIGUNUSEDPARM(self), PyO
   unsigned int *arg4 = (unsigned int *) 0 ;
   unsigned char **arg5 = (unsigned char **) 0 ;
   unsigned int *arg6 = (unsigned int *) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
-  void *argp5 = 0 ;
-  int res5 = 0 ;
-  void *argp6 = 0 ;
-  int res6 = 0 ;
+  unsigned char *data3 = NULL ;
+  unsigned int len3 = 0 ;
+  unsigned char *data5 = NULL ;
+  unsigned int len5 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:PrioClient_encode",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  {
+    arg3 = &data3;
+    arg4 = &len3;
+  }
+  {
+    arg5 = &data5;
+    arg6 = &len5;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"OO:PrioClient_encode",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (const_PrioConfig)PyLong_AsVoidPtr(obj0);
   }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_bool, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioClient_encode" "', argument " "2"" of type '" "bool const *""'"); 
+  {
+    if (!PyByteArray_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+      SWIG_fail;
+    }
+    arg2 = (bool*) PyByteArray_AsString(obj1);
   }
-  arg2 = (bool *)(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "PrioClient_encode" "', argument " "3"" of type '" "unsigned char **""'"); 
-  }
-  arg3 = (unsigned char **)(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_unsigned_int, 0 |  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "PrioClient_encode" "', argument " "4"" of type '" "unsigned int *""'"); 
-  }
-  arg4 = (unsigned int *)(argp4);
-  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "PrioClient_encode" "', argument " "5"" of type '" "unsigned char **""'"); 
-  }
-  arg5 = (unsigned char **)(argp5);
-  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_unsigned_int, 0 |  0 );
-  if (!SWIG_IsOK(res6)) {
-    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "PrioClient_encode" "', argument " "6"" of type '" "unsigned int *""'"); 
-  }
-  arg6 = (unsigned int *)(argp6);
   result = PrioClient_encode((struct prio_config const *)arg1,(bool const *)arg2,arg3,arg4,arg5,arg6);
   resultobj = SWIG_NewPointerObj((SECStatus *)memcpy((SECStatus *)calloc(1,sizeof(SECStatus)),&result,sizeof(SECStatus)), SWIGTYPE_p_SECStatus, SWIG_POINTER_OWN |  0 );
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj, PyByteArray_FromStringAndSize((const char *)*arg3, *arg4));
+    // Free malloc'ed data from within PrioClient_encode
+    if (*arg3) free(*arg3);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj, PyByteArray_FromStringAndSize((const char *)*arg5, *arg6));
+    // Free malloc'ed data from within PrioClient_encode
+    if (*arg5) free(*arg5);
+  }
   return resultobj;
 fail:
   return NULL;
