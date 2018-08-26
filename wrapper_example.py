@@ -4,8 +4,7 @@ from pprint import pformat
 
 print(pformat(dir(prio)))
 
-# TODO: return type
-_ = prio.Prio_init()
+prio.Prio_init()
 
 skA, pkA = prio.Keypair_new(0, 0)
 skB, pkB = prio.Keypair_new(0, 0)
