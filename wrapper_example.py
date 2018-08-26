@@ -67,3 +67,27 @@ output = array('L', output)
 
 # check the output
 assert(list(data_items) == list(output))
+
+prio.PublicKey_clear(pkA)
+prio.PublicKey_clear(pkB)
+prio.PrivateKey_clear(skA)
+prio.PrivateKey_clear(skB)
+
+prio.PrioPacketVerify1_clear(p1A)
+prio.PrioPacketVerify1_clear(p1B)
+prio.PrioPacketVerify2_clear(p2A)
+prio.PrioPacketVerify2_clear(p2B)
+
+prio.PrioVerifier_clear(vA)
+prio.PrioVerifier_clear(vB)
+
+prio.PrioTotalShare_clear(tA)
+prio.PrioTotalShare_clear(tB)
+
+prio.PrioServer_clear(sA)
+prio.PrioServer_clear(sB)
+prio.PrioConfig_clear(cfg)
+
+prio.PrioPRGSeed_cleanup(server_secret)
+
+prio.Prio_clear()

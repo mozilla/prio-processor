@@ -4,5 +4,10 @@ all:
 	python3 setup.py build_ext --build-lib prio/lib
 
 clean:
-	rm *.so *.pyc *.c
+	rm *.so *.pyc
 
+test:
+	coverage run -m pytest tests/
+
+coverage:
+	coverage report
