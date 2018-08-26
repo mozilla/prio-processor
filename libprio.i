@@ -3,6 +3,16 @@
     #include "libprio/include/mprio.h"
 %}
 
+// Handle SECStatus
+// https://stackoverflow.com/a/38191420
+%typemap(out) SECStatus {
+   if ($1 != SECSuccess) {
+       PyErr_SetFromErrno(PyExc_RuntimeError);
+       SWIG_fail;
+   }
+   $result = Py_None;
+   Py_INCREF($result);
+}
 
 // This macro translates the side-effect nature of the pointer to implementation idiom
 // into something more functional. See the SO thread for starters:
