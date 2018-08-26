@@ -130,4 +130,23 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
     $2 = (unsigned int) PyByteArray_Size($input);
 }
 
+// PrioTotalShare_final
+// This typemap should take precendence over the generic handlers
+%typemap(in) (const_PrioConfig, unsigned long *) {
+    $1 = (const_PrioConfig)PyLong_AsVoidPtr($input);
+    $2 = (unsigned long*) malloc(sizeof(long)*PrioConfig_numDataFields($1));
+}
+
+%typemap(argout) (const_PrioConfig, unsigned long *) {
+    $result = SWIG_Python_AppendOutput(
+        $result,
+        PyByteArray_FromStringAndSize((const char*)$2, sizeof(long)*PrioConfig_numDataFields($1))
+    );
+    free($2);
+}
+
+%apply (const_PrioConfig, unsigned long *) {
+    (const_PrioConfig cfg, unsigned long *output)
+}
+
 %include "libprio/include/mprio.h"

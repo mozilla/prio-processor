@@ -256,8 +256,8 @@ def PrioTotalShare_read(t, upk, cfg):
     return _prio.PrioTotalShare_read(t, upk, cfg)
 PrioTotalShare_read = _prio.PrioTotalShare_read
 
-def PrioTotalShare_final(cfg, output, tA, tB):
-    return _prio.PrioTotalShare_final(cfg, output, tA, tB)
+def PrioTotalShare_final(cfg, tA, tB):
+    return _prio.PrioTotalShare_final(cfg, tA, tB)
 PrioTotalShare_final = _prio.PrioTotalShare_final
 # This file is compatible with both classic and new-style classes.
 

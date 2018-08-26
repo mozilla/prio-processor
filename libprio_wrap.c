@@ -4238,31 +4238,31 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
   unsigned long *arg2 = (unsigned long *) 0 ;
   const_PrioTotalShare arg3 = (const_PrioTotalShare) 0 ;
   const_PrioTotalShare arg4 = (const_PrioTotalShare) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:PrioTotalShare_final",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_final",&obj0,&obj1,&obj2)) SWIG_fail;
   {
     arg1 = (const_PrioConfig)PyLong_AsVoidPtr(obj0);
-  }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_long, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioTotalShare_final" "', argument " "2"" of type '" "unsigned long *""'"); 
-  }
-  arg2 = (unsigned long *)(argp2);
-  {
-    arg3 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj2);
+    arg2 = (unsigned long*) malloc(sizeof(long)*PrioConfig_numDataFields(arg1));
   }
   {
-    arg4 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj3);
+    arg3 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj1);
+  }
+  {
+    arg4 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj2);
   }
   result = PrioTotalShare_final((struct prio_config const *)arg1,arg2,(struct prio_total_share const *)arg3,(struct prio_total_share const *)arg4);
   resultobj = SWIG_NewPointerObj((SECStatus *)memcpy((SECStatus *)calloc(1,sizeof(SECStatus)),&result,sizeof(SECStatus)), SWIGTYPE_p_SECStatus, SWIG_POINTER_OWN |  0 );
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj,
+      PyByteArray_FromStringAndSize((const char*)arg2, sizeof(long)*PrioConfig_numDataFields(arg1))
+      );
+    free(arg2);
+  }
   return resultobj;
 fail:
   return NULL;
