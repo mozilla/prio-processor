@@ -3,8 +3,7 @@
     #include "libprio/include/mprio.h"
 %}
 
-// Handle SECStatus
-// https://stackoverflow.com/a/38191420
+// Handle SECStatus.
 %typemap(out) SECStatus {
    if ($1 != SECSuccess) {
        PyErr_SetFromErrno(PyExc_RuntimeError);
@@ -14,27 +13,30 @@
    Py_INCREF($result);
 }
 
-// This macro translates the side-effect nature of the pointer to implementation idiom
-// into something more functional. See the SO thread for starters:
-// https://stackoverflow.com/questions/26567457/swig-wrapping-typedef-struct
-//
+
+// Typemaps for dealing with the pointer to implementation idiom.
 %define OPAQUE_POINTER(T)
+    // Cast the PyLong into the opaque pointer
     %typemap(in) T {
         $1 = (T)PyLong_AsVoidPtr($input);
     }
 
-    %typemap(in) const_ ## T {
-        $1 = (const_ ## T)PyLong_AsVoidPtr($input);
-    }
-
-    %typemap(in) T* (void *tmp) {
-        $1 = (T*)&tmp;
-    }
-
+    // Cast the pointer into a PyLong
     %typemap(out) T {
         $result = PyLong_FromVoidPtr($1);
     }
 
+    // Cast the PyLong into a constant opaque pointer
+    %typemap(in) const_ ## T {
+        $1 = (const_ ## T)PyLong_AsVoidPtr($input);
+    }
+
+    // Create a temporary stack variable for allocating a new opaque pointer
+    %typemap(in) T* (void *tmp) {
+        $1 = (T*)&tmp;
+    }
+
+    // Return the pointer to the newly allocated memory
     %typemap(argout) T* {
         $result = SWIG_Python_AppendOutput($result,PyLong_FromVoidPtr(*$1));
     }
@@ -82,7 +84,7 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
 }
 
 
-// Read constant data into data-structures. These are mostly shared-key related.
+// Read constant data into data-structures.
 // Note: In Python 3, strings are handled as unicode and need to be encoded as UTF-8
 // to work properly when matched against these function signature snippets.
 //
@@ -95,7 +97,6 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
     $2 = (unsigned int) PyString_Size($input);
 }
 
-// http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_multi_argument_typemaps
 %apply (const unsigned char *, unsigned int) {
     (const unsigned char * batch_id, unsigned int batch_id_len),
     (const unsigned char *data, unsigned int dataLen),
@@ -103,7 +104,6 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
 }
 
 
-// Handle the data encoding routines
 // PrioClient_encode
 %typemap(in) const bool * {
     if (!PyByteArray_Check($input)) {
@@ -130,6 +130,7 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
     (unsigned char **for_server_b, unsigned int *bLen)
 }
 
+
 // PrioVerifier_set_data
 %typemap(in) (unsigned char * data, unsigned int dataLen) {
     if (!PyByteArray_Check($input)) {
@@ -140,8 +141,8 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
     $2 = (unsigned int) PyByteArray_Size($input);
 }
 
+
 // PrioTotalShare_final
-// This typemap should take precendence over the generic handlers
 %typemap(in) (const_PrioConfig, unsigned long *) {
     $1 = (const_PrioConfig)PyLong_AsVoidPtr($input);
     $2 = (unsigned long*) malloc(sizeof(long)*PrioConfig_numDataFields($1));
@@ -159,4 +160,12 @@ OPAQUE_POINTER(PrioPRGSeedHandle)
     (const_PrioConfig cfg, unsigned long *output)
 }
 
+
 %include "libprio/include/mprio.h"
+
+
+// Helpful resources:
+// * https://stackoverflow.com/a/38191420
+// * http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_nn2
+// * https://stackoverflow.com/questions/26567457/swig-wrapping-typedef-struct
+// * http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_multi_argument_typemaps
