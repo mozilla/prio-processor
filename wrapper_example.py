@@ -1,4 +1,5 @@
 from prio.lib import prio
+from array import array
 from pprint import pformat
 
 print(pformat(dir(prio)))
@@ -14,9 +15,10 @@ _, skB, pkB = prio.Keypair_new(0, 0)
 # pk_hexA = prio.PublicKey_export_hex(pkA)
 # pk_hexB = prio.PublicKey_export_hex(pkB)
 
-ndata = 3
+# n_clients = 10
+n_data = 133
 batch_id = b"test_batch"
-cfg = prio.PrioConfig_new(ndata, pkA, pkB, batch_id)
+cfg = prio.PrioConfig_new(n_data, pkA, pkB, batch_id)
 
 server_secret = prio.PrioPRGSeed_new()
 _, server_secret = prio.PrioPRGSeed_randomize(server_secret)
@@ -35,9 +37,8 @@ p1B = prio.PrioPacketVerify2_new()
 p2A = prio.PrioPacketVerify1_new()
 p2B = prio.PrioPacketVerify2_new()
 
-# TODO: set random boolean arrays as input
-for_server_a = []
-for_server_b = []
+data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+_, for_server_a, for_server_b = prio.PrioClient_encode(cfg, data_items)
 
 # Setup verification
 _ = prio.PrioVerifier_set_data(vA, for_server_a)
@@ -62,7 +63,8 @@ _ = prio.PrioServer_aggregate(sB, vB)
 _ = prio.PrioTotalShare_set_data(tA, sA)
 _ = prio.PrioTotalShare_set_data(tB, sB)
 
-# TODO: hide the output in the function call
-_, output = PrioTotalShare_final(cfg, tA, tB)
+_, output = prio.PrioTotalShare_final(cfg, tA, tB)
+output = array('L', output)
 
-# TODO: check the output
+# check the output
+print(list(data_items) == list(output))
