@@ -95,6 +95,33 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 
+// PublicKey_export
+%typemap(in,numinputs=0) unsigned char data[CURVE25519_KEY_LEN] {
+    $1 = (unsigned char *) malloc(sizeof(data));
+}
+
+%typemap(argout) unsigned char data[CURVE25519_KEY_LEN] {
+    $result = SWIG_Python_AppendOutput(
+        $result,
+        PyByteArray_FromStringAndSize((const char*)$1, sizeof(data))
+    );
+    if ($1) free($1);
+}
+
+// Publickey_export_hex
+%typemap(in,numinputs=0) unsigned char data[CURVE25519_KEY_LEN_HEX+1] {
+    $1 = (unsigned char *) malloc(sizeof(data));
+}
+
+%typemap(argout) unsigned char data[CURVE25519_KEY_LEN_HEX+1] {
+    $result = SWIG_Python_AppendOutput(
+        $result,
+        PyString_FromStringAndSize((const char*)$1, sizeof(data))
+    );
+    if free($1);
+}
+
+
 // PrioClient_encode
 %typemap(in) const bool * {
     if (!PyByteArray_Check($input)) {
