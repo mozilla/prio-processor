@@ -7,7 +7,7 @@ clean:
 	rm *.so *.pyc
 
 test:
-	coverage run -m pytest tests/
+	pipenv run coverage run -m pytest tests/
 
 coverage:
-	coverage report
+	pipenv run coverage report
