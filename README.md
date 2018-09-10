@@ -7,27 +7,44 @@ This library provides low-level bindings to the reference C implementation of th
 
 ## Build
 
+### Docker (recommended)
+
+This project contains a pre-configured build and test environment through docker.
+
 ```
-$ cd libprio
-$ CFLAGS='-fPIC' scons
-$ cd ..
+$ docker build -t prio .
+$ docker run -it prio
+```
+This will build the package and run the tests.
+You can mount your working directory and shell into the container for development work.
+
+```
+$ docker run -v `pwd`:/app -it prio bash
+```
+
+### Local
+
+Refer to the Dockerfile and the `libprio` submodule for dependencies.
+
+```
 $ make
+$ make test
 ```
 
 ### Notes
-* The statically linked libraries must be compiled with `-fPIC` since Python build a shared library.
-* The `libprio/mpi/SConscript` file must be modified directly to add the `fPIC` flag.
+
+`libprio` is compiled with position-independent code (`fPIC`).
+This is required for the python foreign-function interface.
 
 
 ## Test
 
 ```bash
-$ pipenv shell
-$ make test
-$ make coverage
+$ docker build -t prio . && docker run -it prio
 ```
+You can avoid rebuilds by mounting your working directory and testing directly within the container.
 
-To run the tests directly:
+If you want to avoid the Makefile for tests, the project uses pytest.
 ```bash
 $ pipenv run python -m pytest
 ```
@@ -35,8 +52,3 @@ $ pipenv run python -m pytest
 ## Running examples
 
 The `wrapper_example.py` includes an example of the full pipeline.
-
-To drop into a REPL with state already set up:
-```bash
-$ pipenv run python -i wrapper_example.py
-```
