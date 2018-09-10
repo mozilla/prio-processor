@@ -3,3 +3,5 @@ __pycache__
 *.so
 build
 prio/lib/*.so
+.coverage
+.pytest_cache
