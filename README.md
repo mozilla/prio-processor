@@ -46,7 +46,8 @@ You can avoid rebuilds by mounting your working directory and testing directly w
 
 If you want to avoid the Makefile for tests, the project uses pytest.
 ```bash
-$ pipenv run python -m pytest
+$ pipenv sync --dev
+$ pipenv run pytest
 ```
 
 ## Running examples

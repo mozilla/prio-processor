@@ -9,7 +9,7 @@ clean:
 	rm *.so *.pyc
 
 test:
-	pipenv run coverage run -m pytest tests/
+	pipenv run pytest
 
 coverage:
 	pipenv run coverage report
