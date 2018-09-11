@@ -1,6 +1,8 @@
 FROM fedora:latest
 MAINTAINER Anthony Miyaguchi <amiyaguchi@mozilla.com>
 
+ENV LANG en_US.UTF-8
+
 RUN dnf install -y \
     which \
     make \
@@ -25,4 +27,4 @@ WORKDIR /app
 ADD . /app
 
 RUN pipenv sync --dev
-CMD make && pipenv run make test
+CMD make && make test
