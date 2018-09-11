@@ -15,4 +15,14 @@ extension_mod = Extension(
     include_dirs=["/usr/include/nspr4"],
     libraries=["mprio", "mpi", "nss3", "nspr4", "msgpackc"],
 )
-setup(name="prio", ext_modules=[extension_mod])
+
+setup(
+    name="prio",
+    version = "0.1",
+    description = "An interface to libprio",
+    author = "Anthony Miyaguchi",
+    author_email = "amiyaguchi@mozilla.com",
+    url = "https://github.com/acmiyaguchi/python-libprio",
+    packages = ["prio"],
+    ext_modules=[extension_mod],
+)
