@@ -4,10 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+prio = {path = ".", editable = true}
 
 [dev-packages]
 pytest = "*"
 coverage = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.6"
