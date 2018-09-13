@@ -26,5 +26,6 @@ ENV PATH="$PATH:~/.local/bin"
 WORKDIR /app
 ADD . /app
 
+RUN make
 RUN pipenv sync --dev
-CMD make && make test
+CMD make test
