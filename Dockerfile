@@ -1,6 +1,8 @@
 FROM fedora:latest
 MAINTAINER Anthony Miyaguchi <amiyaguchi@mozilla.com>
 
+ENV LANG en_US.UTF-8
+
 RUN dnf install -y \
     which \
     make \
@@ -24,5 +26,6 @@ ENV PATH="$PATH:~/.local/bin"
 WORKDIR /app
 ADD . /app
 
+RUN make
 RUN pipenv sync --dev
-CMD make && pipenv run make test
+CMD make test

@@ -1,0 +1,29 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+version: 2
+jobs:
+  test:
+    docker:
+      - image: docker:stable-git
+    steps:
+      - checkout
+      - run: 
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: docker build -t prio .
+      - run:
+          name: Test Code
+          command: docker run prio
+
+workflows:
+    version: 2
+    build:
+        jobs:
+            - test
