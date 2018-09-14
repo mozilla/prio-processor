@@ -8,8 +8,6 @@ from pprint import pformat
 
 print(pformat(dir(prio)))
 
-prio.Prio_init()
-
 skA, pkA = prio.Keypair_new(0, 0)
 skB, pkB = prio.Keypair_new(0, 0)
 
@@ -93,5 +91,3 @@ prio.PrioServer_clear(sB)
 prio.PrioConfig_clear(cfg)
 
 prio.PrioPRGSeed_cleanup(server_secret)
-
-prio.Prio_clear()

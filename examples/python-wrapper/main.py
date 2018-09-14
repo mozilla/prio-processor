@@ -6,8 +6,6 @@ from prio import prio
 from prio.lib import prio as libprio
 import sys
 
-libprio.Prio_init()
-
 skA, pkA = libprio.Keypair_new(0, 0)
 skB, pkB = libprio.Keypair_new(0, 0)
 
@@ -57,5 +55,3 @@ output = prio.total_share_final(cfg, tA, tB)
 
 # check the output
 assert(list(data_items) == list(output))
-
-libprio.Prio_clear()
