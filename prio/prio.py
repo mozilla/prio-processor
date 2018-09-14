@@ -3,7 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from lib import prio
+from array import array
 
+# Serializable
 class Config:
     """An object that stores system parameters.
 
@@ -17,18 +19,18 @@ class Config:
     :param batch_id: Which batch of aggregate statistics we are computing.
     """
     def __init__(self, n_fields, server_a, server_b, batch_id):
-        self.config = prio.PrioConfig_new(n_fields, server_a, server_b, batch_id)
+        self.instance = prio.PrioConfig_new(n_fields, server_a, server_b, batch_id)
 
     def num_data_fields(self):
-        return prio.PrioConfig_numDataFields(self.config)
+        return prio.PrioConfig_numDataFields(self.instance)
 
     def __del__(self):
-        prio.PrioConfig_clear(self.config)
+        prio.PrioConfig_clear(self.instance)
 
 
 class TestConfig(Config):
     def __init__(self, n_fields):
-        self.config = prio.PrioConfig_newTest(n_fields)
+        self.instance = prio.PrioConfig_newTest(n_fields)
 
 
 class PublicKey:
@@ -72,50 +74,84 @@ class Keypair:
 
 
 class Client:
-    def __init__(self):
-        pass
+    def __init__(self, config):
+        self.config = config
 
     def encode(self, data):
-        pass
+        return prio.PrioClient_encode(self.config, data)
 
 
 class Server:
-    def __init__(self):
-        # PrioServer_new
-        pass
+    def __init__(self, config, server_id, private_key, secret):
+        """Run the verification and aggregation routines.
+
+        :param config: An instance of the config
+        :param server_id: The enumeration of valid servers
+        :param private_key: The server's private key used for decryption
+        :param secret: The shared random seed
+        """
+        self.instance = prio.PrioServer_new(config.instance, server_id, private_key, secret)
 
     def __del__(self):
-        # PrioServer_clear
-        pass
+        prio.PrioServer_clear(self.instance)
+
+    def create_verifier(self, data):
+        return Verifier(self, data)
+
+    def aggregate(self, verifier):
+        prio.PrioServer_aggregate(self.instance, verifier)
+
+    def total_shares(self):
+        return TotalShare(self)
+
 
 class Verifier:
-    def __init__(self, server):
-        pass
+    """The verifier is not serializable because of the reference to the
+    server. The verification packets are.
+    """
+    def __init__(self, server, data):
+        self.instance = prio.PrioVerifier_new(server.instance)
+        prio.PrioVerifier_set_data(self.instance, data)
 
     def __del__(self):
-        # PrioVerifier_new
-        pass
+        prio.PrioVerifier_clear(self.instance)
 
-    def set_data(self, data):
-        # PrioVerifier_set_data
-        pass
+    def create_verify1(self):
+        return PacketVerify1(self)
+
+    def create_verify2(self, verify1A, verify1B):
+        return PacketVerify2(self, verify1A, verify2B)
+
+    def is_valid(self, verify2A, verify2B):
+        return prio.PrioVerifier_isValid(self, verify2A, verify2B)
 
 
+# Serializable
 class PacketVerify1:
-    def __init__(self):
-        # PrioPacketVerify1_new
-        pass
+    def __init__(self, verifier):
+        self.instance = prio.PrioPacketVerify1_new()
+        prio.PrioPacketVerify1_set_data(self.instance, verifier.instance)
 
     def __del__(self):
-        # PrioPacketVerify2_clear
-        pass
+        prio.PrioPacketVerify1_clear(self.instance)
 
-
+# Serializable
 class PacketVerify2:
-    def __init__(self):
-        pass
+    def __init__(self, verifier, A, B):
+        self.instance = prio.PrioPacketVerif2_new()
+        prio.PrioPacketVerify2_set_data(self.instance, verifier.instance, A.instance, B.instance)
 
 
+# Serializable
 class TotalShare:
-    def __init__(self):
-        pass
+    def __init__(self, server):
+        self.instance = prio.PrioTotalShare_new()
+        prio.PrioTotalShare_set_data(self.instance)
+
+    def __del__(self):
+        prio.PrioTotalShare_clear(self.instance)
+
+
+def total_share_final(config, tA, tB):
+    final = prio.PrioTotalShare_final(config.instance, tA.instance, tB.instance)
+    return array('L', final)
