@@ -4,6 +4,7 @@
 
 from prio import prio
 from prio.lib import prio as libprio
+import sys
 
 libprio.Prio_init()
 
@@ -31,15 +32,19 @@ vB = sB.create_verifier(for_server_b)
 
 # Produce a packet1 and send to the other party
 p1A = vA.create_verify1()
-p1B = vB.create_verify2()
+p1B = vB.create_verify1()
 
 # Produce packet2 and send to the other party
 p2A = vA.create_verify2(p1A, p1B)
 p2B = vB.create_verify2(p1A, p1B)
 
 # Check validity of the request
-vA.is_valid(p2A, p2B)
-vB.is_valid(p2A, p2B)
+if not vA.is_valid(p2A, p2B):
+    print("data for server A is not valid!")
+    sys.exit(1)
+if not vB.is_valid(p2A, p2B):
+    print("data for server A is not valid!")
+    sys.exit(1)
 
 sA.aggregate(vA)
 sB.aggregate(vB)
