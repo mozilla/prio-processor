@@ -2430,22 +2430,25 @@ SWIG_Python_ConvertFunctionPtr(PyObject *obj, void **ptr, swig_type_info *ty) {
     return SWIG_ConvertPtr(obj, ptr, ty, 0);
   } else {
     void *vptr = 0;
-    swig_cast_info *tc;
-
+    
     /* here we get the method pointer for callbacks */
     const char *doc = (((PyCFunctionObject *)obj) -> m_ml -> ml_doc);
     const char *desc = doc ? strstr(doc, "swig_ptr: ") : 0;
     if (desc)
       desc = ty ? SWIG_UnpackVoidPtr(desc + 10, &vptr, ty->name) : 0;
-    if (!desc)
+    if (!desc) 
       return SWIG_ERROR;
-    tc = SWIG_TypeCheck(desc,ty);
-    if (tc) {
-      int newmemory = 0;
-      *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
-      assert(!newmemory); /* newmemory handling not yet implemented */
+    if (ty) {
+      swig_cast_info *tc = SWIG_TypeCheck(desc,ty);
+      if (tc) {
+        int newmemory = 0;
+        *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
+        assert(!newmemory); /* newmemory handling not yet implemented */
+      } else {
+        return SWIG_ERROR;
+      }
     } else {
-      return SWIG_ERROR;
+      *ptr = vptr;
     }
     return SWIG_OK;
   }
@@ -5086,9 +5089,9 @@ extern "C" {
             char *ndoc = (char*)malloc(ldoc + lptr + 10);
             if (ndoc) {
               char *buff = ndoc;
-              memcpy(buff, methods[i].ml_doc, ldoc);
+              strncpy(buff, methods[i].ml_doc, ldoc);
               buff += ldoc;
-              memcpy(buff, "swig_ptr: ", 10);
+              strncpy(buff, "swig_ptr: ", 10);
               buff += 10;
               SWIG_PackVoidPtr(buff, ptr, ty->name, lptr);
               methods[i].ml_doc = ndoc;
@@ -5235,6 +5238,10 @@ SWIG_init(void) {
 #endif
   
   SWIG_InstallConstants(d,swig_const_table);
+  
+  
+  Prio_init();
+  atexit(Prio_clear);
   
   SWIG_Python_SetConstant(d, "CURVE25519_KEY_LEN",SWIG_From_int((int)(32)));
   SWIG_Python_SetConstant(d, "CURVE25519_KEY_LEN_HEX",SWIG_From_int((int)(64)));
