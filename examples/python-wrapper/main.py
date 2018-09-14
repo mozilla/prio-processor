@@ -2,20 +2,23 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import prio
+from prio import prio
+from prio.lib import prio as libprio
 
-skA, pkA = prio.Keypair()
-skB, pkB = prio.Keypair()
+libprio.Prio_init()
+
+skA, pkA = libprio.Keypair_new(0, 0)
+skB, pkB = libprio.Keypair_new(0, 0)
 
 n_data = 133
 batch_id = b"test_batch"
-cfg = prio.PrioConfig_new(n_data, pkA, pkB, batch_id)
+cfg = prio.Config(n_data, pkA, pkB, batch_id)
 
-server_secret = prio.PrioPRGSeed_new()
-server_secret = prio.PrioPRGSeed_randomize(server_secret)
+server_secret = libprio.PrioPRGSeed_new()
+server_secret = libprio.PrioPRGSeed_randomize(server_secret)
 
-sA = prio.Server(cfg, prio.PRIO_SERVER_A, skA, server_secret)
-sB = prio.Server(cfg, prio.PRIO_SERVER_B, skB, server_secret)
+sA = prio.Server(cfg, libprio.PRIO_SERVER_A, skA, server_secret)
+sB = prio.Server(cfg, libprio.PRIO_SERVER_B, skB, server_secret)
 
 client = prio.Client(cfg)
 
@@ -49,3 +52,5 @@ output = total_share_final(cfg, tA, tB)
 
 # check the output
 assert(list(data_items) == list(output))
+
+libprio.Prio_clear()
