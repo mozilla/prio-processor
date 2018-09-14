@@ -6,8 +6,8 @@ from prio import prio
 from prio.lib import prio as libprio
 import sys
 
-skA, pkA = libprio.Keypair_new(0, 0)
-skB, pkB = libprio.Keypair_new(0, 0)
+skA, pkA = prio.create_keypair()
+skB, pkB = prio.create_keypair()
 
 n_data = 133
 batch_id = b"test_batch"

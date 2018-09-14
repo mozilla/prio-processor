@@ -19,7 +19,11 @@ class Config:
     :param batch_id: Which batch of aggregate statistics we are computing.
     """
     def __init__(self, n_fields, server_a, server_b, batch_id):
-        self.instance = prio.PrioConfig_new(n_fields, server_a, server_b, batch_id)
+        self.instance = prio.PrioConfig_new(
+            n_fields,
+            server_a.instance,
+            server_b.instance,
+            batch_id)
 
     def num_data_fields(self):
         return prio.PrioConfig_numDataFields(self.instance)
@@ -34,43 +38,37 @@ class TestConfig(Config):
 
 
 class PublicKey:
-    def __init__(self):
-        pass
+    def __init__(self, instance=None):
+        self.instance = instance
+
+    def __del__(self):
+        if self.instance:
+            prio.PublicKey_clear(self.instance)
 
     def import_key(self, data):
         # PublicKey_import
-        pass
+        raise NotImplementedError
 
     def import_hex(self, data):
         # PublicKey_import_hex
-        pass
+        raise NotImplementedError
 
     def export(self, data):
         # PublicKey_export
-        pass
+        raise NotImplementedError
 
     def export_hex(self):
         # PublicKey_export_hex
-        pass
-
-    def __del__(self):
-        # PublicKey_clear
-        pass
+        raise NotImplementedError
 
 
 class PrivateKey:
-    def __init__(self):
-        pass
+    def __init__(self, instance=None):
+        self.instance = instance
 
     def __del__(self):
-        # PrivateKey_clear
-        pass
-
-
-class Keypair:
-    def __init__(self):
-        # Keypair_new
-        pass
+        if self.instance:
+            prio.PrivateKey_clear(self.instance)
 
 
 class Client:
@@ -90,7 +88,11 @@ class Server:
         :param private_key: The server's private key used for decryption
         :param secret: The shared random seed
         """
-        self.instance = prio.PrioServer_new(config.instance, server_id, private_key, secret)
+        self.instance = prio.PrioServer_new(
+            config.instance,
+            server_id,
+            private_key.instance,
+            secret)
 
     def __del__(self):
         prio.PrioServer_clear(self.instance)
@@ -158,6 +160,10 @@ class TotalShare:
     def __del__(self):
         prio.PrioTotalShare_clear(self.instance)
 
+
+def create_keypair():
+    secret, public = prio.Keypair_new(0, 0)
+    return PrivateKey(secret), PublicKey(public)
 
 def total_share_final(config, tA, tB):
     final = prio.PrioTotalShare_final(config.instance, tA.instance, tB.instance)
