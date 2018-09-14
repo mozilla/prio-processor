@@ -48,7 +48,7 @@ sB.aggregate(vB)
 tA = sA.total_shares()
 tB = sB.total_shares()
 
-output = total_share_final(cfg, tA, tB)
+output = prio.total_share_final(cfg, tA, tB)
 
 # check the output
 assert(list(data_items) == list(output))

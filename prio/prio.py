@@ -78,7 +78,7 @@ class Client:
         self.config = config
 
     def encode(self, data):
-        return prio.PrioClient_encode(self.config, data)
+        return prio.PrioClient_encode(self.config.instance, data)
 
 
 class Server:
@@ -99,7 +99,7 @@ class Server:
         return Verifier(self, data)
 
     def aggregate(self, verifier):
-        prio.PrioServer_aggregate(self.instance, verifier)
+        prio.PrioServer_aggregate(self.instance, verifier.instance)
 
     def total_shares(self):
         return TotalShare(self)
@@ -120,10 +120,15 @@ class Verifier:
         return PacketVerify1(self)
 
     def create_verify2(self, verify1A, verify1B):
-        return PacketVerify2(self, verify1A, verify2B)
+        return PacketVerify2(self, verify1A, verify1B)
 
     def is_valid(self, verify2A, verify2B):
-        return prio.PrioVerifier_isValid(self, verify2A, verify2B)
+        # TODO: replace try except block by wrapping function in swig typemap
+        try:
+            prio.PrioVerifier_isValid(self.instance, verify2A.instance, verify2B.instance)
+            return True
+        except RuntimeError:
+            return False
 
 
 # Serializable
@@ -138,15 +143,17 @@ class PacketVerify1:
 # Serializable
 class PacketVerify2:
     def __init__(self, verifier, A, B):
-        self.instance = prio.PrioPacketVerif2_new()
+        self.instance = prio.PrioPacketVerify2_new()
         prio.PrioPacketVerify2_set_data(self.instance, verifier.instance, A.instance, B.instance)
 
+    def __del__(self):
+        prio.PrioPacketVerify2_clear(self.instance)
 
 # Serializable
 class TotalShare:
     def __init__(self, server):
         self.instance = prio.PrioTotalShare_new()
-        prio.PrioTotalShare_set_data(self.instance)
+        prio.PrioTotalShare_set_data(self.instance, server.instance)
 
     def __del__(self):
         prio.PrioTotalShare_clear(self.instance)
