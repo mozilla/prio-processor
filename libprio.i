@@ -60,36 +60,18 @@ OPAQUE_POINTER(PrioTotalShare)
 OPAQUE_POINTER(PublicKey)
 OPAQUE_POINTER(PrivateKey)
 
-%inline {
-    // This is the original definition of the fixed sized buffer for the
-    // random seed.
-    //
-    //      typedef unsigned char PrioPRGSeed[]
-    //
-    // We treat all new complex types as opaque pointers managed on the heap.
-    // By convention, the pointer referencing the original type is called the
-    // handle.
-    typedef PrioPRGSeed * PrioPRGSeedHandle;
 
-    PrioPRGSeedHandle PrioPRGSeed_new() {
-        return (PrioPRGSeedHandle) malloc(sizeof(PrioPRGSeed));
-    }
-
-    void PrioPRGSeed_cleanup(PrioPRGSeedHandle seed) {
-        free(seed);
-    }
+// The only way to generate a PRGSeed is to call randomize
+%typemap(in,numinputs=0) PrioPRGSeed * (PrioPRGSeed tmp) {
+    $1 = &tmp;
 }
-
-// The new type shares most syntax with the other typedefs.
-OPAQUE_POINTER(PrioPRGSeedHandle)
 
 %typemap(argout) PrioPRGSeed * {
-    $result = SWIG_Python_AppendOutput($result,PyLong_FromVoidPtr($1));
+    $result = SWIG_Python_AppendOutput($result,PyBytes_FromString((const char*)*$1));
 }
 
-// Get the original value from the handle when used as an argument
 %typemap(in) const PrioPRGSeed {
-    $1 = *(PrioPRGSeedHandle)PyLong_AsVoidPtr($input);
+    $1 = (unsigned char*)PyBytes_AsString($input);
 }
 
 

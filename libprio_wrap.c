@@ -3035,25 +3035,6 @@ static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
     #include "libprio/include/mprio.h"
 
 
-    // This is the original definition of the fixed sized buffer for the
-    // random seed.
-    //
-    //      typedef unsigned char PrioPRGSeed[]
-    //
-    // We treat all new complex types as opaque pointers managed on the heap.
-    // By convention, the pointer referencing the original type is called the
-    // handle.
-    typedef PrioPRGSeed * PrioPRGSeedHandle;
-
-    PrioPRGSeedHandle PrioPRGSeed_new() {
-        return (PrioPRGSeedHandle) malloc(sizeof(PrioPRGSeed));
-    }
-
-    void PrioPRGSeed_cleanup(PrioPRGSeedHandle seed) {
-        free(seed);
-    }
-
-
 SWIGINTERNINLINE PyObject*
   SWIG_From_int  (int value)
 {
@@ -3278,40 +3259,6 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
 #ifdef __cplusplus
 extern "C" {
 #endif
-SWIGINTERN PyObject *_wrap_PrioPRGSeed_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioPRGSeedHandle result;
-  
-  if (!PyArg_ParseTuple(args,(char *)":PrioPRGSeed_new")) SWIG_fail;
-  result = (PrioPRGSeedHandle)PrioPRGSeed_new();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_a_AES_128_KEY_LENGTH__unsigned_char, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioPRGSeed_cleanup(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioPRGSeedHandle arg1 = (PrioPRGSeedHandle) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioPRGSeed_cleanup",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_a_AES_128_KEY_LENGTH__unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PrioPRGSeed_cleanup" "', argument " "1"" of type '" "PrioPRGSeedHandle""'"); 
-  }
-  arg1 = (PrioPRGSeedHandle)(argp1);
-  PrioPRGSeed_cleanup((unsigned char (*)[AES_128_KEY_LENGTH])arg1);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_Prio_init(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   SECStatus result;
@@ -3733,17 +3680,13 @@ fail:
 SWIGINTERN PyObject *_wrap_PrioPRGSeed_randomize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   PrioPRGSeed *arg1 = (PrioPRGSeed *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
+  PrioPRGSeed tmp1 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioPRGSeed_randomize",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_a_AES_128_KEY_LENGTH__unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "PrioPRGSeed_randomize" "', argument " "1"" of type '" "PrioPRGSeed *""'"); 
+  {
+    arg1 = &tmp1;
   }
-  arg1 = (PrioPRGSeed *)(argp1);
+  if (!PyArg_ParseTuple(args,(char *)":PrioPRGSeed_randomize")) SWIG_fail;
   result = PrioPRGSeed_randomize((unsigned char (*)[AES_128_KEY_LENGTH])arg1);
   {
     if (result != SECSuccess) {
@@ -3754,7 +3697,7 @@ SWIGINTERN PyObject *_wrap_PrioPRGSeed_randomize(PyObject *SWIGUNUSEDPARM(self),
     Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyLong_FromVoidPtr(arg1));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyBytes_FromString((const char*)*arg1));
   }
   return resultobj;
 fail:
@@ -3789,7 +3732,7 @@ SWIGINTERN PyObject *_wrap_PrioServer_new(PyObject *SWIGUNUSEDPARM(self), PyObje
     arg3 = (PrivateKey)PyLong_AsVoidPtr(obj2);
   }
   {
-    arg4 = *(PrioPRGSeedHandle)PyLong_AsVoidPtr(obj3);
+    arg4 = (unsigned char*)PyBytes_AsString(obj3);
   }
   result = (PrioServer)PrioServer_new((struct prio_config const *)arg1,arg2,arg3,(unsigned char const (*))arg4);
   {
@@ -4417,8 +4360,6 @@ fail:
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
-	 { (char *)"PrioPRGSeed_new", _wrap_PrioPRGSeed_new, METH_VARARGS, NULL},
-	 { (char *)"PrioPRGSeed_cleanup", _wrap_PrioPRGSeed_cleanup, METH_VARARGS, NULL},
 	 { (char *)"Prio_init", _wrap_Prio_init, METH_VARARGS, NULL},
 	 { (char *)"Prio_clear", _wrap_Prio_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_new", _wrap_PrioConfig_new, METH_VARARGS, NULL},
@@ -4466,7 +4407,7 @@ static PyMethodDef SwigMethods[] = {
 static swig_type_info _swigt__p_PrioServerId = {"_p_PrioServerId", "enum PrioServerId *|PrioServerId *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_SECKEYPrivateKey = {"_p_SECKEYPrivateKey", "PrivateKey|SECKEYPrivateKey *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_SECKEYPublicKey = {"_p_SECKEYPublicKey", "SECKEYPublicKey *|PublicKey|const_PublicKey", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_a_AES_128_KEY_LENGTH__unsigned_char = {"_p_a_AES_128_KEY_LENGTH__unsigned_char", "PrioPRGSeedHandle|unsigned char (*)[AES_128_KEY_LENGTH]|PrioPRGSeed *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_a_AES_128_KEY_LENGTH__unsigned_char = {"_p_a_AES_128_KEY_LENGTH__unsigned_char", "unsigned char (*)[AES_128_KEY_LENGTH]|PrioPRGSeed *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_bool = {"_p_bool", "bool *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_msgpack_packer = {"_p_msgpack_packer", "msgpack_packer *", 0, 0, (void*)0, 0};

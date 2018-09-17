@@ -4,9 +4,6 @@
 
 from prio.lib import prio
 from array import array
-from pprint import pformat
-
-print(pformat(dir(prio)))
 
 skA, pkA = prio.Keypair_new(0, 0)
 skB, pkB = prio.Keypair_new(0, 0)
@@ -21,8 +18,7 @@ n_data = 133
 batch_id = b"test_batch"
 cfg = prio.PrioConfig_new(n_data, pkA, pkB, batch_id)
 
-server_secret = prio.PrioPRGSeed_new()
-server_secret = prio.PrioPRGSeed_randomize(server_secret)
+server_secret = prio.PrioPRGSeed_randomize()
 
 sA = prio.PrioServer_new(cfg, prio.PRIO_SERVER_A, skA, server_secret)
 sB = prio.PrioServer_new(cfg, prio.PRIO_SERVER_B, skB, server_secret)
@@ -89,5 +85,3 @@ prio.PrioTotalShare_clear(tB)
 prio.PrioServer_clear(sA)
 prio.PrioServer_clear(sB)
 prio.PrioConfig_clear(cfg)
-
-prio.PrioPRGSeed_cleanup(server_secret)

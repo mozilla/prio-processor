@@ -6,6 +6,11 @@ from .lib import prio
 from array import array
 
 # Serializable
+class PRGSeed:
+    def __init__(self):
+        self.instance = prio.PrioPRGSeed_randomize()
+
+# Serializable
 class Config:
     """An object that stores system parameters.
 
@@ -92,10 +97,11 @@ class Server:
             config.instance,
             server_id,
             private_key.instance,
-            secret)
+            secret.instance)
 
     def __del__(self):
-        prio.PrioServer_clear(self.instance)
+        if self.instance:
+            prio.PrioServer_clear(self.instance)
 
     def create_verifier(self, data):
         return Verifier(self, data)

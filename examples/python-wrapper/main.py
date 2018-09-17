@@ -13,8 +13,7 @@ n_data = 133
 batch_id = b"test_batch"
 cfg = prio.Config(n_data, pkA, pkB, batch_id)
 
-server_secret = libprio.PrioPRGSeed_new()
-server_secret = libprio.PrioPRGSeed_randomize(server_secret)
+server_secret = prio.PRGSeed()
 
 sA = prio.Server(cfg, libprio.PRIO_SERVER_A, skA, server_secret)
 sB = prio.Server(cfg, libprio.PRIO_SERVER_B, skB, server_secret)
