@@ -5,6 +5,10 @@
 from .lib import prio
 from array import array
 
+# re-export enums
+PRIO_SERVER_A = prio.PRIO_SERVER_A
+PRIO_SERVER_B = prio.PRIO_SERVER_B
+
 # Serializable
 class PRGSeed:
     def __init__(self):

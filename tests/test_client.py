@@ -3,19 +3,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-import prio
+from prio import prio
 
+@pytest.mark.parametrize("n_clients", [1, 2, 10])
 def test_client_agg(n_clients):
-    seed = None
+    seed = prio.PRGSeed()
 
-    skA, pkA = prio.Keypair()
-    skA, pkA = prio.Keypair()
+    skA, pkA = prio.create_keypair()
+    skB, pkB = prio.create_keypair()
 
     # the config is shared across all actors
     config = prio.Config(133, pkA, pkB, b"test_batch")
 
-    server_a = prio.Server(config, prio.PRIO_SERVER_A, skA, seed)
-    server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, seed)
+    sA = prio.Server(config, prio.PRIO_SERVER_A, skA, seed)
+    sB = prio.Server(config, prio.PRIO_SERVER_B, skB, seed)
 
     client = prio.Client(config)
 
@@ -25,18 +26,28 @@ def test_client_agg(n_clients):
     for i in range(n_clients):
         for_server_a, for_server_b = client.encode(data_items)
 
-        server_a.set_data(for_server_a)
-        server_b.set_data(for_server_b)
+        # Setup verification
+        vA = sA.create_verifier(for_server_a)
+        vB = sB.create_verifier(for_server_b)
 
-        # gossip and verify data is valid
+        # Produce a packet1 and send to the other party
+        p1A = vA.create_verify1()
+        p1B = vB.create_verify1()
 
-        server_a.aggregate()
-        server_b.aggregate()
+        # Produce packet2 and send to the other party
+        p2A = vA.create_verify2(p1A, p1B)
+        p2B = vB.create_verify2(p1A, p1B)
 
-    t_a = server_a.total_shares()
-    t_b = server_b.total_shares()
+        assert vA.is_valid(p2A, p2B)
+        assert vB.is_valid(p2A, p2B)
 
-    output = prio.aggregate_shares(config, t_a, t_b)
+        sA.aggregate(vA)
+        sB.aggregate(vB)
+
+    t_a = sA.total_shares()
+    t_b = sB.total_shares()
+
+    output = prio.total_share_final(config, t_a, t_b)
 
     expected = [item*n_clients for item in list(data_items)]
     assert(list(output) == expected)
