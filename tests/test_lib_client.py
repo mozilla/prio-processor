@@ -9,10 +9,7 @@ import array
 
 @pytest.mark.parametrize("n_clients", [1, 2, 10])
 def test_client_agg(n_clients):
-    prio.Prio_init()
-
-    seed = prio.PrioPRGSeed_new()
-    seed = prio.PrioPRGSeed_randomize(seed)
+    seed = prio.PrioPRGSeed_randomize()
 
     skA, pkA = prio.Keypair_new(0, 0)
     skB, pkB = prio.Keypair_new(0, 0)

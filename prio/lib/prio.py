@@ -95,14 +95,6 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
-
-def PrioPRGSeed_new():
-    return _prio.PrioPRGSeed_new()
-PrioPRGSeed_new = _prio.PrioPRGSeed_new
-
-def PrioPRGSeed_cleanup(seed):
-    return _prio.PrioPRGSeed_cleanup(seed)
-PrioPRGSeed_cleanup = _prio.PrioPRGSeed_cleanup
 CURVE25519_KEY_LEN = _prio.CURVE25519_KEY_LEN
 CURVE25519_KEY_LEN_HEX = _prio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _prio.PRIO_SERVER_A
@@ -164,8 +156,8 @@ def PrioClient_encode(cfg, data_in):
     return _prio.PrioClient_encode(cfg, data_in)
 PrioClient_encode = _prio.PrioClient_encode
 
-def PrioPRGSeed_randomize(seed):
-    return _prio.PrioPRGSeed_randomize(seed)
+def PrioPRGSeed_randomize():
+    return _prio.PrioPRGSeed_randomize()
 PrioPRGSeed_randomize = _prio.PrioPRGSeed_randomize
 
 def PrioServer_new(cfg, server_idx, server_priv, server_shared_secret):
