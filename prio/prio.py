@@ -97,6 +97,7 @@ class Server:
         :param private_key: The server's private key used for decryption
         :param secret: The shared random seed
         """
+        self.server_id = server_id
         self.instance = prio.PrioServer_new(
             config.instance,
             server_id,
