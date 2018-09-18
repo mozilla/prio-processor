@@ -3510,21 +3510,17 @@ SWIGINTERN PyObject *_wrap_PublicKey_export(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *resultobj = 0;
   const_PublicKey arg1 = (const_PublicKey) 0 ;
   unsigned char *arg2 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
+  unsigned char tmp2[32] ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_export",&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = tmp2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_export",&obj0)) SWIG_fail;
   {
     arg1 = (const_PublicKey)PyLong_AsVoidPtr(obj0);
   }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PublicKey_export" "', argument " "2"" of type '" "unsigned char [32]""'"); 
-  } 
-  arg2 = (unsigned char *)(argp2);
   result = PublicKey_export((SECKEYPublicKey const *)arg1,arg2);
   {
     if (result != SECSuccess) {
@@ -3533,6 +3529,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_export(PyObject *SWIGUNUSEDPARM(self), PyOb
     }
     resultobj = Py_None;
     Py_INCREF(resultobj);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj,
+      PyByteArray_FromStringAndSize((const char*)arg2, 32)
+      );
   }
   return resultobj;
 fail:
@@ -3544,21 +3546,17 @@ SWIGINTERN PyObject *_wrap_PublicKey_export_hex(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *resultobj = 0;
   const_PublicKey arg1 = (const_PublicKey) 0 ;
   unsigned char *arg2 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
+  unsigned char tmp2[64+1] ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_export_hex",&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = tmp2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_export_hex",&obj0)) SWIG_fail;
   {
     arg1 = (const_PublicKey)PyLong_AsVoidPtr(obj0);
   }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PublicKey_export_hex" "', argument " "2"" of type '" "unsigned char [64+1]""'"); 
-  } 
-  arg2 = (unsigned char *)(argp2);
   result = PublicKey_export_hex((SECKEYPublicKey const *)arg1,arg2);
   {
     if (result != SECSuccess) {
@@ -3567,6 +3565,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_export_hex(PyObject *SWIGUNUSEDPARM(self), 
     }
     resultobj = Py_None;
     Py_INCREF(resultobj);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj,
+      PyByteArray_FromStringAndSize((const char*)arg2, 64+1)
+      );
   }
   return resultobj;
 fail:
@@ -3730,6 +3734,12 @@ SWIGINTERN PyObject *_wrap_PrioServer_new(PyObject *SWIGUNUSEDPARM(self), PyObje
   result = (PrioServer)PrioServer_new((struct prio_config const *)arg1,arg2,arg3,(unsigned char const (*))arg4);
   {
     resultobj = PyLong_FromVoidPtr(result);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj,
+      PyByteArray_FromStringAndSize((const char*)arg4, AES_128_KEY_LENGTH)
+      );
   }
   return resultobj;
 fail:

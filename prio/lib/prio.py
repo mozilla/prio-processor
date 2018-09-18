@@ -136,12 +136,12 @@ def PublicKey_import_hex(hex_data):
     return _prio.PublicKey_import_hex(hex_data)
 PublicKey_import_hex = _prio.PublicKey_import_hex
 
-def PublicKey_export(pk, data):
-    return _prio.PublicKey_export(pk, data)
+def PublicKey_export(pk):
+    return _prio.PublicKey_export(pk)
 PublicKey_export = _prio.PublicKey_export
 
-def PublicKey_export_hex(pk, data):
-    return _prio.PublicKey_export_hex(pk, data)
+def PublicKey_export_hex(pk):
+    return _prio.PublicKey_export_hex(pk)
 PublicKey_export_hex = _prio.PublicKey_export_hex
 
 def PublicKey_clear(pubkey):
