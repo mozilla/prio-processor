@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from prio import prio
-from prio.lib import prio as libprio
 import sys
 
 skA, pkA = prio.create_keypair()
@@ -15,8 +14,8 @@ cfg = prio.Config(n_data, pkA, pkB, batch_id)
 
 server_secret = prio.PRGSeed()
 
-sA = prio.Server(cfg, libprio.PRIO_SERVER_A, skA, server_secret)
-sB = prio.Server(cfg, libprio.PRIO_SERVER_B, skB, server_secret)
+sA = prio.Server(cfg, prio.PRIO_SERVER_A, skA, server_secret)
+sB = prio.Server(cfg, prio.PRIO_SERVER_B, skB, server_secret)
 
 client = prio.Client(cfg)
 
