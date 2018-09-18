@@ -4,6 +4,7 @@
 
 import asyncio
 import logging
+import random
 import sys
 from collections import namedtuple
 
@@ -20,10 +21,14 @@ PACKET_VERIFY_2 = 2
 Packet = namedtuple("Packet", ["id", "type", "data"])
 
 async def server_consume(server, read_queue, write_queue):
-    # maintain state for verification
+    # maintain state of the server's shares in the verifier, along with the
+    # generated verification packets
     cache = {}
 
     while True:
+        # add random jitter to simulate io
+        await asyncio.sleep(random.random())
+
         packet = await read_queue.get()
         pid = packet.id
         v, p1, p2 = cache.get(pid, (None, None, None))
@@ -31,16 +36,28 @@ async def server_consume(server, read_queue, write_queue):
         def log(line):
              logger.info("Server {}, PID {}: {}".format(server.server_id, pid, line))
 
+        
+        # out of order packet execution is dealt with by pushing data back
+        # into the queue
+
         if packet.type == PACKET_DATA:
             log("Generate verify packet 1")
             v = server.create_verifier(packet.data)
             p1 = v.create_verify1()
             await write_queue.put(Packet(id=pid, type=PACKET_VERIFY_1, data=p1))
         elif packet.type == PACKET_VERIFY_1:
+            if not p1:
+                await read_queue.put(packet)
+                read_queue.task_done()
+                continue
             log("Generate verify packet 2")
             p2 = v.create_verify2(p1, packet.data)
             await write_queue.put(Packet(id=pid, type=PACKET_VERIFY_2, data=p2))
         elif packet.type == PACKET_VERIFY_2:
+            if not p2:
+                await read_queue.put(packet)
+                read_queue.task_done()
+                continue
             if v.is_valid(p2, packet.data):
                 log("Aggregate data")
                 server.aggregate(v)
@@ -58,6 +75,7 @@ async def client_produce(client, data_items, queue_a, queue_b, n_clients):
         for_server_a, for_server_b = client.encode(data_items)
         await queue_a.put(Packet(id=i, type=PACKET_DATA, data=for_server_a))
         await queue_b.put(Packet(id=i, type=PACKET_DATA, data=for_server_b))
+
 
 async def main():
     n_clients = 10
