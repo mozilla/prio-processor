@@ -2430,25 +2430,22 @@ SWIG_Python_ConvertFunctionPtr(PyObject *obj, void **ptr, swig_type_info *ty) {
     return SWIG_ConvertPtr(obj, ptr, ty, 0);
   } else {
     void *vptr = 0;
-    
+    swig_cast_info *tc;
+
     /* here we get the method pointer for callbacks */
     const char *doc = (((PyCFunctionObject *)obj) -> m_ml -> ml_doc);
     const char *desc = doc ? strstr(doc, "swig_ptr: ") : 0;
     if (desc)
       desc = ty ? SWIG_UnpackVoidPtr(desc + 10, &vptr, ty->name) : 0;
-    if (!desc) 
+    if (!desc)
       return SWIG_ERROR;
-    if (ty) {
-      swig_cast_info *tc = SWIG_TypeCheck(desc,ty);
-      if (tc) {
-        int newmemory = 0;
-        *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
-        assert(!newmemory); /* newmemory handling not yet implemented */
-      } else {
-        return SWIG_ERROR;
-      }
+    tc = SWIG_TypeCheck(desc,ty);
+    if (tc) {
+      int newmemory = 0;
+      *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
+      assert(!newmemory); /* newmemory handling not yet implemented */
     } else {
-      *ptr = vptr;
+      return SWIG_ERROR;
     }
     return SWIG_OK;
   }
@@ -3401,17 +3398,15 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
   PublicKey *arg2 = (PublicKey *) 0 ;
   void *tmp1 ;
   void *tmp2 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Keypair_new",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PrivateKey*)&tmp1;
   }
   {
     arg2 = (PublicKey*)&tmp2;
   }
+  if (!PyArg_ParseTuple(args,(char *)":Keypair_new")) SWIG_fail;
   result = Keypair_new(arg1,arg2);
   {
     if (result != SECSuccess) {
@@ -3440,20 +3435,19 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
   unsigned int arg3 ;
   void *tmp1 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_import",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PublicKey*)&tmp1;
   }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj1)) {
+    if (!PyString_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj1);
-    arg3 = (unsigned int) PyString_Size(obj1);
+    arg2 = (unsigned char*) PyString_AsString(obj0);
+    arg3 = (unsigned int) PyString_Size(obj0);
   }
   result = PublicKey_import(arg1,(unsigned char const *)arg2,arg3);
   {
@@ -3480,20 +3474,19 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
   unsigned int arg3 ;
   void *tmp1 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_import_hex",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PublicKey*)&tmp1;
   }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import_hex",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj1)) {
+    if (!PyString_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj1);
-    arg3 = (unsigned int) PyString_Size(obj1);
+    arg2 = (unsigned char*) PyString_AsString(obj0);
+    arg3 = (unsigned int) PyString_Size(obj0);
   }
   result = PublicKey_import_hex(arg1,(unsigned char const *)arg2,arg3);
   {
@@ -5030,9 +5023,9 @@ extern "C" {
             char *ndoc = (char*)malloc(ldoc + lptr + 10);
             if (ndoc) {
               char *buff = ndoc;
-              strncpy(buff, methods[i].ml_doc, ldoc);
+              memcpy(buff, methods[i].ml_doc, ldoc);
               buff += ldoc;
-              strncpy(buff, "swig_ptr: ", 10);
+              memcpy(buff, "swig_ptr: ", 10);
               buff += 10;
               SWIG_PackVoidPtr(buff, ptr, ty->name, lptr);
               methods[i].ml_doc = ndoc;

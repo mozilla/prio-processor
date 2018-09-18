@@ -41,7 +41,7 @@
     }
 
     // Create a temporary stack variable for allocating a new opaque pointer
-    %typemap(in) T* (void *tmp) {
+    %typemap(in,numinputs=0) T* (void *tmp) {
         $1 = (T*)&tmp;
     }
 

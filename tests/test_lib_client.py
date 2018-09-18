@@ -11,8 +11,8 @@ import array
 def test_client_agg(n_clients):
     seed = prio.PrioPRGSeed_randomize()
 
-    skA, pkA = prio.Keypair_new(0, 0)
-    skB, pkB = prio.Keypair_new(0, 0)
+    skA, pkA = prio.Keypair_new()
+    skB, pkB = prio.Keypair_new()
     cfg = prio.PrioConfig_new(133, pkA, pkB, b"test_batch")
     sA = prio.PrioServer_new(cfg, prio.PRIO_SERVER_A, skA, seed)
     sB = prio.PrioServer_new(cfg, prio.PRIO_SERVER_B, skB, seed)

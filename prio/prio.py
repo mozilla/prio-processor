@@ -173,7 +173,7 @@ class TotalShare:
 
 
 def create_keypair():
-    secret, public = prio.Keypair_new(0, 0)
+    secret, public = prio.Keypair_new()
     return PrivateKey(secret), PublicKey(public)
 
 def total_share_final(config, tA, tB):
