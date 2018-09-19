@@ -100,7 +100,7 @@ OPAQUE_POINTER(PrivateKey)
     $1 = tmp;
 }
 
-%typemap(argout) unsigned char [ANY] {
+%typemap(argout) unsigned char data[ANY] {
     $result = SWIG_Python_AppendOutput(
         $result,
         PyByteArray_FromStringAndSize((const char*)$1, $1_dim0)
