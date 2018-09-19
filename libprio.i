@@ -41,7 +41,7 @@
     }
 
     // Create a temporary stack variable for allocating a new opaque pointer
-    %typemap(in) T* (void *tmp) {
+    %typemap(in,numinputs=0) T* (void *tmp) {
         $1 = (T*)&tmp;
     }
 
@@ -92,6 +92,19 @@ OPAQUE_POINTER(PrivateKey)
     (const unsigned char * batch_id, unsigned int batch_id_len),
     (const unsigned char *data, unsigned int dataLen),
     (const unsigned char *hex_data, unsigned int dataLen)
+}
+
+
+// PublicKey_export
+%typemap(in,numinputs=0) unsigned char data[ANY] (unsigned char tmp[$1_dim0]) {
+    $1 = tmp;
+}
+
+%typemap(argout) unsigned char data[ANY] {
+    $result = SWIG_Python_AppendOutput(
+        $result,
+        PyByteArray_FromStringAndSize((const char*)$1, $1_dim0)
+    );
 }
 
 

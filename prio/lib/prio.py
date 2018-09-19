@@ -124,24 +124,24 @@ def PrioConfig_newTest(n_fields):
     return _prio.PrioConfig_newTest(n_fields)
 PrioConfig_newTest = _prio.PrioConfig_newTest
 
-def Keypair_new(pvtkey, pubkey):
-    return _prio.Keypair_new(pvtkey, pubkey)
+def Keypair_new():
+    return _prio.Keypair_new()
 Keypair_new = _prio.Keypair_new
 
-def PublicKey_import(pk, data):
-    return _prio.PublicKey_import(pk, data)
+def PublicKey_import(data):
+    return _prio.PublicKey_import(data)
 PublicKey_import = _prio.PublicKey_import
 
-def PublicKey_import_hex(pk, hex_data):
-    return _prio.PublicKey_import_hex(pk, hex_data)
+def PublicKey_import_hex(hex_data):
+    return _prio.PublicKey_import_hex(hex_data)
 PublicKey_import_hex = _prio.PublicKey_import_hex
 
-def PublicKey_export(pk, data):
-    return _prio.PublicKey_export(pk, data)
+def PublicKey_export(pk):
+    return _prio.PublicKey_export(pk)
 PublicKey_export = _prio.PublicKey_export
 
-def PublicKey_export_hex(pk, data):
-    return _prio.PublicKey_export_hex(pk, data)
+def PublicKey_export_hex(pk):
+    return _prio.PublicKey_export_hex(pk)
 PublicKey_export_hex = _prio.PublicKey_export_hex
 
 def PublicKey_clear(pubkey):

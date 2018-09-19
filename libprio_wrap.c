@@ -3401,17 +3401,15 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
   PublicKey *arg2 = (PublicKey *) 0 ;
   void *tmp1 ;
   void *tmp2 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Keypair_new",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PrivateKey*)&tmp1;
   }
   {
     arg2 = (PublicKey*)&tmp2;
   }
+  if (!PyArg_ParseTuple(args,(char *)":Keypair_new")) SWIG_fail;
   result = Keypair_new(arg1,arg2);
   {
     if (result != SECSuccess) {
@@ -3440,20 +3438,19 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
   unsigned int arg3 ;
   void *tmp1 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_import",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PublicKey*)&tmp1;
   }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj1)) {
+    if (!PyString_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj1);
-    arg3 = (unsigned int) PyString_Size(obj1);
+    arg2 = (unsigned char*) PyString_AsString(obj0);
+    arg3 = (unsigned int) PyString_Size(obj0);
   }
   result = PublicKey_import(arg1,(unsigned char const *)arg2,arg3);
   {
@@ -3480,20 +3477,19 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
   unsigned int arg3 ;
   void *tmp1 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_import_hex",&obj0,&obj1)) SWIG_fail;
   {
     arg1 = (PublicKey*)&tmp1;
   }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import_hex",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj1)) {
+    if (!PyString_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj1);
-    arg3 = (unsigned int) PyString_Size(obj1);
+    arg2 = (unsigned char*) PyString_AsString(obj0);
+    arg3 = (unsigned int) PyString_Size(obj0);
   }
   result = PublicKey_import_hex(arg1,(unsigned char const *)arg2,arg3);
   {
@@ -3517,21 +3513,17 @@ SWIGINTERN PyObject *_wrap_PublicKey_export(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *resultobj = 0;
   const_PublicKey arg1 = (const_PublicKey) 0 ;
   unsigned char *arg2 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
+  unsigned char tmp2[32] ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_export",&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = tmp2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_export",&obj0)) SWIG_fail;
   {
     arg1 = (const_PublicKey)PyLong_AsVoidPtr(obj0);
   }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PublicKey_export" "', argument " "2"" of type '" "unsigned char [32]""'"); 
-  } 
-  arg2 = (unsigned char *)(argp2);
   result = PublicKey_export((SECKEYPublicKey const *)arg1,arg2);
   {
     if (result != SECSuccess) {
@@ -3540,6 +3532,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_export(PyObject *SWIGUNUSEDPARM(self), PyOb
     }
     resultobj = Py_None;
     Py_INCREF(resultobj);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj,
+      PyByteArray_FromStringAndSize((const char*)arg2, 32)
+      );
   }
   return resultobj;
 fail:
@@ -3551,21 +3549,17 @@ SWIGINTERN PyObject *_wrap_PublicKey_export_hex(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *resultobj = 0;
   const_PublicKey arg1 = (const_PublicKey) 0 ;
   unsigned char *arg2 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
+  unsigned char tmp2[64+1] ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:PublicKey_export_hex",&obj0,&obj1)) SWIG_fail;
+  {
+    arg2 = tmp2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_export_hex",&obj0)) SWIG_fail;
   {
     arg1 = (const_PublicKey)PyLong_AsVoidPtr(obj0);
   }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PublicKey_export_hex" "', argument " "2"" of type '" "unsigned char [64+1]""'"); 
-  } 
-  arg2 = (unsigned char *)(argp2);
   result = PublicKey_export_hex((SECKEYPublicKey const *)arg1,arg2);
   {
     if (result != SECSuccess) {
@@ -3574,6 +3568,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_export_hex(PyObject *SWIGUNUSEDPARM(self), 
     }
     resultobj = Py_None;
     Py_INCREF(resultobj);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj,
+      PyByteArray_FromStringAndSize((const char*)arg2, 64+1)
+      );
   }
   return resultobj;
 fail:
