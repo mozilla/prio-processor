@@ -53,22 +53,32 @@ class PublicKey:
     def __del__(self):
         if self.instance:
             prio.PublicKey_clear(self.instance)
+    
+    def import_bin(self, data):
+        """Import a curve25519 key from a raw byte string.
 
-    def import_key(self, data):
-        # PublicKey_import
-        raise NotImplementedError
+        :param data: a bytestring of length `CURVE25519_KEY_LEN`
+        """
+        self.instance = prio.PublicKey_import(data)
 
     def import_hex(self, data):
-        # PublicKey_import_hex
-        raise NotImplementedError
+        """Import a curve25519 key from a case-insenstive hex string.
 
-    def export(self, data):
-        # PublicKey_export
-        raise NotImplementedError
+        :param data: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
+        """
+        self.instance = prio.PublicKey_import_hex(data)
+
+    def export_bin(self):
+        """Export a curve25519 public key as a bytestring."""
+        if not self.instance:
+            return None
+        return prio.PublicKey_export(self.instance)
 
     def export_hex(self):
-        # PublicKey_export_hex
-        raise NotImplementedError
+        """Export a curve25519 public key as a NULL-terminated hex bytestring."""
+        if not self.instance:
+            return None
+        return prio.PublicKey_export_hex(self.instance)
 
 
 class PrivateKey:
