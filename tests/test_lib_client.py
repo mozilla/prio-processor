@@ -55,3 +55,11 @@ def test_client_agg(n_clients):
     prio.PrioServer_clear(sA)
     prio.PrioServer_clear(sB)
     prio.PrioConfig_clear(cfg)
+
+
+def test_publickey_export():
+    raw_bytes = bytearray((3*x + 7) % 0xFF for x in range(prio.CURVE25519_KEY_LEN))
+    pubkey = prio.PublicKey_import(raw_bytes)
+    raw_bytes2 = prio.PublicKey_export(pubkey)
+
+    assert raw_bytes == raw_bytes2
