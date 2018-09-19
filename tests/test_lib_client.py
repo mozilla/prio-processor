@@ -58,7 +58,7 @@ def test_client_agg(n_clients):
 
 
 def test_publickey_export():
-    raw_bytes = bytearray((3*x + 7) % 0xFF for x in range(prio.CURVE25519_KEY_LEN))
+    raw_bytes = bytes((3*x + 7) % 0xFF for x in range(prio.CURVE25519_KEY_LEN))
     pubkey = prio.PublicKey_import(raw_bytes)
     raw_bytes2 = prio.PublicKey_export(pubkey)
 
