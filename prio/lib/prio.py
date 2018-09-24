@@ -95,6 +95,18 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
+
+def PrioPacketVerify1_write_wrapper(p):
+    return _prio.PrioPacketVerify1_write_wrapper(p)
+PrioPacketVerify1_write_wrapper = _prio.PrioPacketVerify1_write_wrapper
+
+def PrioPacketVerify2_write_wrapper(p):
+    return _prio.PrioPacketVerify2_write_wrapper(p)
+PrioPacketVerify2_write_wrapper = _prio.PrioPacketVerify2_write_wrapper
+
+def PrioTotalShare_write_wrapper(p):
+    return _prio.PrioTotalShare_write_wrapper(p)
+PrioTotalShare_write_wrapper = _prio.PrioTotalShare_write_wrapper
 CURVE25519_KEY_LEN = _prio.CURVE25519_KEY_LEN
 CURVE25519_KEY_LEN_HEX = _prio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _prio.PRIO_SERVER_A

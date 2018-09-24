@@ -165,6 +165,42 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 
+// Define wrapper functions for msgpacker_packer due to the dynamically allocated sbuffer.
+// Memory shouldn't be moving around so much, but this wrapper function needs to exist in
+// order to marshal data due to typemaps not having side-effects
+
+%apply (unsigned char **, unsigned int *) {
+    (unsigned char ** data, unsigned int * len)
+}
+
+%define MSGPACK_WRITE_WRAPPER(type)
+%inline %{
+SECStatus type ## _write_wrapper(const_ ## type p, unsigned char** data, unsigned int* len) {
+    msgpack_sbuffer sbuf;
+    msgpack_packer pk;
+    msgpack_sbuffer_init(&sbuf);
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    SECStatus rv = type ##_write(p, &pk);
+
+    // move the data outside of this wrapper
+    data = malloc(sbuf.size);
+    memcpy(data, sbuf.data, sbuf.size);
+    *len = sbuf.size;
+
+    // free msgpacker data-structures
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return rv;
+}
+%}
+%enddef
+
+MSGPACK_WRITE_WRAPPER(PrioPacketVerify1)
+MSGPACK_WRITE_WRAPPER(PrioPacketVerify2)
+MSGPACK_WRITE_WRAPPER(PrioTotalShare)
+
+
 %include "libprio/include/mprio.h"
 
 

@@ -2430,25 +2430,22 @@ SWIG_Python_ConvertFunctionPtr(PyObject *obj, void **ptr, swig_type_info *ty) {
     return SWIG_ConvertPtr(obj, ptr, ty, 0);
   } else {
     void *vptr = 0;
-    
+    swig_cast_info *tc;
+
     /* here we get the method pointer for callbacks */
     const char *doc = (((PyCFunctionObject *)obj) -> m_ml -> ml_doc);
     const char *desc = doc ? strstr(doc, "swig_ptr: ") : 0;
     if (desc)
       desc = ty ? SWIG_UnpackVoidPtr(desc + 10, &vptr, ty->name) : 0;
-    if (!desc) 
+    if (!desc)
       return SWIG_ERROR;
-    if (ty) {
-      swig_cast_info *tc = SWIG_TypeCheck(desc,ty);
-      if (tc) {
-        int newmemory = 0;
-        *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
-        assert(!newmemory); /* newmemory handling not yet implemented */
-      } else {
-        return SWIG_ERROR;
-      }
+    tc = SWIG_TypeCheck(desc,ty);
+    if (tc) {
+      int newmemory = 0;
+      *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
+      assert(!newmemory); /* newmemory handling not yet implemented */
     } else {
-      *ptr = vptr;
+      return SWIG_ERROR;
     }
     return SWIG_OK;
   }
@@ -3035,6 +3032,66 @@ static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
     #include "libprio/include/mprio.h"
 
 
+SECStatus PrioPacketVerify1_write_wrapper(const_PrioPacketVerify1 p, unsigned char** data, unsigned int* len) {
+    msgpack_sbuffer sbuf;
+    msgpack_packer pk;
+    msgpack_sbuffer_init(&sbuf);
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    SECStatus rv = PrioPacketVerify1_write(p, &pk);
+
+    // move the data outside of this wrapper
+    data = malloc(sbuf.size);
+    memcpy(data, sbuf.data, sbuf.size);
+    *len = sbuf.size;
+
+    // free msgpacker data-structures
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return rv;
+}
+
+
+SECStatus PrioPacketVerify2_write_wrapper(const_PrioPacketVerify2 p, unsigned char** data, unsigned int* len) {
+    msgpack_sbuffer sbuf;
+    msgpack_packer pk;
+    msgpack_sbuffer_init(&sbuf);
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    SECStatus rv = PrioPacketVerify2_write(p, &pk);
+
+    // move the data outside of this wrapper
+    data = malloc(sbuf.size);
+    memcpy(data, sbuf.data, sbuf.size);
+    *len = sbuf.size;
+
+    // free msgpacker data-structures
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return rv;
+}
+
+
+SECStatus PrioTotalShare_write_wrapper(const_PrioTotalShare p, unsigned char** data, unsigned int* len) {
+    msgpack_sbuffer sbuf;
+    msgpack_packer pk;
+    msgpack_sbuffer_init(&sbuf);
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    SECStatus rv = PrioTotalShare_write(p, &pk);
+
+    // move the data outside of this wrapper
+    data = malloc(sbuf.size);
+    memcpy(data, sbuf.data, sbuf.size);
+    *len = sbuf.size;
+
+    // free msgpacker data-structures
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return rv;
+}
+
+
 SWIGINTERNINLINE PyObject*
   SWIG_From_int  (int value)
 {
@@ -3259,6 +3316,123 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
 #ifdef __cplusplus
 extern "C" {
 #endif
+SWIGINTERN PyObject *_wrap_PrioPacketVerify1_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  const_PrioPacketVerify1 arg1 = (const_PrioPacketVerify1) 0 ;
+  unsigned char **arg2 = (unsigned char **) 0 ;
+  unsigned int *arg3 = (unsigned int *) 0 ;
+  unsigned char *data2 = NULL ;
+  unsigned int len2 = 0 ;
+  PyObject * obj0 = 0 ;
+  SECStatus result;
+  
+  {
+    arg2 = &data2;
+    arg3 = &len2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify1_write_wrapper",&obj0)) SWIG_fail;
+  {
+    arg1 = (const_PrioPacketVerify1)PyLong_AsVoidPtr(obj0);
+  }
+  result = PrioPacketVerify1_write_wrapper((struct prio_packet_verify1 const *)arg1,arg2,arg3);
+  {
+    if (result != SECSuccess) {
+      PyErr_SetFromErrno(PyExc_RuntimeError);
+      SWIG_fail;
+    }
+    resultobj = Py_None;
+    Py_INCREF(resultobj);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj, PyByteArray_FromStringAndSize((const char *)*arg2, *arg3));
+    // Free malloc'ed data from within PrioClient_encode
+    if (*arg2) free(*arg2);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PrioPacketVerify2_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  const_PrioPacketVerify2 arg1 = (const_PrioPacketVerify2) 0 ;
+  unsigned char **arg2 = (unsigned char **) 0 ;
+  unsigned int *arg3 = (unsigned int *) 0 ;
+  unsigned char *data2 = NULL ;
+  unsigned int len2 = 0 ;
+  PyObject * obj0 = 0 ;
+  SECStatus result;
+  
+  {
+    arg2 = &data2;
+    arg3 = &len2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify2_write_wrapper",&obj0)) SWIG_fail;
+  {
+    arg1 = (const_PrioPacketVerify2)PyLong_AsVoidPtr(obj0);
+  }
+  result = PrioPacketVerify2_write_wrapper((struct prio_packet_verify2 const *)arg1,arg2,arg3);
+  {
+    if (result != SECSuccess) {
+      PyErr_SetFromErrno(PyExc_RuntimeError);
+      SWIG_fail;
+    }
+    resultobj = Py_None;
+    Py_INCREF(resultobj);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj, PyByteArray_FromStringAndSize((const char *)*arg2, *arg3));
+    // Free malloc'ed data from within PrioClient_encode
+    if (*arg2) free(*arg2);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PrioTotalShare_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  const_PrioTotalShare arg1 = (const_PrioTotalShare) 0 ;
+  unsigned char **arg2 = (unsigned char **) 0 ;
+  unsigned int *arg3 = (unsigned int *) 0 ;
+  unsigned char *data2 = NULL ;
+  unsigned int len2 = 0 ;
+  PyObject * obj0 = 0 ;
+  SECStatus result;
+  
+  {
+    arg2 = &data2;
+    arg3 = &len2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioTotalShare_write_wrapper",&obj0)) SWIG_fail;
+  {
+    arg1 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj0);
+  }
+  result = PrioTotalShare_write_wrapper((struct prio_total_share const *)arg1,arg2,arg3);
+  {
+    if (result != SECSuccess) {
+      PyErr_SetFromErrno(PyExc_RuntimeError);
+      SWIG_fail;
+    }
+    resultobj = Py_None;
+    Py_INCREF(resultobj);
+  }
+  {
+    resultobj = SWIG_Python_AppendOutput(
+      resultobj, PyByteArray_FromStringAndSize((const char *)*arg2, *arg3));
+    // Free malloc'ed data from within PrioClient_encode
+    if (*arg2) free(*arg2);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_Prio_init(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   SECStatus result;
@@ -4360,6 +4534,9 @@ fail:
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
+	 { (char *)"PrioPacketVerify1_write_wrapper", _wrap_PrioPacketVerify1_write_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify2_write_wrapper", _wrap_PrioPacketVerify2_write_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioTotalShare_write_wrapper", _wrap_PrioTotalShare_write_wrapper, METH_VARARGS, NULL},
 	 { (char *)"Prio_init", _wrap_Prio_init, METH_VARARGS, NULL},
 	 { (char *)"Prio_clear", _wrap_Prio_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_new", _wrap_PrioConfig_new, METH_VARARGS, NULL},
@@ -4416,10 +4593,10 @@ static swig_type_info _swigt__p_p_SECKEYPrivateKey = {"_p_p_SECKEYPrivateKey", "
 static swig_type_info _swigt__p_p_SECKEYPublicKey = {"_p_p_SECKEYPublicKey", "PublicKey *|SECKEYPublicKey **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_unsigned_char = {"_p_p_unsigned_char", "unsigned char **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_prio_config = {"_p_prio_config", "struct prio_config *|PrioConfig|const_PrioConfig", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_prio_packet_verify1 = {"_p_prio_packet_verify1", "PrioPacketVerify1|const_PrioPacketVerify1|struct prio_packet_verify1 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_prio_packet_verify2 = {"_p_prio_packet_verify2", "PrioPacketVerify2|const_PrioPacketVerify2|struct prio_packet_verify2 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_prio_packet_verify1 = {"_p_prio_packet_verify1", "const_PrioPacketVerify1|PrioPacketVerify1|struct prio_packet_verify1 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_prio_packet_verify2 = {"_p_prio_packet_verify2", "const_PrioPacketVerify2|PrioPacketVerify2|struct prio_packet_verify2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_prio_server = {"_p_prio_server", "PrioServer|const_PrioServer|struct prio_server *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_prio_total_share = {"_p_prio_total_share", "PrioTotalShare|const_PrioTotalShare|struct prio_total_share *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_prio_total_share = {"_p_prio_total_share", "const_PrioTotalShare|PrioTotalShare|struct prio_total_share *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_prio_verifier = {"_p_prio_verifier", "struct prio_verifier *|PrioVerifier|const_PrioVerifier", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *", 0, 0, (void*)0, 0};
@@ -5030,9 +5207,9 @@ extern "C" {
             char *ndoc = (char*)malloc(ldoc + lptr + 10);
             if (ndoc) {
               char *buff = ndoc;
-              strncpy(buff, methods[i].ml_doc, ldoc);
+              memcpy(buff, methods[i].ml_doc, ldoc);
               buff += ldoc;
-              strncpy(buff, "swig_ptr: ", 10);
+              memcpy(buff, "swig_ptr: ", 10);
               buff += 10;
               SWIG_PackVoidPtr(buff, ptr, ty->name, lptr);
               methods[i].ml_doc = ndoc;
