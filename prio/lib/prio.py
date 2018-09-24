@@ -107,6 +107,18 @@ PrioPacketVerify2_write_wrapper = _prio.PrioPacketVerify2_write_wrapper
 def PrioTotalShare_write_wrapper(p):
     return _prio.PrioTotalShare_write_wrapper(p)
 PrioTotalShare_write_wrapper = _prio.PrioTotalShare_write_wrapper
+
+def PrioPacketVerify1_read_wrapper(p, data, cfg):
+    return _prio.PrioPacketVerify1_read_wrapper(p, data, cfg)
+PrioPacketVerify1_read_wrapper = _prio.PrioPacketVerify1_read_wrapper
+
+def PrioPacketVerify2_read_wrapper(p, data, cfg):
+    return _prio.PrioPacketVerify2_read_wrapper(p, data, cfg)
+PrioPacketVerify2_read_wrapper = _prio.PrioPacketVerify2_read_wrapper
+
+def PrioTotalShare_read_wrapper(p, data, cfg):
+    return _prio.PrioTotalShare_read_wrapper(p, data, cfg)
+PrioTotalShare_read_wrapper = _prio.PrioTotalShare_read_wrapper
 CURVE25519_KEY_LEN = _prio.CURVE25519_KEY_LEN
 CURVE25519_KEY_LEN_HEX = _prio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _prio.PRIO_SERVER_A

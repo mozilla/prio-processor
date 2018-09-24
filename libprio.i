@@ -169,6 +169,7 @@ OPAQUE_POINTER(PrivateKey)
 // Memory shouldn't be moving around so much, but this wrapper function needs to exist in
 // order to marshal data due to typemaps not having side-effects
 
+
 %apply (unsigned char **, unsigned int *) {
     (unsigned char ** data, unsigned int * len)
 }
@@ -201,6 +202,32 @@ MSGPACK_WRITE_WRAPPER(PrioPacketVerify2)
 MSGPACK_WRITE_WRAPPER(PrioTotalShare)
 
 
+// Unfortunately, unpacking also requires some manual work. We take the binary message and
+// copy the data into an unpacker
+
+%apply (const unsigned char*, unsigned int) {
+    (const unsigned char *data, unsigned int len)
+}
+
+%define MSGPACK_READ_WRAPPER(type)
+%inline %{
+SECStatus type ## _read_wrapper(type p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    msgpack_unpacker upk;
+    msgpack_unpacker_init(&upk, len);
+    memcpy(msgpack_unpacker_buffer(&upk), data, len);
+
+    SECStatus rv = type ## _read(p, &upk, cfg);
+    msgpack_unpacker_destroy(&upk);
+    return rv;
+}
+%}
+%enddef
+
+MSGPACK_READ_WRAPPER(PrioPacketVerify1)
+MSGPACK_READ_WRAPPER(PrioPacketVerify2)
+MSGPACK_READ_WRAPPER(PrioTotalShare)
+
+
 %include "libprio/include/mprio.h"
 
 
@@ -209,3 +236,4 @@ MSGPACK_WRITE_WRAPPER(PrioTotalShare)
 // * http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_nn2
 // * https://stackoverflow.com/questions/26567457/swig-wrapping-typedef-struct
 // * http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_multi_argument_typemaps
+// * https://github.com/msgpack/msgpack-c/wiki/v1_1_c_overview
