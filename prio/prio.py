@@ -53,7 +53,7 @@ class PublicKey:
     def __del__(self):
         if self.instance:
             prio.PublicKey_clear(self.instance)
-    
+
     def import_bin(self, data):
         """Import a curve25519 key from a raw byte string.
 
@@ -107,6 +107,7 @@ class Server:
         :param private_key: The server's private key used for decryption
         :param secret: The shared random seed
         """
+        self.config = config
         self.server_id = server_id
         self.instance = prio.PrioServer_new(
             config.instance,
@@ -133,6 +134,7 @@ class Verifier:
     server. The verification packets are.
     """
     def __init__(self, server, data):
+        self.server = server
         self.instance = prio.PrioVerifier_new(server.instance)
         prio.PrioVerifier_set_data(self.instance, data)
 
@@ -143,6 +145,14 @@ class Verifier:
         return PacketVerify1(self)
 
     def create_verify2(self, verify1A, verify1B):
+        # Deserialization requires context from the shared config. It would be nice
+        # to isolate this behavior to the class, but serializing the entire config
+        # is probably not a good idea.
+        if verify1A.needs_deserialization:
+            verify1A.deserialize(self.server.config)
+        if verify1B.needs_deserialization:
+            verify1B.deserialize(self.server.config)
+
         return PacketVerify2(self, verify1A, verify1B)
 
     def is_valid(self, verify2A, verify2B):
@@ -159,6 +169,26 @@ class PacketVerify1:
     def __init__(self, verifier):
         self.instance = prio.PrioPacketVerify1_new()
         prio.PrioPacketVerify1_set_data(self.instance, verifier.instance)
+        self.needs_deserialization = False
+        self._serial_data = None
+
+    def deserialize(self, config):
+        if not (self.needs_deserialization and self._serial_data):
+            return
+        prio.PrioPacketVerify1_read_wrapper(self.instance, self._serial_data, config.instance)
+        self.needs_deserialization = False
+        self.serial_data = None
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['instance']
+        self.needs_deserialization = True
+        state['_serial_data'] = prio.PrioPacketVerify1_write_wrapper(self.instance)
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.instance = prio.PrioPacketVerify1_new()
 
     def __del__(self):
         prio.PrioPacketVerify1_clear(self.instance)
