@@ -5,15 +5,9 @@
 from prio.lib import prio
 from array import array
 
-skA, pkA = prio.Keypair_new(0, 0)
-skB, pkB = prio.Keypair_new(0, 0)
+skA, pkA = prio.Keypair_new()
+skB, pkB = prio.Keypair_new()
 
-# TODO: export hex data into a string
-## pk_hexA = prio.buffer.create(CURVE25519_KEY_LEN+1)
-# pk_hexA = prio.PublicKey_export_hex(pkA)
-# pk_hexB = prio.PublicKey_export_hex(pkB)
-
-# n_clients = 10
 n_data = 133
 batch_id = b"test_batch"
 cfg = prio.PrioConfig_new(n_data, pkA, pkB, batch_id)

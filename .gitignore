@@ -5,6 +5,8 @@ __pycache__
 build
 MANIFEST
 
+examples/*/Pipfile.lock
+
 .coverage
 .pytest_cache
 
