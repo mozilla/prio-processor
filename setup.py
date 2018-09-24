@@ -12,7 +12,7 @@ extension_mod = Extension(
         "libprio/build/prio",
         "libprio/build/mpi",
     ],
-    include_dirs=["/usr/include/nspr4"],
+    include_dirs=["/usr/include/nspr4", "/usr/include/nss3"],
     libraries=["mprio", "mpi", "nss3", "nspr4", "msgpackc"],
 )
 
