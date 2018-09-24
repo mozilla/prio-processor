@@ -6,9 +6,19 @@ all:
 
 clean:
 	cd libprio && scons -c && cd ..
-	rm *.so *.pyc
+	find . \( \
+		-name "*.pyc" \
+		-o -name "*.so" \
+		\) -delete
+	find . \( \
+		-name "__pycache__" \
+		-o -name "*.egg-info" \
+		-o -name "htmlcov" \
+		\) -exec rm -r {} +
+	rm -rf build
 
 test:
+	pipenv sync --dev
 	pipenv run pytest
 
 coverage:

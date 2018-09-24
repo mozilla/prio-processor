@@ -1,7 +1,11 @@
 __pycache__
 *.pyc
 *.so
+*.egg-info
 build
-prio/lib/*.so
+MANIFEST
+
 .coverage
 .pytest_cache
+
+.vscode
