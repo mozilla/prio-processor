@@ -182,12 +182,12 @@ class PacketVerify1:
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['instance']
-        self.needs_deserialization = True
-        state['_serial_data'] = prio.PrioPacketVerify1_write_wrapper(self.instance)
+        state['_serial_data'] = bytes(prio.PrioPacketVerify1_write_wrapper(self.instance))
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
+        self.needs_deserialization = True
         self.instance = prio.PrioPacketVerify1_new()
 
     def __del__(self):
