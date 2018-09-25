@@ -217,6 +217,19 @@ class TotalShare:
     def __init__(self, server):
         self.instance = prio.PrioTotalShare_new()
         prio.PrioTotalShare_set_data(self.instance, server.instance)
+        self._serial_data = None
+
+    def deserialize(self, config):
+        if self._serial_data:
+            prio.PrioTotalShare_read_wrapper(self.instance, self._serial_data, config.instance)
+        self._serial_data = None
+
+    def __getstate__(self):
+        return bytes(prio.PrioTotalShare_write_wrapper(self.instance))
+
+    def __setstate__(self, state):
+        self.instance = prio.PrioTotalShare_new()
+        self._serial_data = state
 
     def __del__(self):
         if self.instance:
@@ -228,5 +241,7 @@ def create_keypair():
     return PrivateKey(secret), PublicKey(public)
 
 def total_share_final(config, tA, tB):
+    tA.deserialize(config)
+    tB.deserialize(config)
     final = prio.PrioTotalShare_final(config.instance, tA.instance, tB.instance)
     return array('L', final)
