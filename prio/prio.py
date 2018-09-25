@@ -148,14 +148,15 @@ class Verifier:
         # Deserialization requires context from the shared config. It would be nice
         # to isolate this behavior to the class, but serializing the entire config
         # is probably not a good idea.
-        if verify1A.needs_deserialization:
-            verify1A.deserialize(self.server.config)
-        if verify1B.needs_deserialization:
-            verify1B.deserialize(self.server.config)
+        verify1A.deserialize(self.server.config)
+        verify1B.deserialize(self.server.config)
 
         return PacketVerify2(self, verify1A, verify1B)
 
     def is_valid(self, verify2A, verify2B):
+        verify2A.deserialize(self.server.config)
+        verify2B.deserialize(self.server.config)
+
         # TODO: replace try except block by wrapping function in swig typemap
         try:
             prio.PrioVerifier_isValid(self.instance, verify2A.instance, verify2B.instance)
@@ -169,26 +170,19 @@ class PacketVerify1:
     def __init__(self, verifier):
         self.instance = prio.PrioPacketVerify1_new()
         prio.PrioPacketVerify1_set_data(self.instance, verifier.instance)
-        self.needs_deserialization = False
         self._serial_data = None
 
     def deserialize(self, config):
-        if not (self.needs_deserialization and self._serial_data):
-            return
-        prio.PrioPacketVerify1_read_wrapper(self.instance, self._serial_data, config.instance)
-        self.needs_deserialization = False
+        if self._serial_data:
+            prio.PrioPacketVerify1_read_wrapper(self.instance, self._serial_data, config.instance)
         self.serial_data = None
 
     def __getstate__(self):
-        state = self.__dict__.copy()
-        del state['instance']
-        state['_serial_data'] = bytes(prio.PrioPacketVerify1_write_wrapper(self.instance))
-        return state
+        return bytes(prio.PrioPacketVerify1_write_wrapper(self.instance))
 
     def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.needs_deserialization = True
         self.instance = prio.PrioPacketVerify1_new()
+        self._serial_data = state
 
     def __del__(self):
         prio.PrioPacketVerify1_clear(self.instance)
@@ -198,6 +192,19 @@ class PacketVerify2:
     def __init__(self, verifier, A, B):
         self.instance = prio.PrioPacketVerify2_new()
         prio.PrioPacketVerify2_set_data(self.instance, verifier.instance, A.instance, B.instance)
+        self._serial_data = None
+
+    def deserialize(self, config):
+        if self._serial_data:
+            prio.PrioPacketVerify2_read_wrapper(self.instance, self._serial_data, config.instance)
+        self._serial_data = None
+
+    def __getstate__(self):
+        return bytes(prio.PrioPacketVerify2_write_wrapper(self.instance))
+
+    def __setstate__(self, state):
+        self.instance = prio.PrioPacketVerify2_new()
+        self._serial_data = state
 
     def __del__(self):
         prio.PrioPacketVerify2_clear(self.instance)
