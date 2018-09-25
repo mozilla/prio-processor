@@ -185,8 +185,8 @@ SECStatus type ## _write_wrapper(const_ ## type p, unsigned char** data, unsigne
     SECStatus rv = type ##_write(p, &pk);
 
     // move the data outside of this wrapper
-    data = malloc(sbuf.size);
-    memcpy(data, sbuf.data, sbuf.size);
+    *data = malloc(sbuf.size);
+    memcpy(*data, sbuf.data, sbuf.size);
     *len = sbuf.size;
 
     // free msgpacker data-structures
@@ -212,11 +212,14 @@ MSGPACK_WRITE_WRAPPER(PrioTotalShare)
 %define MSGPACK_READ_WRAPPER(type)
 %inline %{
 SECStatus type ## _read_wrapper(type p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    msgpack_unpacker_init(&upk, len);
-    memcpy(msgpack_unpacker_buffer(&upk), data, len);
-
-    SECStatus rv = type ## _read(p, &upk, cfg);
+    bool result = msgpack_unpacker_init(&upk, len);
+    if (result) {
+        memcpy(msgpack_unpacker_buffer(&upk), data, len);
+        msgpack_unpacker_buffer_consumed(&upk, len);
+        rv = type ## _read(p, &upk, cfg);
+    }
     msgpack_unpacker_destroy(&upk);
     return rv;
 }

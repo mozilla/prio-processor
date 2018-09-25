@@ -3041,8 +3041,8 @@ SECStatus PrioPacketVerify1_write_wrapper(const_PrioPacketVerify1 p, unsigned ch
     SECStatus rv = PrioPacketVerify1_write(p, &pk);
 
     // move the data outside of this wrapper
-    data = malloc(sbuf.size);
-    memcpy(data, sbuf.data, sbuf.size);
+    *data = malloc(sbuf.size);
+    memcpy(*data, sbuf.data, sbuf.size);
     *len = sbuf.size;
 
     // free msgpacker data-structures
@@ -3061,8 +3061,8 @@ SECStatus PrioPacketVerify2_write_wrapper(const_PrioPacketVerify2 p, unsigned ch
     SECStatus rv = PrioPacketVerify2_write(p, &pk);
 
     // move the data outside of this wrapper
-    data = malloc(sbuf.size);
-    memcpy(data, sbuf.data, sbuf.size);
+    *data = malloc(sbuf.size);
+    memcpy(*data, sbuf.data, sbuf.size);
     *len = sbuf.size;
 
     // free msgpacker data-structures
@@ -3081,8 +3081,8 @@ SECStatus PrioTotalShare_write_wrapper(const_PrioTotalShare p, unsigned char** d
     SECStatus rv = PrioTotalShare_write(p, &pk);
 
     // move the data outside of this wrapper
-    data = malloc(sbuf.size);
-    memcpy(data, sbuf.data, sbuf.size);
+    *data = malloc(sbuf.size);
+    memcpy(*data, sbuf.data, sbuf.size);
     *len = sbuf.size;
 
     // free msgpacker data-structures
@@ -3093,11 +3093,14 @@ SECStatus PrioTotalShare_write_wrapper(const_PrioTotalShare p, unsigned char** d
 
 
 SECStatus PrioPacketVerify1_read_wrapper(PrioPacketVerify1 p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    msgpack_unpacker_init(&upk, len);
-    memcpy(msgpack_unpacker_buffer(&upk), data, len);
-
-    SECStatus rv = PrioPacketVerify1_read(p, &upk, cfg);
+    bool result = msgpack_unpacker_init(&upk, len);
+    if (result) {
+        memcpy(msgpack_unpacker_buffer(&upk), data, len);
+        msgpack_unpacker_buffer_consumed(&upk, len);
+        rv = PrioPacketVerify1_read(p, &upk, cfg);
+    }
     msgpack_unpacker_destroy(&upk);
     return rv;
 }
@@ -3260,22 +3263,28 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
 
 
 SECStatus PrioPacketVerify2_read_wrapper(PrioPacketVerify2 p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    msgpack_unpacker_init(&upk, len);
-    memcpy(msgpack_unpacker_buffer(&upk), data, len);
-
-    SECStatus rv = PrioPacketVerify2_read(p, &upk, cfg);
+    bool result = msgpack_unpacker_init(&upk, len);
+    if (result) {
+        memcpy(msgpack_unpacker_buffer(&upk), data, len);
+        msgpack_unpacker_buffer_consumed(&upk, len);
+        rv = PrioPacketVerify2_read(p, &upk, cfg);
+    }
     msgpack_unpacker_destroy(&upk);
     return rv;
 }
 
 
 SECStatus PrioTotalShare_read_wrapper(PrioTotalShare p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    msgpack_unpacker_init(&upk, len);
-    memcpy(msgpack_unpacker_buffer(&upk), data, len);
-
-    SECStatus rv = PrioTotalShare_read(p, &upk, cfg);
+    bool result = msgpack_unpacker_init(&upk, len);
+    if (result) {
+        memcpy(msgpack_unpacker_buffer(&upk), data, len);
+        msgpack_unpacker_buffer_consumed(&upk, len);
+        rv = PrioTotalShare_read(p, &upk, cfg);
+    }
     msgpack_unpacker_destroy(&upk);
     return rv;
 }
