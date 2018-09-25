@@ -157,7 +157,7 @@ OPAQUE_POINTER(PrivateKey)
         $result,
         PyByteArray_FromStringAndSize((const char*)$2, sizeof(long)*PrioConfig_numDataFields($1))
     );
-    free($2);
+    if ($2) free($2);
 }
 
 %apply (const_PrioConfig, unsigned long *) {

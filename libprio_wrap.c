@@ -4689,7 +4689,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
       resultobj,
       PyByteArray_FromStringAndSize((const char*)arg2, sizeof(long)*PrioConfig_numDataFields(arg1))
       );
-    free(arg2);
+    if (arg2) free(arg2);
   }
   return resultobj;
 fail:
