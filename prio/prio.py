@@ -38,7 +38,8 @@ class Config:
         return prio.PrioConfig_numDataFields(self.instance)
 
     def __del__(self):
-        prio.PrioConfig_clear(self.instance)
+        if self.instance:
+            prio.PrioConfig_clear(self.instance)
 
 
 class TestConfig(Config):
@@ -175,7 +176,7 @@ class PacketVerify1:
     def deserialize(self, config):
         if self._serial_data:
             prio.PrioPacketVerify1_read_wrapper(self.instance, self._serial_data, config.instance)
-        self.serial_data = None
+        self._serial_data = None
 
     def __getstate__(self):
         return bytes(prio.PrioPacketVerify1_write_wrapper(self.instance))
@@ -185,7 +186,8 @@ class PacketVerify1:
         self._serial_data = state
 
     def __del__(self):
-        prio.PrioPacketVerify1_clear(self.instance)
+        if self.instance:
+            prio.PrioPacketVerify1_clear(self.instance)
 
 # Serializable
 class PacketVerify2:
@@ -207,7 +209,8 @@ class PacketVerify2:
         self._serial_data = state
 
     def __del__(self):
-        prio.PrioPacketVerify2_clear(self.instance)
+        if self.instance:
+            prio.PrioPacketVerify2_clear(self.instance)
 
 # Serializable
 class TotalShare:
@@ -216,7 +219,8 @@ class TotalShare:
         prio.PrioTotalShare_set_data(self.instance, server.instance)
 
     def __del__(self):
-        prio.PrioTotalShare_clear(self.instance)
+        if self.instance:
+            prio.PrioTotalShare_clear(self.instance)
 
 
 def create_keypair():
