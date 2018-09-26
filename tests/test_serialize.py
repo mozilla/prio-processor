@@ -39,7 +39,7 @@ def serverB(seed, config, serverB_keypair):
 def client(config):
     return prio.Client(config)
 
-
+@pytest.mark.skip
 def test_serialize_verifier(config, client, serverA, serverB):
     n_data = config.num_data_fields()
     data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
