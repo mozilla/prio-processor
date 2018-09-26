@@ -3035,6 +3035,46 @@ static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
     #include "libprio/include/mprio.h"
 
 
+void PrioConfig_PyCapsule_clear(PyObject *capsule) {
+    PrioConfig_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
+void PrioServer_PyCapsule_clear(PyObject *capsule) {
+    PrioServer_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
+void PrioVerifier_PyCapsule_clear(PyObject *capsule) {
+    PrioVerifier_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
+void PrioPacketVerify1_PyCapsule_clear(PyObject *capsule) {
+    PrioPacketVerify1_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
+void PrioPacketVerify2_PyCapsule_clear(PyObject *capsule) {
+    PrioPacketVerify2_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
+void PrioTotalShare_PyCapsule_clear(PyObject *capsule) {
+    PrioTotalShare_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
+void PublicKey_PyCapsule_clear(PyObject *capsule) {
+    PublicKey_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
+void PrivateKey_PyCapsule_clear(PyObject *capsule) {
+    PrivateKey_clear(PyCapsule_GetPointer(capsule, NULL));
+}
+
+
 PyObject* PrioPacketVerify1_write_wrapper(const_PrioPacketVerify1 p) {
     PyObject* data = NULL;
     msgpack_sbuffer sbuf;
@@ -3607,7 +3647,7 @@ SWIGINTERN PyObject *_wrap_PrioConfig_new(PyObject *SWIGUNUSEDPARM(self), PyObje
   }
   result = (PrioConfig)PrioConfig_new(arg1,arg2,arg3,(unsigned char const *)arg4,arg5);
   {
-    resultobj = PyCapsule_New(result, NULL, NULL);
+    resultobj = PyCapsule_New(result, NULL, PrioConfig_PyCapsule_clear);
   }
   return resultobj;
 fail:
@@ -3666,7 +3706,7 @@ SWIGINTERN PyObject *_wrap_PrioConfig_newTest(PyObject *SWIGUNUSEDPARM(self), Py
   arg1 = (int)(val1);
   result = (PrioConfig)PrioConfig_newTest(arg1);
   {
-    resultobj = PyCapsule_New(result, NULL, NULL);
+    resultobj = PyCapsule_New(result, NULL, PrioConfig_PyCapsule_clear);
   }
   return resultobj;
 fail:
@@ -3699,10 +3739,10 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
     Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, NULL));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, PrivateKey_PyCapsule_clear));
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg2, NULL, NULL));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg2, NULL, PublicKey_PyCapsule_clear));
   }
   return resultobj;
 fail:
@@ -3741,7 +3781,7 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
     Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, NULL));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, PublicKey_PyCapsule_clear));
   }
   return resultobj;
 fail:
@@ -3780,7 +3820,7 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
     Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, NULL));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, PublicKey_PyCapsule_clear));
   }
   return resultobj;
 fail:
@@ -4015,7 +4055,7 @@ SWIGINTERN PyObject *_wrap_PrioServer_new(PyObject *SWIGUNUSEDPARM(self), PyObje
   }
   result = (PrioServer)PrioServer_new((struct prio_config const *)arg1,arg2,arg3,(unsigned char const (*))arg4);
   {
-    resultobj = PyCapsule_New(result, NULL, NULL);
+    resultobj = PyCapsule_New(result, NULL, PrioServer_PyCapsule_clear);
   }
   return resultobj;
 fail:
@@ -4052,7 +4092,7 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_new(PyObject *SWIGUNUSEDPARM(self), PyOb
   }
   result = (PrioVerifier)PrioVerifier_new(arg1);
   {
-    resultobj = PyCapsule_New(result, NULL, NULL);
+    resultobj = PyCapsule_New(result, NULL, PrioVerifier_PyCapsule_clear);
   }
   return resultobj;
 fail:
@@ -4120,7 +4160,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_new(PyObject *SWIGUNUSEDPARM(self),
   if (!PyArg_ParseTuple(args,(char *)":PrioPacketVerify1_new")) SWIG_fail;
   result = (PrioPacketVerify1)PrioPacketVerify1_new();
   {
-    resultobj = PyCapsule_New(result, NULL, NULL);
+    resultobj = PyCapsule_New(result, NULL, PrioPacketVerify1_PyCapsule_clear);
   }
   return resultobj;
 fail:
@@ -4255,7 +4295,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_new(PyObject *SWIGUNUSEDPARM(self),
   if (!PyArg_ParseTuple(args,(char *)":PrioPacketVerify2_new")) SWIG_fail;
   result = (PrioPacketVerify2)PrioPacketVerify2_new();
   {
-    resultobj = PyCapsule_New(result, NULL, NULL);
+    resultobj = PyCapsule_New(result, NULL, PrioPacketVerify2_PyCapsule_clear);
   }
   return resultobj;
 fail:
@@ -4465,7 +4505,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_new(PyObject *SWIGUNUSEDPARM(self), Py
   if (!PyArg_ParseTuple(args,(char *)":PrioTotalShare_new")) SWIG_fail;
   result = (PrioTotalShare)PrioTotalShare_new();
   {
-    resultobj = PyCapsule_New(result, NULL, NULL);
+    resultobj = PyCapsule_New(result, NULL, PrioTotalShare_PyCapsule_clear);
   }
   return resultobj;
 fail:

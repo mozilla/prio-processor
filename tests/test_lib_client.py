@@ -41,21 +41,6 @@ def test_client_agg(n_clients):
     expected = [item*n_clients for item in list(data_items)]
     assert(list(output) == expected)
 
-    prio.PublicKey_clear(pkA)
-    prio.PublicKey_clear(pkB)
-    prio.PrivateKey_clear(skA)
-    prio.PrivateKey_clear(skB)
-
-    prio.PrioVerifier_clear(vA)
-    prio.PrioVerifier_clear(vB)
-
-    prio.PrioTotalShare_clear(tA)
-    prio.PrioTotalShare_clear(tB)
-
-    prio.PrioServer_clear(sA)
-    prio.PrioServer_clear(sB)
-    prio.PrioConfig_clear(cfg)
-
 
 def test_publickey_export():
     raw_bytes = bytes((3*x + 7) % 0xFF for x in range(prio.CURVE25519_KEY_LEN))

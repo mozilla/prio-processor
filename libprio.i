@@ -25,25 +25,32 @@
 
 // Typemaps for dealing with the pointer to implementation idiom.
 %define OPAQUE_POINTER(T)
-    // Get the pointer from the capsule
-    %typemap(in) T, const_ ## T {
-        $1 = PyCapsule_GetPointer($input, NULL);
-    }
 
-    // Create a new capsule for the new pointer
-    %typemap(out) T {
-        $result = PyCapsule_New($1, NULL, NULL);
-    }
+%{
+void T ## _PyCapsule_clear(PyObject *capsule) {
+    T ## _clear(PyCapsule_GetPointer(capsule, NULL));
+}
+%}
 
-    // Create a temporary stack variable for allocating a new opaque pointer
-    %typemap(in,numinputs=0) T* (void *tmp) {
-        $1 = (T*)&tmp;
-    }
+// Get the pointer from the capsule
+%typemap(in) T, const_ ## T {
+    $1 = PyCapsule_GetPointer($input, NULL);
+}
 
-    // Return the pointer to the newly allocated memory
-    %typemap(argout) T* {
-        $result = SWIG_Python_AppendOutput($result,PyCapsule_New(*$1, NULL, NULL));
-    }
+// Create a new capsule for the new pointer
+%typemap(out) T {
+    $result = PyCapsule_New($1, NULL, T ## _PyCapsule_clear);
+}
+
+// Create a temporary stack variable for allocating a new opaque pointer
+%typemap(in,numinputs=0) T* (void *tmp) {
+    $1 = (T*)&tmp;
+}
+
+// Return the pointer to the newly allocated memory
+%typemap(argout) T* {
+    $result = SWIG_Python_AppendOutput($result,PyCapsule_New(*$1, NULL, T ## _PyCapsule_clear));
+}
 %enddef
 
 OPAQUE_POINTER(PrioConfig)

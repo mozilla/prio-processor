@@ -37,10 +37,6 @@ class Config:
     def num_data_fields(self):
         return prio.PrioConfig_numDataFields(self.instance)
 
-    def __del__(self):
-        if self.instance:
-            prio.PrioConfig_clear(self.instance)
-
 
 class TestConfig(Config):
     def __init__(self, n_fields):
@@ -50,10 +46,6 @@ class TestConfig(Config):
 class PublicKey:
     def __init__(self, instance=None):
         self.instance = instance
-
-    def __del__(self):
-        if self.instance:
-            prio.PublicKey_clear(self.instance)
 
     def import_bin(self, data):
         """Import a curve25519 key from a raw byte string.
@@ -86,11 +78,6 @@ class PrivateKey:
     def __init__(self, instance=None):
         self.instance = instance
 
-    def __del__(self):
-        if self.instance:
-            prio.PrivateKey_clear(self.instance)
-
-
 class Client:
     def __init__(self, config):
         self.config = config
@@ -116,10 +103,6 @@ class Server:
             private_key.instance,
             secret.instance)
 
-    def __del__(self):
-        if self.instance:
-            prio.PrioServer_clear(self.instance)
-
     def create_verifier(self, data):
         return Verifier(self, data)
 
@@ -138,9 +121,6 @@ class Verifier:
         self.server = server
         self.instance = prio.PrioVerifier_new(server.instance)
         prio.PrioVerifier_set_data(self.instance, data)
-
-    def __del__(self):
-        prio.PrioVerifier_clear(self.instance)
 
     def create_verify1(self):
         return PacketVerify1(self)
@@ -185,9 +165,6 @@ class PacketVerify1:
         self.instance = prio.PrioPacketVerify1_new()
         self._serial_data = state
 
-    def __del__(self):
-        if self.instance:
-            prio.PrioPacketVerify1_clear(self.instance)
 
 # Serializable
 class PacketVerify2:
@@ -208,9 +185,6 @@ class PacketVerify2:
         self.instance = prio.PrioPacketVerify2_new()
         self._serial_data = state
 
-    def __del__(self):
-        if self.instance:
-            prio.PrioPacketVerify2_clear(self.instance)
 
 # Serializable
 class TotalShare:
@@ -230,10 +204,6 @@ class TotalShare:
     def __setstate__(self, state):
         self.instance = prio.PrioTotalShare_new()
         self._serial_data = state
-
-    def __del__(self):
-        if self.instance:
-            prio.PrioTotalShare_clear(self.instance)
 
 
 def create_keypair():
