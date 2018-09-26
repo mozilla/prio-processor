@@ -25,19 +25,14 @@
 
 // Typemaps for dealing with the pointer to implementation idiom.
 %define OPAQUE_POINTER(T)
-    // Cast the PyLong into the opaque pointer
-    %typemap(in) T {
-        $1 = (T)PyLong_AsVoidPtr($input);
+    // Get the pointer from the capsule
+    %typemap(in) T, const_ ## T {
+        $1 = PyCapsule_GetPointer($input, NULL);
     }
 
-    // Cast the pointer into a PyLong
+    // Create a new capsule for the new pointer
     %typemap(out) T {
-        $result = PyLong_FromVoidPtr($1);
-    }
-
-    // Cast the PyLong into a constant opaque pointer
-    %typemap(in) const_ ## T {
-        $1 = (const_ ## T)PyLong_AsVoidPtr($input);
+        $result = PyCapsule_New($1, NULL, NULL);
     }
 
     // Create a temporary stack variable for allocating a new opaque pointer
@@ -47,7 +42,7 @@
 
     // Return the pointer to the newly allocated memory
     %typemap(argout) T* {
-        $result = SWIG_Python_AppendOutput($result,PyLong_FromVoidPtr(*$1));
+        $result = SWIG_Python_AppendOutput($result,PyCapsule_New(*$1, NULL, NULL));
     }
 %enddef
 
@@ -148,7 +143,7 @@ OPAQUE_POINTER(PrivateKey)
 
 // PrioTotalShare_final
 %typemap(in) (const_PrioConfig, unsigned long *) {
-    $1 = (const_PrioConfig)PyLong_AsVoidPtr($input);
+    $1 = (const_PrioConfig)PyCapsule_GetPointer($input, NULL);
     $2 = (unsigned long*) malloc(sizeof(long)*PrioConfig_numDataFields($1));
 }
 
