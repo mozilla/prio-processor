@@ -159,7 +159,7 @@ class PacketVerify1:
         self._serial_data = None
 
     def __getstate__(self):
-        return bytes(prio.PrioPacketVerify1_write_wrapper(self.instance))
+        return prio.PrioPacketVerify1_write_wrapper(self.instance)
 
     def __setstate__(self, state):
         self.instance = prio.PrioPacketVerify1_new()
@@ -179,7 +179,7 @@ class PacketVerify2:
         self._serial_data = None
 
     def __getstate__(self):
-        return bytes(prio.PrioPacketVerify2_write_wrapper(self.instance))
+        return prio.PrioPacketVerify2_write_wrapper(self.instance)
 
     def __setstate__(self, state):
         self.instance = prio.PrioPacketVerify2_new()
@@ -199,7 +199,7 @@ class TotalShare:
         self._serial_data = None
 
     def __getstate__(self):
-        return bytes(prio.PrioTotalShare_write_wrapper(self.instance))
+        return prio.PrioTotalShare_write_wrapper(self.instance)
 
     def __setstate__(self, state):
         self.instance = prio.PrioTotalShare_new()

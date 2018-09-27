@@ -3036,42 +3036,50 @@ static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
 
 
 void PrioConfig_PyCapsule_clear(PyObject *capsule) {
-    PrioConfig_clear(PyCapsule_GetPointer(capsule, NULL));
+    PrioConfig ptr = PyCapsule_GetPointer(capsule, NULL);
+    PrioConfig_clear(ptr);
 }
 
 
 void PrioServer_PyCapsule_clear(PyObject *capsule) {
-    PrioServer_clear(PyCapsule_GetPointer(capsule, NULL));
+    PrioServer ptr = PyCapsule_GetPointer(capsule, NULL);
+    PrioServer_clear(ptr);
 }
 
 
 void PrioVerifier_PyCapsule_clear(PyObject *capsule) {
-    PrioVerifier_clear(PyCapsule_GetPointer(capsule, NULL));
+    PrioVerifier ptr = PyCapsule_GetPointer(capsule, NULL);
+    PrioVerifier_clear(ptr);
 }
 
 
 void PrioPacketVerify1_PyCapsule_clear(PyObject *capsule) {
-    PrioPacketVerify1_clear(PyCapsule_GetPointer(capsule, NULL));
+    PrioPacketVerify1 ptr = PyCapsule_GetPointer(capsule, NULL);
+    PrioPacketVerify1_clear(ptr);
 }
 
 
 void PrioPacketVerify2_PyCapsule_clear(PyObject *capsule) {
-    PrioPacketVerify2_clear(PyCapsule_GetPointer(capsule, NULL));
+    PrioPacketVerify2 ptr = PyCapsule_GetPointer(capsule, NULL);
+    PrioPacketVerify2_clear(ptr);
 }
 
 
 void PrioTotalShare_PyCapsule_clear(PyObject *capsule) {
-    PrioTotalShare_clear(PyCapsule_GetPointer(capsule, NULL));
+    PrioTotalShare ptr = PyCapsule_GetPointer(capsule, NULL);
+    PrioTotalShare_clear(ptr);
 }
 
 
 void PublicKey_PyCapsule_clear(PyObject *capsule) {
-    PublicKey_clear(PyCapsule_GetPointer(capsule, NULL));
+    PublicKey ptr = PyCapsule_GetPointer(capsule, NULL);
+    PublicKey_clear(ptr);
 }
 
 
 void PrivateKey_PyCapsule_clear(PyObject *capsule) {
-    PrivateKey_clear(PyCapsule_GetPointer(capsule, NULL));
+    PrivateKey ptr = PyCapsule_GetPointer(capsule, NULL);
+    PrivateKey_clear(ptr);
 }
 
 
@@ -3471,12 +3479,12 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read_wrapper(PyObject *SWIGUNUSEDPA
     arg1 = PyCapsule_GetPointer(obj0, NULL);
   }
   {
-    if (!PyString_Check(obj1)) {
+    if (!PyBytes_Check(obj1)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj1);
-    arg3 = (unsigned int) PyString_Size(obj1);
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
   }
   {
     arg4 = PyCapsule_GetPointer(obj2, NULL);
@@ -3512,12 +3520,12 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read_wrapper(PyObject *SWIGUNUSEDPA
     arg1 = PyCapsule_GetPointer(obj0, NULL);
   }
   {
-    if (!PyString_Check(obj1)) {
+    if (!PyBytes_Check(obj1)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj1);
-    arg3 = (unsigned int) PyString_Size(obj1);
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
   }
   {
     arg4 = PyCapsule_GetPointer(obj2, NULL);
@@ -3553,12 +3561,12 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_read_wrapper(PyObject *SWIGUNUSEDPARM(
     arg1 = PyCapsule_GetPointer(obj0, NULL);
   }
   {
-    if (!PyString_Check(obj1)) {
+    if (!PyBytes_Check(obj1)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj1);
-    arg3 = (unsigned int) PyString_Size(obj1);
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
   }
   {
     arg4 = PyCapsule_GetPointer(obj2, NULL);
@@ -3638,12 +3646,12 @@ SWIGINTERN PyObject *_wrap_PrioConfig_new(PyObject *SWIGUNUSEDPARM(self), PyObje
     arg3 = PyCapsule_GetPointer(obj2, NULL);
   }
   {
-    if (!PyString_Check(obj3)) {
+    if (!PyBytes_Check(obj3)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg4 = (unsigned char*) PyString_AsString(obj3);
-    arg5 = (unsigned int) PyString_Size(obj3);
+    arg4 = (unsigned char*) PyBytes_AsString(obj3);
+    arg5 = (unsigned int) PyBytes_Size(obj3);
   }
   result = (PrioConfig)PrioConfig_new(arg1,arg2,arg3,(unsigned char const *)arg4,arg5);
   {
@@ -3764,12 +3772,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj0)) {
+    if (!PyBytes_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj0);
-    arg3 = (unsigned int) PyString_Size(obj0);
+    arg2 = (unsigned char*) PyBytes_AsString(obj0);
+    arg3 = (unsigned int) PyBytes_Size(obj0);
   }
   result = PublicKey_import(arg1,(unsigned char const *)arg2,arg3);
   {
@@ -3803,12 +3811,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import_hex",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj0)) {
+    if (!PyBytes_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj0);
-    arg3 = (unsigned int) PyString_Size(obj0);
+    arg2 = (unsigned char*) PyBytes_AsString(obj0);
+    arg3 = (unsigned int) PyBytes_Size(obj0);
   }
   result = PublicKey_import_hex(arg1,(unsigned char const *)arg2,arg3);
   {
@@ -3855,7 +3863,7 @@ SWIGINTERN PyObject *_wrap_PublicKey_export(PyObject *SWIGUNUSEDPARM(self), PyOb
   {
     resultobj = SWIG_Python_AppendOutput(
       resultobj,
-      PyByteArray_FromStringAndSize((const char*)arg2, 32)
+      PyBytes_FromStringAndSize((const char*)arg2, 32)
       );
   }
   return resultobj;
@@ -3891,7 +3899,7 @@ SWIGINTERN PyObject *_wrap_PublicKey_export_hex(PyObject *SWIGUNUSEDPARM(self), 
   {
     resultobj = SWIG_Python_AppendOutput(
       resultobj,
-      PyByteArray_FromStringAndSize((const char*)arg2, 64+1)
+      PyBytes_FromStringAndSize((const char*)arg2, 64+1)
       );
   }
   return resultobj;
@@ -3963,11 +3971,11 @@ SWIGINTERN PyObject *_wrap_PrioClient_encode(PyObject *SWIGUNUSEDPARM(self), PyO
     arg1 = PyCapsule_GetPointer(obj0, NULL);
   }
   {
-    if (!PyByteArray_Check(obj1)) {
-      PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+    if (!PyBytes_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (bool*) PyByteArray_AsString(obj1);
+    arg2 = (bool*) PyBytes_AsString(obj1);
   }
   result = PrioClient_encode((struct prio_config const *)arg1,(bool const *)arg2,arg3,arg4,arg5,arg6);
   {
@@ -3980,13 +3988,13 @@ SWIGINTERN PyObject *_wrap_PrioClient_encode(PyObject *SWIGUNUSEDPARM(self), PyO
   }
   {
     resultobj = SWIG_Python_AppendOutput(
-      resultobj, PyByteArray_FromStringAndSize((const char *)*arg3, *arg4));
+      resultobj, PyBytes_FromStringAndSize((const char *)*arg3, *arg4));
     // Free malloc'ed data from within PrioClient_encode
     if (*arg3) free(*arg3);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
-      resultobj, PyByteArray_FromStringAndSize((const char *)*arg5, *arg6));
+      resultobj, PyBytes_FromStringAndSize((const char *)*arg5, *arg6));
     // Free malloc'ed data from within PrioClient_encode
     if (*arg5) free(*arg5);
   }
@@ -4016,7 +4024,7 @@ SWIGINTERN PyObject *_wrap_PrioPRGSeed_randomize(PyObject *SWIGUNUSEDPARM(self),
     Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyBytes_FromString((const char*)*arg1));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyBytes_FromStringAndSize((const char*)*arg1, PRG_SEED_LENGTH));
   }
   return resultobj;
 fail:
@@ -4131,12 +4139,12 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_set_data(PyObject *SWIGUNUSEDPARM(self),
     arg1 = PyCapsule_GetPointer(obj0, NULL);
   }
   {
-    if (!PyByteArray_Check(obj1)) {
-      PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+    if (!PyBytes_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyByteArray_AsString(obj1);
-    arg3 = (unsigned int) PyByteArray_Size(obj1);
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
   }
   result = PrioVerifier_set_data(arg1,arg2,arg3);
   {
@@ -4646,8 +4654,8 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
   
   if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_final",&obj0,&obj1,&obj2)) SWIG_fail;
   {
-    arg1 = (const_PrioConfig)PyCapsule_GetPointer(obj0, NULL);
-    arg2 = (unsigned long*) malloc(sizeof(long)*PrioConfig_numDataFields(arg1));
+    arg1 = PyCapsule_GetPointer(obj0, NULL);
+    arg2 = malloc(sizeof(long)*PrioConfig_numDataFields(arg1));
   }
   {
     arg3 = PyCapsule_GetPointer(obj1, NULL);

@@ -28,7 +28,8 @@
 
 %{
 void T ## _PyCapsule_clear(PyObject *capsule) {
-    T ## _clear(PyCapsule_GetPointer(capsule, NULL));
+    T ptr = PyCapsule_GetPointer(capsule, NULL);
+    T ## _clear(ptr);
 }
 %}
 
@@ -69,7 +70,7 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 %typemap(argout) PrioPRGSeed * {
-    $result = SWIG_Python_AppendOutput($result,PyBytes_FromString((const char*)*$1));
+    $result = SWIG_Python_AppendOutput($result,PyBytes_FromStringAndSize((const char*)*$1, PRG_SEED_LENGTH));
 }
 
 %typemap(in) const PrioPRGSeed {
@@ -82,12 +83,12 @@ OPAQUE_POINTER(PrivateKey)
 // to work properly when matched against these function signature snippets.
 //
 %typemap(in) (const unsigned char *, unsigned int) {
-    if (!PyString_Check($input)) {
+    if (!PyBytes_Check($input)) {
         PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
         SWIG_fail;
     }
-    $1 = (unsigned char*) PyString_AsString($input);
-    $2 = (unsigned int) PyString_Size($input);
+    $1 = (unsigned char*) PyBytes_AsString($input);
+    $2 = (unsigned int) PyBytes_Size($input);
 }
 
 %apply (const unsigned char *, unsigned int) {
@@ -105,18 +106,18 @@ OPAQUE_POINTER(PrivateKey)
 %typemap(argout) unsigned char data[ANY] {
     $result = SWIG_Python_AppendOutput(
         $result,
-        PyByteArray_FromStringAndSize((const char*)$1, $1_dim0)
+        PyBytes_FromStringAndSize((const char*)$1, $1_dim0)
     );
 }
 
 
 // PrioClient_encode
 %typemap(in) const bool * {
-    if (!PyByteArray_Check($input)) {
-        PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+    if (!PyBytes_Check($input)) {
+        PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
         SWIG_fail;
     }
-    $1 = (bool*) PyByteArray_AsString($input);
+    $1 = (bool*) PyBytes_AsString($input);
 }
 
 %typemap(in,numinputs=0) (unsigned char **, unsigned int *) (unsigned char *data = NULL, unsigned int len = 0) {
@@ -126,7 +127,7 @@ OPAQUE_POINTER(PrivateKey)
 
 %typemap(argout) (unsigned char **, unsigned int *) {
     $result = SWIG_Python_AppendOutput(
-        $result, PyByteArray_FromStringAndSize((const char *)*$1, *$2));
+        $result, PyBytes_FromStringAndSize((const char *)*$1, *$2));
     // Free malloc'ed data from within PrioClient_encode
     if (*$1) free(*$1);
 }
@@ -139,19 +140,19 @@ OPAQUE_POINTER(PrivateKey)
 
 // PrioVerifier_set_data
 %typemap(in) (unsigned char * data, unsigned int dataLen) {
-    if (!PyByteArray_Check($input)) {
-        PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+    if (!PyBytes_Check($input)) {
+        PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
         SWIG_fail;
     }
-    $1 = (unsigned char*) PyByteArray_AsString($input);
-    $2 = (unsigned int) PyByteArray_Size($input);
+    $1 = (unsigned char*) PyBytes_AsString($input);
+    $2 = (unsigned int) PyBytes_Size($input);
 }
 
 
 // PrioTotalShare_final
 %typemap(in) (const_PrioConfig, unsigned long *) {
-    $1 = (const_PrioConfig)PyCapsule_GetPointer($input, NULL);
-    $2 = (unsigned long*) malloc(sizeof(long)*PrioConfig_numDataFields($1));
+    $1 = PyCapsule_GetPointer($input, NULL);
+    $2 = malloc(sizeof(long)*PrioConfig_numDataFields($1));
 }
 
 %typemap(argout) (const_PrioConfig, unsigned long *) {

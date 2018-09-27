@@ -43,7 +43,7 @@ def client(config):
 @pytest.mark.skip
 def test_serialize_verifier(config, client, serverA, serverB):
     n_data = config.num_data_fields()
-    data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+    data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 
     for_server_a, for_server_b = client.encode(data_items)
 
@@ -62,7 +62,7 @@ def test_serialize_verifier(config, client, serverA, serverB):
 
 def test_serialize_verify1(config, client, serverA, serverB):
     n_data = config.num_data_fields()
-    data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+    data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 
     for_server_a, for_server_b = client.encode(data_items)
 
@@ -81,7 +81,7 @@ def test_serialize_verify1(config, client, serverA, serverB):
 
 def test_serialize_verify2(config, client, serverA, serverB):
     n_data = config.num_data_fields()
-    data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+    data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 
     for_server_a, for_server_b = client.encode(data_items)
 
@@ -100,7 +100,7 @@ def test_serialize_verify2(config, client, serverA, serverB):
 
 def test_serialize_total_shares(config, client, serverA, serverB):
     n_data = config.num_data_fields()
-    data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+    data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 
     for_server_a, for_server_b = client.encode(data_items)
 

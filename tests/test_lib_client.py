@@ -22,7 +22,7 @@ def test_client_agg(n_clients):
     tB = prio.PrioTotalShare_new()
 
     n_data = prio.PrioConfig_numDataFields(cfg)
-    data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+    data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 
     for i in range(n_clients):
         for_server_a, for_server_b = prio.PrioClient_encode(cfg, data_items)
