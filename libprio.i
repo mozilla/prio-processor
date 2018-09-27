@@ -4,18 +4,18 @@
 
 %module prio
 %{
-    #include "libprio/include/mprio.h"
+#include "libprio/include/mprio.h"
 %}
 
 %init %{
-    Prio_init();
-    atexit(Prio_clear);
+Prio_init();
+atexit(Prio_clear);
 %}
 
 // Handle SECStatus.
 %typemap(out) SECStatus {
    if ($1 != SECSuccess) {
-       PyErr_SetFromErrno(PyExc_RuntimeError);
+       PyErr_SetString(PyExc_RuntimeError, "$symname was not succesful.");
        SWIG_fail;
    }
    $result = Py_None;
@@ -27,19 +27,19 @@
 
 %{
 void T ## _PyCapsule_clear(PyObject *capsule) {
-    T ptr = PyCapsule_GetPointer(capsule, NULL);
+    T ptr = PyCapsule_GetPointer(capsule, "T");
     T ## _clear(ptr);
 }
 %}
 
 // Get the pointer from the capsule
 %typemap(in) T, const_ ## T {
-    $1 = PyCapsule_GetPointer($input, NULL);
+    $1 = PyCapsule_GetPointer($input, "T");
 }
 
 // Create a new capsule for the new pointer
 %typemap(out) T {
-    $result = PyCapsule_New($1, NULL, T ## _PyCapsule_clear);
+    $result = PyCapsule_New($1, "T", T ## _PyCapsule_clear);
 }
 
 // Create a temporary stack variable for allocating a new opaque pointer
@@ -49,7 +49,7 @@ void T ## _PyCapsule_clear(PyObject *capsule) {
 
 // Return the pointer to the newly allocated memory
 %typemap(argout) T* {
-    $result = SWIG_Python_AppendOutput($result,PyCapsule_New(*$1, NULL, T ## _PyCapsule_clear));
+    $result = SWIG_Python_AppendOutput($result,PyCapsule_New(*$1, "T", T ## _PyCapsule_clear));
 }
 %enddef
 
@@ -150,7 +150,7 @@ OPAQUE_POINTER(PrivateKey)
 
 // PrioTotalShare_final
 %typemap(in) (const_PrioConfig, unsigned long *) {
-    $1 = PyCapsule_GetPointer($input, NULL);
+    $1 = PyCapsule_GetPointer($input, "PrioConfig");
     $2 = malloc(sizeof(long)*PrioConfig_numDataFields($1));
 }
 
