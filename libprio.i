@@ -43,8 +43,8 @@ void T ## _PyCapsule_clear(PyObject *capsule) {
 }
 
 // Create a temporary stack variable for allocating a new opaque pointer
-%typemap(in,numinputs=0) T* (void *tmp) {
-    $1 = (T*)&tmp;
+%typemap(in,numinputs=0) T* (T tmp = NULL) {
+    $1 = &tmp;
 }
 
 // Return the pointer to the newly allocated memory

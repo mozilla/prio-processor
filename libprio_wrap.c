@@ -3722,15 +3722,15 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
   PyObject *resultobj = 0;
   PrivateKey *arg1 = (PrivateKey *) 0 ;
   PublicKey *arg2 = (PublicKey *) 0 ;
-  void *tmp1 ;
-  void *tmp2 ;
+  PrivateKey tmp1 = NULL ;
+  PublicKey tmp2 = NULL ;
   SECStatus result;
   
   {
-    arg1 = (PrivateKey*)&tmp1;
+    arg1 = &tmp1;
   }
   {
-    arg2 = (PublicKey*)&tmp2;
+    arg2 = &tmp2;
   }
   if (!PyArg_ParseTuple(args,(char *)":Keypair_new")) SWIG_fail;
   result = Keypair_new(arg1,arg2);
@@ -3758,12 +3758,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
   PublicKey *arg1 = (PublicKey *) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
   unsigned int arg3 ;
-  void *tmp1 ;
+  PublicKey tmp1 = NULL ;
   PyObject * obj0 = 0 ;
   SECStatus result;
   
   {
-    arg1 = (PublicKey*)&tmp1;
+    arg1 = &tmp1;
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import",&obj0)) SWIG_fail;
   {
@@ -3796,12 +3796,12 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
   PublicKey *arg1 = (PublicKey *) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
   unsigned int arg3 ;
-  void *tmp1 ;
+  PublicKey tmp1 = NULL ;
   PyObject * obj0 = 0 ;
   SECStatus result;
   
   {
-    arg1 = (PublicKey*)&tmp1;
+    arg1 = &tmp1;
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import_hex",&obj0)) SWIG_fail;
   {
