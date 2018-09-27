@@ -3496,7 +3496,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read_wrapper(PyObject *SWIGUNUSEDPA
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -3537,7 +3536,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read_wrapper(PyObject *SWIGUNUSEDPA
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -3578,7 +3576,6 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_read_wrapper(PyObject *SWIGUNUSEDPARM(
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -3598,7 +3595,6 @@ SWIGINTERN PyObject *_wrap_Prio_init(PyObject *SWIGUNUSEDPARM(self), PyObject *a
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -3744,7 +3740,6 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, PrivateKey_PyCapsule_clear));
@@ -3786,7 +3781,6 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, PublicKey_PyCapsule_clear));
@@ -3825,7 +3819,6 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, NULL, PublicKey_PyCapsule_clear));
@@ -3858,7 +3851,6 @@ SWIGINTERN PyObject *_wrap_PublicKey_export(PyObject *SWIGUNUSEDPARM(self), PyOb
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
@@ -3894,7 +3886,6 @@ SWIGINTERN PyObject *_wrap_PublicKey_export_hex(PyObject *SWIGUNUSEDPARM(self), 
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
@@ -3984,7 +3975,6 @@ SWIGINTERN PyObject *_wrap_PrioClient_encode(PyObject *SWIGUNUSEDPARM(self), PyO
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
@@ -4021,7 +4011,6 @@ SWIGINTERN PyObject *_wrap_PrioPRGSeed_randomize(PyObject *SWIGUNUSEDPARM(self),
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyBytes_FromStringAndSize((const char*)*arg1, PRG_SEED_LENGTH));
@@ -4153,7 +4142,6 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_set_data(PyObject *SWIGUNUSEDPARM(self),
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4215,7 +4203,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_set_data(PyObject *SWIGUNUSEDPARM(s
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4249,7 +4236,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_write(PyObject *SWIGUNUSEDPARM(self
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4288,7 +4274,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read(PyObject *SWIGUNUSEDPARM(self)
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4360,7 +4345,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_set_data(PyObject *SWIGUNUSEDPARM(s
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4394,7 +4378,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_write(PyObject *SWIGUNUSEDPARM(self
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4433,7 +4416,6 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read(PyObject *SWIGUNUSEDPARM(self)
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4468,7 +4450,6 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_isValid(PyObject *SWIGUNUSEDPARM(self), 
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4498,7 +4479,6 @@ SWIGINTERN PyObject *_wrap_PrioServer_aggregate(PyObject *SWIGUNUSEDPARM(self), 
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4560,7 +4540,6 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_set_data(PyObject *SWIGUNUSEDPARM(self
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4594,7 +4573,6 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_write(PyObject *SWIGUNUSEDPARM(self), 
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4633,7 +4611,6 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_read(PyObject *SWIGUNUSEDPARM(self), P
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4670,7 +4647,6 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(

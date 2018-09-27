@@ -19,7 +19,6 @@
        SWIG_fail;
    }
    $result = Py_None;
-   Py_INCREF($result);
 }
 
 
