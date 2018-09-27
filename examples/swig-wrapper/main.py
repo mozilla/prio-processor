@@ -28,7 +28,7 @@ p1B = prio.PrioPacketVerify1_new()
 p2A = prio.PrioPacketVerify2_new()
 p2B = prio.PrioPacketVerify2_new()
 
-data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 for_server_a, for_server_b = prio.PrioClient_encode(cfg, data_items)
 
 # Setup verification
@@ -59,23 +59,3 @@ output = array('L', output)
 
 # check the output
 assert(list(data_items) == list(output))
-
-prio.PublicKey_clear(pkA)
-prio.PublicKey_clear(pkB)
-prio.PrivateKey_clear(skA)
-prio.PrivateKey_clear(skB)
-
-prio.PrioPacketVerify1_clear(p1A)
-prio.PrioPacketVerify1_clear(p1B)
-prio.PrioPacketVerify2_clear(p2A)
-prio.PrioPacketVerify2_clear(p2B)
-
-prio.PrioVerifier_clear(vA)
-prio.PrioVerifier_clear(vB)
-
-prio.PrioTotalShare_clear(tA)
-prio.PrioTotalShare_clear(tB)
-
-prio.PrioServer_clear(sA)
-prio.PrioServer_clear(sB)
-prio.PrioConfig_clear(cfg)

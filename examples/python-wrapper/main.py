@@ -19,7 +19,7 @@ sB = prio.Server(cfg, prio.PRIO_SERVER_B, skB, server_secret)
 
 client = prio.Client(cfg)
 
-data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 for_server_a, for_server_b = client.encode(data_items)
 
 # Setup verification
