@@ -136,10 +136,6 @@ def PrioConfig_new(n_fields, server_a, server_b, batch_id):
     return _prio.PrioConfig_new(n_fields, server_a, server_b, batch_id)
 PrioConfig_new = _prio.PrioConfig_new
 
-def PrioConfig_clear(cfg):
-    return _prio.PrioConfig_clear(cfg)
-PrioConfig_clear = _prio.PrioConfig_clear
-
 def PrioConfig_numDataFields(cfg):
     return _prio.PrioConfig_numDataFields(cfg)
 PrioConfig_numDataFields = _prio.PrioConfig_numDataFields
@@ -168,14 +164,6 @@ def PublicKey_export_hex(pk):
     return _prio.PublicKey_export_hex(pk)
 PublicKey_export_hex = _prio.PublicKey_export_hex
 
-def PublicKey_clear(pubkey):
-    return _prio.PublicKey_clear(pubkey)
-PublicKey_clear = _prio.PublicKey_clear
-
-def PrivateKey_clear(pvtkey):
-    return _prio.PrivateKey_clear(pvtkey)
-PrivateKey_clear = _prio.PrivateKey_clear
-
 def PrioClient_encode(cfg, data_in):
     return _prio.PrioClient_encode(cfg, data_in)
 PrioClient_encode = _prio.PrioClient_encode
@@ -188,17 +176,9 @@ def PrioServer_new(cfg, server_idx, server_priv, server_shared_secret):
     return _prio.PrioServer_new(cfg, server_idx, server_priv, server_shared_secret)
 PrioServer_new = _prio.PrioServer_new
 
-def PrioServer_clear(s):
-    return _prio.PrioServer_clear(s)
-PrioServer_clear = _prio.PrioServer_clear
-
 def PrioVerifier_new(s):
     return _prio.PrioVerifier_new(s)
 PrioVerifier_new = _prio.PrioVerifier_new
-
-def PrioVerifier_clear(v):
-    return _prio.PrioVerifier_clear(v)
-PrioVerifier_clear = _prio.PrioVerifier_clear
 
 def PrioVerifier_set_data(v, data):
     return _prio.PrioVerifier_set_data(v, data)
@@ -208,41 +188,17 @@ def PrioPacketVerify1_new():
     return _prio.PrioPacketVerify1_new()
 PrioPacketVerify1_new = _prio.PrioPacketVerify1_new
 
-def PrioPacketVerify1_clear(p1):
-    return _prio.PrioPacketVerify1_clear(p1)
-PrioPacketVerify1_clear = _prio.PrioPacketVerify1_clear
-
 def PrioPacketVerify1_set_data(p1, v):
     return _prio.PrioPacketVerify1_set_data(p1, v)
 PrioPacketVerify1_set_data = _prio.PrioPacketVerify1_set_data
-
-def PrioPacketVerify1_write(p, pk):
-    return _prio.PrioPacketVerify1_write(p, pk)
-PrioPacketVerify1_write = _prio.PrioPacketVerify1_write
-
-def PrioPacketVerify1_read(p, upk, cfg):
-    return _prio.PrioPacketVerify1_read(p, upk, cfg)
-PrioPacketVerify1_read = _prio.PrioPacketVerify1_read
 
 def PrioPacketVerify2_new():
     return _prio.PrioPacketVerify2_new()
 PrioPacketVerify2_new = _prio.PrioPacketVerify2_new
 
-def PrioPacketVerify2_clear(p):
-    return _prio.PrioPacketVerify2_clear(p)
-PrioPacketVerify2_clear = _prio.PrioPacketVerify2_clear
-
 def PrioPacketVerify2_set_data(p2, v, p1A, p1B):
     return _prio.PrioPacketVerify2_set_data(p2, v, p1A, p1B)
 PrioPacketVerify2_set_data = _prio.PrioPacketVerify2_set_data
-
-def PrioPacketVerify2_write(p, pk):
-    return _prio.PrioPacketVerify2_write(p, pk)
-PrioPacketVerify2_write = _prio.PrioPacketVerify2_write
-
-def PrioPacketVerify2_read(p, upk, cfg):
-    return _prio.PrioPacketVerify2_read(p, upk, cfg)
-PrioPacketVerify2_read = _prio.PrioPacketVerify2_read
 
 def PrioVerifier_isValid(v, pA, pB):
     return _prio.PrioVerifier_isValid(v, pA, pB)
@@ -256,21 +212,9 @@ def PrioTotalShare_new():
     return _prio.PrioTotalShare_new()
 PrioTotalShare_new = _prio.PrioTotalShare_new
 
-def PrioTotalShare_clear(t):
-    return _prio.PrioTotalShare_clear(t)
-PrioTotalShare_clear = _prio.PrioTotalShare_clear
-
 def PrioTotalShare_set_data(t, s):
     return _prio.PrioTotalShare_set_data(t, s)
 PrioTotalShare_set_data = _prio.PrioTotalShare_set_data
-
-def PrioTotalShare_write(t, pk):
-    return _prio.PrioTotalShare_write(t, pk)
-PrioTotalShare_write = _prio.PrioTotalShare_write
-
-def PrioTotalShare_read(t, upk, cfg):
-    return _prio.PrioTotalShare_read(t, upk, cfg)
-PrioTotalShare_read = _prio.PrioTotalShare_read
 
 def PrioTotalShare_final(cfg, tA, tB):
     return _prio.PrioTotalShare_final(cfg, tA, tB)

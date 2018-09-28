@@ -32,6 +32,10 @@ void T ## _PyCapsule_clear(PyObject *capsule) {
 }
 %}
 
+// We've assigned a destructor to the capsule instance, so prevent users from
+// manually destroying the pointer for safety.
+%ignore T ## _clear;
+
 // Get the pointer from the capsule
 %typemap(in) T, const_ ## T {
     $1 = PyCapsule_GetPointer($input, "T");
@@ -172,6 +176,7 @@ OPAQUE_POINTER(PrivateKey)
 // order to marshal data due to typemaps not having side-effects
 
 %define MSGPACK_WRITE_WRAPPER(type)
+%ignore type ## _write;
 %inline %{
 PyObject* type ## _write_wrapper(const_ ## type p) {
     PyObject* data = NULL;
@@ -180,7 +185,7 @@ PyObject* type ## _write_wrapper(const_ ## type p) {
     msgpack_sbuffer_init(&sbuf);
     msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
 
-    SECStatus rv = type ##_write(p, &pk);
+    SECStatus rv = type ## _write(p, &pk);
     if (rv == SECSuccess) {
         // move the data outside of this wrapper
         data = PyBytes_FromStringAndSize(sbuf.data, sbuf.size);
@@ -207,6 +212,7 @@ MSGPACK_WRITE_WRAPPER(PrioTotalShare)
 }
 
 %define MSGPACK_READ_WRAPPER(type)
+%ignore type ## _read;
 %inline %{
 SECStatus type ## _read_wrapper(type p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
