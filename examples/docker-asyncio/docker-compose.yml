@@ -1,0 +1,32 @@
+version: '3.4'
+
+x-app: &app
+  build: ../../
+  volumes:
+    - .:/app/examples/docker-asyncio
+
+services:  
+  client:
+    <<: *app
+    depends_on:
+      - rabbitmq
+      - server
+    command: >
+      bash -c "cd examples/docker-asyncio &&
+      pipenv sync &&
+      sleep 5 && 
+      wait-for-it rabbitmq:5672 -- pipenv run python client.py"
+  
+  server:
+    <<: *app
+    depends_on:
+      - rabbitmq
+    command: >
+      bash -c "cd examples/docker-asyncio &&
+      pipenv sync &&
+      wait-for-it rabbitmq:5672 -- pipenv run python server.py"
+
+  rabbitmq:
+    image: rabbitmq:latest
+    ports:
+      - 5672:5672

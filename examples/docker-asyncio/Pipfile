@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+docker-compose = ">= 1.10.0"
 
 [packages]
 "prio" = {path = "./../..", editable = true}
+aioamqp = "*"
 
 [requires]
 python_version = "3.6"

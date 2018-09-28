@@ -1,10 +1,11 @@
-# asyncio Example Usage
+# docker-asyncio
 
-This example demonstrates usage of the python wrapper using asyncio in docker.
+This example demonstrates an example service running the prio pipeline in docker.
 
 ## Running the example
 
 ```
-$ pipenv sync
-$ pipenv run main.py
+$ pipenv sync --dev
+$ docker-compose build
+$ docker-compose up
 ```
