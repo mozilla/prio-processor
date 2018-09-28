@@ -210,6 +210,7 @@ def create_keypair():
     secret, public = prio.Keypair_new()
     return PrivateKey(secret), PublicKey(public)
 
+
 def total_share_final(config, tA, tB):
     tA.deserialize(config)
     tB.deserialize(config)
