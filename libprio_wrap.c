@@ -2985,22 +2985,20 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_a_AES_128_KEY_LENGTH__unsigned_char swig_types[3]
 #define SWIGTYPE_p_bool swig_types[4]
 #define SWIGTYPE_p_char swig_types[5]
-#define SWIGTYPE_p_msgpack_packer swig_types[6]
-#define SWIGTYPE_p_msgpack_unpacker swig_types[7]
-#define SWIGTYPE_p_p_SECKEYPrivateKey swig_types[8]
-#define SWIGTYPE_p_p_SECKEYPublicKey swig_types[9]
-#define SWIGTYPE_p_p_unsigned_char swig_types[10]
-#define SWIGTYPE_p_prio_config swig_types[11]
-#define SWIGTYPE_p_prio_packet_verify1 swig_types[12]
-#define SWIGTYPE_p_prio_packet_verify2 swig_types[13]
-#define SWIGTYPE_p_prio_server swig_types[14]
-#define SWIGTYPE_p_prio_total_share swig_types[15]
-#define SWIGTYPE_p_prio_verifier swig_types[16]
-#define SWIGTYPE_p_unsigned_char swig_types[17]
-#define SWIGTYPE_p_unsigned_int swig_types[18]
-#define SWIGTYPE_p_unsigned_long swig_types[19]
-static swig_type_info *swig_types[21];
-static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
+#define SWIGTYPE_p_p_SECKEYPrivateKey swig_types[6]
+#define SWIGTYPE_p_p_SECKEYPublicKey swig_types[7]
+#define SWIGTYPE_p_p_unsigned_char swig_types[8]
+#define SWIGTYPE_p_prio_config swig_types[9]
+#define SWIGTYPE_p_prio_packet_verify1 swig_types[10]
+#define SWIGTYPE_p_prio_packet_verify2 swig_types[11]
+#define SWIGTYPE_p_prio_server swig_types[12]
+#define SWIGTYPE_p_prio_total_share swig_types[13]
+#define SWIGTYPE_p_prio_verifier swig_types[14]
+#define SWIGTYPE_p_unsigned_char swig_types[15]
+#define SWIGTYPE_p_unsigned_int swig_types[16]
+#define SWIGTYPE_p_unsigned_long swig_types[17]
+static swig_type_info *swig_types[19];
+static swig_module_info swig_module = {swig_types, 18, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3032,13 +3030,128 @@ static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
 #define SWIG_as_voidptrptr(a) ((void)SWIG_as_voidptr(*a),(void**)(a)) 
 
 
-    #include "libprio/include/mprio.h"
+#include "libprio/include/mprio.h"
 
 
-SWIGINTERNINLINE PyObject*
-  SWIG_From_int  (int value)
-{
-  return PyInt_FromLong((long) value);
+void PrioConfig_PyCapsule_clear(PyObject *capsule) {
+    PrioConfig ptr = PyCapsule_GetPointer(capsule, "PrioConfig");
+    PrioConfig_clear(ptr);
+}
+
+
+void PrioServer_PyCapsule_clear(PyObject *capsule) {
+    PrioServer ptr = PyCapsule_GetPointer(capsule, "PrioServer");
+    PrioServer_clear(ptr);
+}
+
+
+void PrioVerifier_PyCapsule_clear(PyObject *capsule) {
+    PrioVerifier ptr = PyCapsule_GetPointer(capsule, "PrioVerifier");
+    PrioVerifier_clear(ptr);
+}
+
+
+void PrioPacketVerify1_PyCapsule_clear(PyObject *capsule) {
+    PrioPacketVerify1 ptr = PyCapsule_GetPointer(capsule, "PrioPacketVerify1");
+    PrioPacketVerify1_clear(ptr);
+}
+
+
+void PrioPacketVerify2_PyCapsule_clear(PyObject *capsule) {
+    PrioPacketVerify2 ptr = PyCapsule_GetPointer(capsule, "PrioPacketVerify2");
+    PrioPacketVerify2_clear(ptr);
+}
+
+
+void PrioTotalShare_PyCapsule_clear(PyObject *capsule) {
+    PrioTotalShare ptr = PyCapsule_GetPointer(capsule, "PrioTotalShare");
+    PrioTotalShare_clear(ptr);
+}
+
+
+void PublicKey_PyCapsule_clear(PyObject *capsule) {
+    PublicKey ptr = PyCapsule_GetPointer(capsule, "PublicKey");
+    PublicKey_clear(ptr);
+}
+
+
+void PrivateKey_PyCapsule_clear(PyObject *capsule) {
+    PrivateKey ptr = PyCapsule_GetPointer(capsule, "PrivateKey");
+    PrivateKey_clear(ptr);
+}
+
+
+PyObject* PrioPacketVerify1_write_wrapper(const_PrioPacketVerify1 p) {
+    PyObject* data = NULL;
+    msgpack_sbuffer sbuf;
+    msgpack_packer pk;
+    msgpack_sbuffer_init(&sbuf);
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    SECStatus rv = PrioPacketVerify1_write(p, &pk);
+    if (rv == SECSuccess) {
+        // move the data outside of this wrapper
+        data = PyBytes_FromStringAndSize(sbuf.data, sbuf.size);
+    }
+
+    // free msgpacker data-structures
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return data;
+}
+
+
+PyObject* PrioPacketVerify2_write_wrapper(const_PrioPacketVerify2 p) {
+    PyObject* data = NULL;
+    msgpack_sbuffer sbuf;
+    msgpack_packer pk;
+    msgpack_sbuffer_init(&sbuf);
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    SECStatus rv = PrioPacketVerify2_write(p, &pk);
+    if (rv == SECSuccess) {
+        // move the data outside of this wrapper
+        data = PyBytes_FromStringAndSize(sbuf.data, sbuf.size);
+    }
+
+    // free msgpacker data-structures
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return data;
+}
+
+
+PyObject* PrioTotalShare_write_wrapper(const_PrioTotalShare p) {
+    PyObject* data = NULL;
+    msgpack_sbuffer sbuf;
+    msgpack_packer pk;
+    msgpack_sbuffer_init(&sbuf);
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    SECStatus rv = PrioTotalShare_write(p, &pk);
+    if (rv == SECSuccess) {
+        // move the data outside of this wrapper
+        data = PyBytes_FromStringAndSize(sbuf.data, sbuf.size);
+    }
+
+    // free msgpacker data-structures
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return data;
+}
+
+
+SECStatus PrioPacketVerify1_read_wrapper(PrioPacketVerify1 p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    SECStatus rv = SECFailure;
+    msgpack_unpacker upk;
+    bool result = msgpack_unpacker_init(&upk, len+1);
+    if (result) {
+        memcpy(msgpack_unpacker_buffer(&upk), data, len);
+        msgpack_unpacker_buffer_consumed(&upk, len);
+        rv = PrioPacketVerify1_read(p, &upk, cfg);
+    }
+    msgpack_unpacker_destroy(&upk);
+    return rv;
 }
 
 
@@ -3135,65 +3248,6 @@ SWIG_CanCastAsInteger(double *d, double min, double max) {
 
 
 SWIGINTERN int
-SWIG_AsVal_long (PyObject *obj, long* val)
-{
-#if PY_VERSION_HEX < 0x03000000
-  if (PyInt_Check(obj)) {
-    if (val) *val = PyInt_AsLong(obj);
-    return SWIG_OK;
-  } else
-#endif
-  if (PyLong_Check(obj)) {
-    long v = PyLong_AsLong(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_OK;
-    } else {
-      PyErr_Clear();
-      return SWIG_OverflowError;
-    }
-  }
-#ifdef SWIG_PYTHON_CAST_MODE
-  {
-    int dispatch = 0;
-    long v = PyInt_AsLong(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_AddCast(SWIG_OK);
-    } else {
-      PyErr_Clear();
-    }
-    if (!dispatch) {
-      double d;
-      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
-      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
-	if (val) *val = (long)(d);
-	return res;
-      }
-    }
-  }
-#endif
-  return SWIG_TypeError;
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_int (PyObject * obj, int *val)
-{
-  long v;
-  int res = SWIG_AsVal_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v < INT_MIN || v > INT_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = (int)(v);
-    }
-  }  
-  return res;
-}
-
-
-SWIGINTERN int
 SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val) 
 {
 #if PY_VERSION_HEX < 0x03000000
@@ -3256,9 +3310,277 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
   return res;
 }
 
+
+SECStatus PrioPacketVerify2_read_wrapper(PrioPacketVerify2 p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    SECStatus rv = SECFailure;
+    msgpack_unpacker upk;
+    bool result = msgpack_unpacker_init(&upk, len+1);
+    if (result) {
+        memcpy(msgpack_unpacker_buffer(&upk), data, len);
+        msgpack_unpacker_buffer_consumed(&upk, len);
+        rv = PrioPacketVerify2_read(p, &upk, cfg);
+    }
+    msgpack_unpacker_destroy(&upk);
+    return rv;
+}
+
+
+SECStatus PrioTotalShare_read_wrapper(PrioTotalShare p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+    SECStatus rv = SECFailure;
+    msgpack_unpacker upk;
+    bool result = msgpack_unpacker_init(&upk, len+1);
+    if (result) {
+        memcpy(msgpack_unpacker_buffer(&upk), data, len);
+        msgpack_unpacker_buffer_consumed(&upk, len);
+        rv = PrioTotalShare_read(p, &upk, cfg);
+    }
+    msgpack_unpacker_destroy(&upk);
+    return rv;
+}
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_long (PyObject *obj, long* val)
+{
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    if (val) *val = PyInt_AsLong(obj);
+    return SWIG_OK;
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    long v = PyLong_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    long v = PyInt_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
+	if (val) *val = (long)(d);
+	return res;
+      }
+    }
+  }
+#endif
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_int (PyObject * obj, int *val)
+{
+  long v;
+  int res = SWIG_AsVal_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v < INT_MIN || v > INT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = (int)(v);
+    }
+  }  
+  return res;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+SWIGINTERN PyObject *_wrap_PrioPacketVerify1_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  const_PrioPacketVerify1 arg1 = (const_PrioPacketVerify1) 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify1_write_wrapper",&obj0)) SWIG_fail;
+  {
+    arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify1");
+  }
+  result = (PyObject *)PrioPacketVerify1_write_wrapper((struct prio_packet_verify1 const *)arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PrioPacketVerify2_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  const_PrioPacketVerify2 arg1 = (const_PrioPacketVerify2) 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify2_write_wrapper",&obj0)) SWIG_fail;
+  {
+    arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify2");
+  }
+  result = (PyObject *)PrioPacketVerify2_write_wrapper((struct prio_packet_verify2 const *)arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PrioTotalShare_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  const_PrioTotalShare arg1 = (const_PrioTotalShare) 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioTotalShare_write_wrapper",&obj0)) SWIG_fail;
+  {
+    arg1 = PyCapsule_GetPointer(obj0, "PrioTotalShare");
+  }
+  result = (PyObject *)PrioTotalShare_write_wrapper((struct prio_total_share const *)arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PrioPacketVerify1 arg1 = (PrioPacketVerify1) 0 ;
+  unsigned char *arg2 = (unsigned char *) 0 ;
+  unsigned int arg3 ;
+  const_PrioConfig arg4 = (const_PrioConfig) 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  SECStatus result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify1_read_wrapper",&obj0,&obj1,&obj2)) SWIG_fail;
+  {
+    arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify1");
+  }
+  {
+    if (!PyBytes_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
+      SWIG_fail;
+    }
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
+  }
+  {
+    arg4 = PyCapsule_GetPointer(obj2, "PrioConfig");
+  }
+  result = PrioPacketVerify1_read_wrapper(arg1,(unsigned char const *)arg2,arg3,(struct prio_config const *)arg4);
+  {
+    if (result != SECSuccess) {
+      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify1_read_wrapper was not succesful.");
+      SWIG_fail;
+    }
+    resultobj = Py_None;
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PrioPacketVerify2 arg1 = (PrioPacketVerify2) 0 ;
+  unsigned char *arg2 = (unsigned char *) 0 ;
+  unsigned int arg3 ;
+  const_PrioConfig arg4 = (const_PrioConfig) 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  SECStatus result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify2_read_wrapper",&obj0,&obj1,&obj2)) SWIG_fail;
+  {
+    arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify2");
+  }
+  {
+    if (!PyBytes_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
+      SWIG_fail;
+    }
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
+  }
+  {
+    arg4 = PyCapsule_GetPointer(obj2, "PrioConfig");
+  }
+  result = PrioPacketVerify2_read_wrapper(arg1,(unsigned char const *)arg2,arg3,(struct prio_config const *)arg4);
+  {
+    if (result != SECSuccess) {
+      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify2_read_wrapper was not succesful.");
+      SWIG_fail;
+    }
+    resultobj = Py_None;
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_PrioTotalShare_read_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PrioTotalShare arg1 = (PrioTotalShare) 0 ;
+  unsigned char *arg2 = (unsigned char *) 0 ;
+  unsigned int arg3 ;
+  const_PrioConfig arg4 = (const_PrioConfig) 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  SECStatus result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_read_wrapper",&obj0,&obj1,&obj2)) SWIG_fail;
+  {
+    arg1 = PyCapsule_GetPointer(obj0, "PrioTotalShare");
+  }
+  {
+    if (!PyBytes_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
+      SWIG_fail;
+    }
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
+  }
+  {
+    arg4 = PyCapsule_GetPointer(obj2, "PrioConfig");
+  }
+  result = PrioTotalShare_read_wrapper(arg1,(unsigned char const *)arg2,arg3,(struct prio_config const *)arg4);
+  {
+    if (result != SECSuccess) {
+      PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_read_wrapper was not succesful.");
+      SWIG_fail;
+    }
+    resultobj = Py_None;
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_Prio_init(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   SECStatus result;
@@ -3267,11 +3589,10 @@ SWIGINTERN PyObject *_wrap_Prio_init(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   result = Prio_init();
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "Prio_init was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -3313,40 +3634,23 @@ SWIGINTERN PyObject *_wrap_PrioConfig_new(PyObject *SWIGUNUSEDPARM(self), PyObje
   } 
   arg1 = (int)(val1);
   {
-    arg2 = (PublicKey)PyLong_AsVoidPtr(obj1);
+    arg2 = PyCapsule_GetPointer(obj1, "PublicKey");
   }
   {
-    arg3 = (PublicKey)PyLong_AsVoidPtr(obj2);
+    arg3 = PyCapsule_GetPointer(obj2, "PublicKey");
   }
   {
-    if (!PyString_Check(obj3)) {
+    if (!PyBytes_Check(obj3)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg4 = (unsigned char*) PyString_AsString(obj3);
-    arg5 = (unsigned int) PyString_Size(obj3);
+    arg4 = (unsigned char*) PyBytes_AsString(obj3);
+    arg5 = (unsigned int) PyBytes_Size(obj3);
   }
   result = (PrioConfig)PrioConfig_new(arg1,arg2,arg3,(unsigned char const *)arg4,arg5);
   {
-    resultobj = PyLong_FromVoidPtr(result);
+    resultobj = PyCapsule_New(result, "PrioConfig", PrioConfig_PyCapsule_clear);
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioConfig_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioConfig arg1 = (PrioConfig) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioConfig_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PrioConfig)PyLong_AsVoidPtr(obj0);
-  }
-  PrioConfig_clear(arg1);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -3361,7 +3665,7 @@ SWIGINTERN PyObject *_wrap_PrioConfig_numDataFields(PyObject *SWIGUNUSEDPARM(sel
   
   if (!PyArg_ParseTuple(args,(char *)"O:PrioConfig_numDataFields",&obj0)) SWIG_fail;
   {
-    arg1 = (const_PrioConfig)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioConfig");
   }
   result = (int)PrioConfig_numDataFields((struct prio_config const *)arg1);
   resultobj = SWIG_From_int((int)(result));
@@ -3387,7 +3691,7 @@ SWIGINTERN PyObject *_wrap_PrioConfig_newTest(PyObject *SWIGUNUSEDPARM(self), Py
   arg1 = (int)(val1);
   result = (PrioConfig)PrioConfig_newTest(arg1);
   {
-    resultobj = PyLong_FromVoidPtr(result);
+    resultobj = PyCapsule_New(result, "PrioConfig", PrioConfig_PyCapsule_clear);
   }
   return resultobj;
 fail:
@@ -3399,31 +3703,30 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
   PyObject *resultobj = 0;
   PrivateKey *arg1 = (PrivateKey *) 0 ;
   PublicKey *arg2 = (PublicKey *) 0 ;
-  void *tmp1 ;
-  void *tmp2 ;
+  PrivateKey tmp1 = NULL ;
+  PublicKey tmp2 = NULL ;
   SECStatus result;
   
   {
-    arg1 = (PrivateKey*)&tmp1;
+    arg1 = &tmp1;
   }
   {
-    arg2 = (PublicKey*)&tmp2;
+    arg2 = &tmp2;
   }
   if (!PyArg_ParseTuple(args,(char *)":Keypair_new")) SWIG_fail;
   result = Keypair_new(arg1,arg2);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "Keypair_new was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyLong_FromVoidPtr(*arg1));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PrivateKey", PrivateKey_PyCapsule_clear));
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyLong_FromVoidPtr(*arg2));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg2, "PublicKey", PublicKey_PyCapsule_clear));
   }
   return resultobj;
 fail:
@@ -3436,33 +3739,32 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
   PublicKey *arg1 = (PublicKey *) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
   unsigned int arg3 ;
-  void *tmp1 ;
+  PublicKey tmp1 = NULL ;
   PyObject * obj0 = 0 ;
   SECStatus result;
   
   {
-    arg1 = (PublicKey*)&tmp1;
+    arg1 = &tmp1;
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj0)) {
+    if (!PyBytes_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj0);
-    arg3 = (unsigned int) PyString_Size(obj0);
+    arg2 = (unsigned char*) PyBytes_AsString(obj0);
+    arg3 = (unsigned int) PyBytes_Size(obj0);
   }
   result = PublicKey_import(arg1,(unsigned char const *)arg2,arg3);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PublicKey_import was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyLong_FromVoidPtr(*arg1));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PublicKey", PublicKey_PyCapsule_clear));
   }
   return resultobj;
 fail:
@@ -3475,33 +3777,32 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
   PublicKey *arg1 = (PublicKey *) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
   unsigned int arg3 ;
-  void *tmp1 ;
+  PublicKey tmp1 = NULL ;
   PyObject * obj0 = 0 ;
   SECStatus result;
   
   {
-    arg1 = (PublicKey*)&tmp1;
+    arg1 = &tmp1;
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_import_hex",&obj0)) SWIG_fail;
   {
-    if (!PyString_Check(obj0)) {
+    if (!PyBytes_Check(obj0)) {
       PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyString_AsString(obj0);
-    arg3 = (unsigned int) PyString_Size(obj0);
+    arg2 = (unsigned char*) PyBytes_AsString(obj0);
+    arg3 = (unsigned int) PyBytes_Size(obj0);
   }
   result = PublicKey_import_hex(arg1,(unsigned char const *)arg2,arg3);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PublicKey_import_hex was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyLong_FromVoidPtr(*arg1));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PublicKey", PublicKey_PyCapsule_clear));
   }
   return resultobj;
 fail:
@@ -3522,21 +3823,20 @@ SWIGINTERN PyObject *_wrap_PublicKey_export(PyObject *SWIGUNUSEDPARM(self), PyOb
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_export",&obj0)) SWIG_fail;
   {
-    arg1 = (const_PublicKey)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PublicKey");
   }
   result = PublicKey_export((SECKEYPublicKey const *)arg1,arg2);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PublicKey_export was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
       resultobj,
-      PyByteArray_FromStringAndSize((const char*)arg2, 32)
+      PyBytes_FromStringAndSize((const char*)arg2, 32)
       );
   }
   return resultobj;
@@ -3558,57 +3858,22 @@ SWIGINTERN PyObject *_wrap_PublicKey_export_hex(PyObject *SWIGUNUSEDPARM(self), 
   }
   if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_export_hex",&obj0)) SWIG_fail;
   {
-    arg1 = (const_PublicKey)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PublicKey");
   }
   result = PublicKey_export_hex((SECKEYPublicKey const *)arg1,arg2);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PublicKey_export_hex was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
       resultobj,
-      PyByteArray_FromStringAndSize((const char*)arg2, 64+1)
+      PyBytes_FromStringAndSize((const char*)arg2, 64+1)
       );
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PublicKey_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PublicKey arg1 = (PublicKey) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PublicKey_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PublicKey)PyLong_AsVoidPtr(obj0);
-  }
-  PublicKey_clear(arg1);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrivateKey_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrivateKey arg1 = (PrivateKey) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrivateKey_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PrivateKey)PyLong_AsVoidPtr(obj0);
-  }
-  PrivateKey_clear(arg1);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -3641,33 +3906,32 @@ SWIGINTERN PyObject *_wrap_PrioClient_encode(PyObject *SWIGUNUSEDPARM(self), PyO
   }
   if (!PyArg_ParseTuple(args,(char *)"OO:PrioClient_encode",&obj0,&obj1)) SWIG_fail;
   {
-    arg1 = (const_PrioConfig)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioConfig");
   }
   {
-    if (!PyByteArray_Check(obj1)) {
-      PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+    if (!PyBytes_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (bool*) PyByteArray_AsString(obj1);
+    arg2 = (bool*) PyBytes_AsString(obj1);
   }
   result = PrioClient_encode((struct prio_config const *)arg1,(bool const *)arg2,arg3,arg4,arg5,arg6);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioClient_encode was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
-      resultobj, PyByteArray_FromStringAndSize((const char *)*arg3, *arg4));
+      resultobj, PyBytes_FromStringAndSize((const char *)*arg3, *arg4));
     // Free malloc'ed data from within PrioClient_encode
     if (*arg3) free(*arg3);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
-      resultobj, PyByteArray_FromStringAndSize((const char *)*arg5, *arg6));
+      resultobj, PyBytes_FromStringAndSize((const char *)*arg5, *arg6));
     // Free malloc'ed data from within PrioClient_encode
     if (*arg5) free(*arg5);
   }
@@ -3690,14 +3954,13 @@ SWIGINTERN PyObject *_wrap_PrioPRGSeed_randomize(PyObject *SWIGUNUSEDPARM(self),
   result = PrioPRGSeed_randomize((unsigned char (*)[AES_128_KEY_LENGTH])arg1);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioPRGSeed_randomize was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
-    resultobj = SWIG_Python_AppendOutput(resultobj,PyBytes_FromString((const char*)*arg1));
+    resultobj = SWIG_Python_AppendOutput(resultobj,PyBytes_FromStringAndSize((const char*)*arg1, PRG_SEED_LENGTH));
   }
   return resultobj;
 fail:
@@ -3721,7 +3984,7 @@ SWIGINTERN PyObject *_wrap_PrioServer_new(PyObject *SWIGUNUSEDPARM(self), PyObje
   
   if (!PyArg_ParseTuple(args,(char *)"OOOO:PrioServer_new",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   {
-    arg1 = (const_PrioConfig)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioConfig");
   }
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
@@ -3729,32 +3992,15 @@ SWIGINTERN PyObject *_wrap_PrioServer_new(PyObject *SWIGUNUSEDPARM(self), PyObje
   } 
   arg2 = (PrioServerId)(val2);
   {
-    arg3 = (PrivateKey)PyLong_AsVoidPtr(obj2);
+    arg3 = PyCapsule_GetPointer(obj2, "PrivateKey");
   }
   {
     arg4 = (unsigned char*)PyBytes_AsString(obj3);
   }
   result = (PrioServer)PrioServer_new((struct prio_config const *)arg1,arg2,arg3,(unsigned char const (*))arg4);
   {
-    resultobj = PyLong_FromVoidPtr(result);
+    resultobj = PyCapsule_New(result, "PrioServer", PrioServer_PyCapsule_clear);
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioServer_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioServer arg1 = (PrioServer) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioServer_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PrioServer)PyLong_AsVoidPtr(obj0);
-  }
-  PrioServer_clear(arg1);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -3769,29 +4015,12 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_new(PyObject *SWIGUNUSEDPARM(self), PyOb
   
   if (!PyArg_ParseTuple(args,(char *)"O:PrioVerifier_new",&obj0)) SWIG_fail;
   {
-    arg1 = (PrioServer)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioServer");
   }
   result = (PrioVerifier)PrioVerifier_new(arg1);
   {
-    resultobj = PyLong_FromVoidPtr(result);
+    resultobj = PyCapsule_New(result, "PrioVerifier", PrioVerifier_PyCapsule_clear);
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioVerifier_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioVerifier arg1 = (PrioVerifier) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioVerifier_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PrioVerifier)PyLong_AsVoidPtr(obj0);
-  }
-  PrioVerifier_clear(arg1);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -3809,24 +4038,23 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_set_data(PyObject *SWIGUNUSEDPARM(self),
   
   if (!PyArg_ParseTuple(args,(char *)"OO:PrioVerifier_set_data",&obj0,&obj1)) SWIG_fail;
   {
-    arg1 = (PrioVerifier)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioVerifier");
   }
   {
-    if (!PyByteArray_Check(obj1)) {
-      PyErr_SetString(PyExc_ValueError, "Expecting a bytearray");
+    if (!PyBytes_Check(obj1)) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
       SWIG_fail;
     }
-    arg2 = (unsigned char*) PyByteArray_AsString(obj1);
-    arg3 = (unsigned int) PyByteArray_Size(obj1);
+    arg2 = (unsigned char*) PyBytes_AsString(obj1);
+    arg3 = (unsigned int) PyBytes_Size(obj1);
   }
   result = PrioVerifier_set_data(arg1,arg2,arg3);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioVerifier_set_data was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -3841,25 +4069,8 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_new(PyObject *SWIGUNUSEDPARM(self),
   if (!PyArg_ParseTuple(args,(char *)":PrioPacketVerify1_new")) SWIG_fail;
   result = (PrioPacketVerify1)PrioPacketVerify1_new();
   {
-    resultobj = PyLong_FromVoidPtr(result);
+    resultobj = PyCapsule_New(result, "PrioPacketVerify1", PrioPacketVerify1_PyCapsule_clear);
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioPacketVerify1_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioPacketVerify1 arg1 = (PrioPacketVerify1) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify1_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PrioPacketVerify1)PyLong_AsVoidPtr(obj0);
-  }
-  PrioPacketVerify1_clear(arg1);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -3876,92 +4087,18 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_set_data(PyObject *SWIGUNUSEDPARM(s
   
   if (!PyArg_ParseTuple(args,(char *)"OO:PrioPacketVerify1_set_data",&obj0,&obj1)) SWIG_fail;
   {
-    arg1 = (PrioPacketVerify1)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify1");
   }
   {
-    arg2 = (const_PrioVerifier)PyLong_AsVoidPtr(obj1);
+    arg2 = PyCapsule_GetPointer(obj1, "PrioVerifier");
   }
   result = PrioPacketVerify1_set_data(arg1,(struct prio_verifier const *)arg2);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify1_set_data was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioPacketVerify1_write(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  const_PrioPacketVerify1 arg1 = (const_PrioPacketVerify1) 0 ;
-  msgpack_packer *arg2 = (msgpack_packer *) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  SECStatus result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:PrioPacketVerify1_write",&obj0,&obj1)) SWIG_fail;
-  {
-    arg1 = (const_PrioPacketVerify1)PyLong_AsVoidPtr(obj0);
-  }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_msgpack_packer, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioPacketVerify1_write" "', argument " "2"" of type '" "msgpack_packer *""'"); 
-  }
-  arg2 = (msgpack_packer *)(argp2);
-  result = PrioPacketVerify1_write((struct prio_packet_verify1 const *)arg1,arg2);
-  {
-    if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
-      SWIG_fail;
-    }
-    resultobj = Py_None;
-    Py_INCREF(resultobj);
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioPacketVerify1 arg1 = (PrioPacketVerify1) 0 ;
-  msgpack_unpacker *arg2 = (msgpack_unpacker *) 0 ;
-  const_PrioConfig arg3 = (const_PrioConfig) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  SECStatus result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify1_read",&obj0,&obj1,&obj2)) SWIG_fail;
-  {
-    arg1 = (PrioPacketVerify1)PyLong_AsVoidPtr(obj0);
-  }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_msgpack_unpacker, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioPacketVerify1_read" "', argument " "2"" of type '" "msgpack_unpacker *""'"); 
-  }
-  arg2 = (msgpack_unpacker *)(argp2);
-  {
-    arg3 = (const_PrioConfig)PyLong_AsVoidPtr(obj2);
-  }
-  result = PrioPacketVerify1_read(arg1,arg2,(struct prio_config const *)arg3);
-  {
-    if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
-      SWIG_fail;
-    }
-    resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -3976,25 +4113,8 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_new(PyObject *SWIGUNUSEDPARM(self),
   if (!PyArg_ParseTuple(args,(char *)":PrioPacketVerify2_new")) SWIG_fail;
   result = (PrioPacketVerify2)PrioPacketVerify2_new();
   {
-    resultobj = PyLong_FromVoidPtr(result);
+    resultobj = PyCapsule_New(result, "PrioPacketVerify2", PrioPacketVerify2_PyCapsule_clear);
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioPacketVerify2_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioPacketVerify2 arg1 = (PrioPacketVerify2) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify2_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PrioPacketVerify2)PyLong_AsVoidPtr(obj0);
-  }
-  PrioPacketVerify2_clear(arg1);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -4015,98 +4135,24 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_set_data(PyObject *SWIGUNUSEDPARM(s
   
   if (!PyArg_ParseTuple(args,(char *)"OOOO:PrioPacketVerify2_set_data",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   {
-    arg1 = (PrioPacketVerify2)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify2");
   }
   {
-    arg2 = (const_PrioVerifier)PyLong_AsVoidPtr(obj1);
+    arg2 = PyCapsule_GetPointer(obj1, "PrioVerifier");
   }
   {
-    arg3 = (const_PrioPacketVerify1)PyLong_AsVoidPtr(obj2);
+    arg3 = PyCapsule_GetPointer(obj2, "PrioPacketVerify1");
   }
   {
-    arg4 = (const_PrioPacketVerify1)PyLong_AsVoidPtr(obj3);
+    arg4 = PyCapsule_GetPointer(obj3, "PrioPacketVerify1");
   }
   result = PrioPacketVerify2_set_data(arg1,(struct prio_verifier const *)arg2,(struct prio_packet_verify1 const *)arg3,(struct prio_packet_verify1 const *)arg4);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify2_set_data was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioPacketVerify2_write(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  const_PrioPacketVerify2 arg1 = (const_PrioPacketVerify2) 0 ;
-  msgpack_packer *arg2 = (msgpack_packer *) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  SECStatus result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:PrioPacketVerify2_write",&obj0,&obj1)) SWIG_fail;
-  {
-    arg1 = (const_PrioPacketVerify2)PyLong_AsVoidPtr(obj0);
-  }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_msgpack_packer, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioPacketVerify2_write" "', argument " "2"" of type '" "msgpack_packer *""'"); 
-  }
-  arg2 = (msgpack_packer *)(argp2);
-  result = PrioPacketVerify2_write((struct prio_packet_verify2 const *)arg1,arg2);
-  {
-    if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
-      SWIG_fail;
-    }
-    resultobj = Py_None;
-    Py_INCREF(resultobj);
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioPacketVerify2 arg1 = (PrioPacketVerify2) 0 ;
-  msgpack_unpacker *arg2 = (msgpack_unpacker *) 0 ;
-  const_PrioConfig arg3 = (const_PrioConfig) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  SECStatus result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify2_read",&obj0,&obj1,&obj2)) SWIG_fail;
-  {
-    arg1 = (PrioPacketVerify2)PyLong_AsVoidPtr(obj0);
-  }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_msgpack_unpacker, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioPacketVerify2_read" "', argument " "2"" of type '" "msgpack_unpacker *""'"); 
-  }
-  arg2 = (msgpack_unpacker *)(argp2);
-  {
-    arg3 = (const_PrioConfig)PyLong_AsVoidPtr(obj2);
-  }
-  result = PrioPacketVerify2_read(arg1,arg2,(struct prio_config const *)arg3);
-  {
-    if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
-      SWIG_fail;
-    }
-    resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4126,22 +4172,21 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_isValid(PyObject *SWIGUNUSEDPARM(self), 
   
   if (!PyArg_ParseTuple(args,(char *)"OOO:PrioVerifier_isValid",&obj0,&obj1,&obj2)) SWIG_fail;
   {
-    arg1 = (const_PrioVerifier)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioVerifier");
   }
   {
-    arg2 = (const_PrioPacketVerify2)PyLong_AsVoidPtr(obj1);
+    arg2 = PyCapsule_GetPointer(obj1, "PrioPacketVerify2");
   }
   {
-    arg3 = (const_PrioPacketVerify2)PyLong_AsVoidPtr(obj2);
+    arg3 = PyCapsule_GetPointer(obj2, "PrioPacketVerify2");
   }
   result = PrioVerifier_isValid((struct prio_verifier const *)arg1,(struct prio_packet_verify2 const *)arg2,(struct prio_packet_verify2 const *)arg3);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioVerifier_isValid was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4159,19 +4204,18 @@ SWIGINTERN PyObject *_wrap_PrioServer_aggregate(PyObject *SWIGUNUSEDPARM(self), 
   
   if (!PyArg_ParseTuple(args,(char *)"OO:PrioServer_aggregate",&obj0,&obj1)) SWIG_fail;
   {
-    arg1 = (PrioServer)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioServer");
   }
   {
-    arg2 = (PrioVerifier)PyLong_AsVoidPtr(obj1);
+    arg2 = PyCapsule_GetPointer(obj1, "PrioVerifier");
   }
   result = PrioServer_aggregate(arg1,arg2);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioServer_aggregate was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4186,25 +4230,8 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_new(PyObject *SWIGUNUSEDPARM(self), Py
   if (!PyArg_ParseTuple(args,(char *)":PrioTotalShare_new")) SWIG_fail;
   result = (PrioTotalShare)PrioTotalShare_new();
   {
-    resultobj = PyLong_FromVoidPtr(result);
+    resultobj = PyCapsule_New(result, "PrioTotalShare", PrioTotalShare_PyCapsule_clear);
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioTotalShare_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioTotalShare arg1 = (PrioTotalShare) 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioTotalShare_clear",&obj0)) SWIG_fail;
-  {
-    arg1 = (PrioTotalShare)PyLong_AsVoidPtr(obj0);
-  }
-  PrioTotalShare_clear(arg1);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -4221,92 +4248,18 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_set_data(PyObject *SWIGUNUSEDPARM(self
   
   if (!PyArg_ParseTuple(args,(char *)"OO:PrioTotalShare_set_data",&obj0,&obj1)) SWIG_fail;
   {
-    arg1 = (PrioTotalShare)PyLong_AsVoidPtr(obj0);
+    arg1 = PyCapsule_GetPointer(obj0, "PrioTotalShare");
   }
   {
-    arg2 = (const_PrioServer)PyLong_AsVoidPtr(obj1);
+    arg2 = PyCapsule_GetPointer(obj1, "PrioServer");
   }
   result = PrioTotalShare_set_data(arg1,(struct prio_server const *)arg2);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_set_data was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioTotalShare_write(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  const_PrioTotalShare arg1 = (const_PrioTotalShare) 0 ;
-  msgpack_packer *arg2 = (msgpack_packer *) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  SECStatus result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:PrioTotalShare_write",&obj0,&obj1)) SWIG_fail;
-  {
-    arg1 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj0);
-  }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_msgpack_packer, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioTotalShare_write" "', argument " "2"" of type '" "msgpack_packer *""'"); 
-  }
-  arg2 = (msgpack_packer *)(argp2);
-  result = PrioTotalShare_write((struct prio_total_share const *)arg1,arg2);
-  {
-    if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
-      SWIG_fail;
-    }
-    resultobj = Py_None;
-    Py_INCREF(resultobj);
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_PrioTotalShare_read(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  PrioTotalShare arg1 = (PrioTotalShare) 0 ;
-  msgpack_unpacker *arg2 = (msgpack_unpacker *) 0 ;
-  const_PrioConfig arg3 = (const_PrioConfig) 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  SECStatus result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_read",&obj0,&obj1,&obj2)) SWIG_fail;
-  {
-    arg1 = (PrioTotalShare)PyLong_AsVoidPtr(obj0);
-  }
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_msgpack_unpacker, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "PrioTotalShare_read" "', argument " "2"" of type '" "msgpack_unpacker *""'"); 
-  }
-  arg2 = (msgpack_unpacker *)(argp2);
-  {
-    arg3 = (const_PrioConfig)PyLong_AsVoidPtr(obj2);
-  }
-  result = PrioTotalShare_read(arg1,arg2,(struct prio_config const *)arg3);
-  {
-    if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
-      SWIG_fail;
-    }
-    resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   return resultobj;
 fail:
@@ -4327,30 +4280,29 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
   
   if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_final",&obj0,&obj1,&obj2)) SWIG_fail;
   {
-    arg1 = (const_PrioConfig)PyLong_AsVoidPtr(obj0);
-    arg2 = (unsigned long*) malloc(sizeof(long)*PrioConfig_numDataFields(arg1));
+    arg1 = PyCapsule_GetPointer(obj0, "PrioConfig");
+    arg2 = malloc(sizeof(long)*PrioConfig_numDataFields(arg1));
   }
   {
-    arg3 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj1);
+    arg3 = PyCapsule_GetPointer(obj1, "PrioTotalShare");
   }
   {
-    arg4 = (const_PrioTotalShare)PyLong_AsVoidPtr(obj2);
+    arg4 = PyCapsule_GetPointer(obj2, "PrioTotalShare");
   }
   result = PrioTotalShare_final((struct prio_config const *)arg1,arg2,(struct prio_total_share const *)arg3,(struct prio_total_share const *)arg4);
   {
     if (result != SECSuccess) {
-      PyErr_SetFromErrno(PyExc_RuntimeError);
+      PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_final was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
-    Py_INCREF(resultobj);
   }
   {
     resultobj = SWIG_Python_AppendOutput(
       resultobj,
       PyByteArray_FromStringAndSize((const char*)arg2, sizeof(long)*PrioConfig_numDataFields(arg1))
       );
-    free(arg2);
+    if (arg2) free(arg2);
   }
   return resultobj;
 fail:
@@ -4360,10 +4312,15 @@ fail:
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
+	 { (char *)"PrioPacketVerify1_write_wrapper", _wrap_PrioPacketVerify1_write_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify2_write_wrapper", _wrap_PrioPacketVerify2_write_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioTotalShare_write_wrapper", _wrap_PrioTotalShare_write_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify1_read_wrapper", _wrap_PrioPacketVerify1_read_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify2_read_wrapper", _wrap_PrioPacketVerify2_read_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioTotalShare_read_wrapper", _wrap_PrioTotalShare_read_wrapper, METH_VARARGS, NULL},
 	 { (char *)"Prio_init", _wrap_Prio_init, METH_VARARGS, NULL},
 	 { (char *)"Prio_clear", _wrap_Prio_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_new", _wrap_PrioConfig_new, METH_VARARGS, NULL},
-	 { (char *)"PrioConfig_clear", _wrap_PrioConfig_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_numDataFields", _wrap_PrioConfig_numDataFields, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_newTest", _wrap_PrioConfig_newTest, METH_VARARGS, NULL},
 	 { (char *)"Keypair_new", _wrap_Keypair_new, METH_VARARGS, NULL},
@@ -4371,32 +4328,19 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"PublicKey_import_hex", _wrap_PublicKey_import_hex, METH_VARARGS, NULL},
 	 { (char *)"PublicKey_export", _wrap_PublicKey_export, METH_VARARGS, NULL},
 	 { (char *)"PublicKey_export_hex", _wrap_PublicKey_export_hex, METH_VARARGS, NULL},
-	 { (char *)"PublicKey_clear", _wrap_PublicKey_clear, METH_VARARGS, NULL},
-	 { (char *)"PrivateKey_clear", _wrap_PrivateKey_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioClient_encode", _wrap_PrioClient_encode, METH_VARARGS, NULL},
 	 { (char *)"PrioPRGSeed_randomize", _wrap_PrioPRGSeed_randomize, METH_VARARGS, NULL},
 	 { (char *)"PrioServer_new", _wrap_PrioServer_new, METH_VARARGS, NULL},
-	 { (char *)"PrioServer_clear", _wrap_PrioServer_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioVerifier_new", _wrap_PrioVerifier_new, METH_VARARGS, NULL},
-	 { (char *)"PrioVerifier_clear", _wrap_PrioVerifier_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioVerifier_set_data", _wrap_PrioVerifier_set_data, METH_VARARGS, NULL},
 	 { (char *)"PrioPacketVerify1_new", _wrap_PrioPacketVerify1_new, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_clear", _wrap_PrioPacketVerify1_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioPacketVerify1_set_data", _wrap_PrioPacketVerify1_set_data, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_write", _wrap_PrioPacketVerify1_write, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_read", _wrap_PrioPacketVerify1_read, METH_VARARGS, NULL},
 	 { (char *)"PrioPacketVerify2_new", _wrap_PrioPacketVerify2_new, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_clear", _wrap_PrioPacketVerify2_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioPacketVerify2_set_data", _wrap_PrioPacketVerify2_set_data, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_write", _wrap_PrioPacketVerify2_write, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_read", _wrap_PrioPacketVerify2_read, METH_VARARGS, NULL},
 	 { (char *)"PrioVerifier_isValid", _wrap_PrioVerifier_isValid, METH_VARARGS, NULL},
 	 { (char *)"PrioServer_aggregate", _wrap_PrioServer_aggregate, METH_VARARGS, NULL},
 	 { (char *)"PrioTotalShare_new", _wrap_PrioTotalShare_new, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_clear", _wrap_PrioTotalShare_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioTotalShare_set_data", _wrap_PrioTotalShare_set_data, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_write", _wrap_PrioTotalShare_write, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_read", _wrap_PrioTotalShare_read, METH_VARARGS, NULL},
 	 { (char *)"PrioTotalShare_final", _wrap_PrioTotalShare_final, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
@@ -4410,16 +4354,14 @@ static swig_type_info _swigt__p_SECKEYPublicKey = {"_p_SECKEYPublicKey", "SECKEY
 static swig_type_info _swigt__p_a_AES_128_KEY_LENGTH__unsigned_char = {"_p_a_AES_128_KEY_LENGTH__unsigned_char", "unsigned char (*)[AES_128_KEY_LENGTH]|PrioPRGSeed *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_bool = {"_p_bool", "bool *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_msgpack_packer = {"_p_msgpack_packer", "msgpack_packer *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_msgpack_unpacker = {"_p_msgpack_unpacker", "msgpack_unpacker *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_SECKEYPrivateKey = {"_p_p_SECKEYPrivateKey", "SECKEYPrivateKey **|PrivateKey *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_SECKEYPublicKey = {"_p_p_SECKEYPublicKey", "PublicKey *|SECKEYPublicKey **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_unsigned_char = {"_p_p_unsigned_char", "unsigned char **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_prio_config = {"_p_prio_config", "struct prio_config *|PrioConfig|const_PrioConfig", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_prio_packet_verify1 = {"_p_prio_packet_verify1", "PrioPacketVerify1|const_PrioPacketVerify1|struct prio_packet_verify1 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_prio_packet_verify2 = {"_p_prio_packet_verify2", "PrioPacketVerify2|const_PrioPacketVerify2|struct prio_packet_verify2 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_prio_config = {"_p_prio_config", "struct prio_config *|const_PrioConfig", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_prio_packet_verify1 = {"_p_prio_packet_verify1", "const_PrioPacketVerify1|PrioPacketVerify1|struct prio_packet_verify1 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_prio_packet_verify2 = {"_p_prio_packet_verify2", "const_PrioPacketVerify2|PrioPacketVerify2|struct prio_packet_verify2 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_prio_server = {"_p_prio_server", "PrioServer|const_PrioServer|struct prio_server *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_prio_total_share = {"_p_prio_total_share", "PrioTotalShare|const_PrioTotalShare|struct prio_total_share *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_prio_total_share = {"_p_prio_total_share", "const_PrioTotalShare|PrioTotalShare|struct prio_total_share *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_prio_verifier = {"_p_prio_verifier", "struct prio_verifier *|PrioVerifier|const_PrioVerifier", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *", 0, 0, (void*)0, 0};
@@ -4432,8 +4374,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_a_AES_128_KEY_LENGTH__unsigned_char,
   &_swigt__p_bool,
   &_swigt__p_char,
-  &_swigt__p_msgpack_packer,
-  &_swigt__p_msgpack_unpacker,
   &_swigt__p_p_SECKEYPrivateKey,
   &_swigt__p_p_SECKEYPublicKey,
   &_swigt__p_p_unsigned_char,
@@ -4454,8 +4394,6 @@ static swig_cast_info _swigc__p_SECKEYPublicKey[] = {  {&_swigt__p_SECKEYPublicK
 static swig_cast_info _swigc__p_a_AES_128_KEY_LENGTH__unsigned_char[] = {  {&_swigt__p_a_AES_128_KEY_LENGTH__unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_bool[] = {  {&_swigt__p_bool, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_msgpack_packer[] = {  {&_swigt__p_msgpack_packer, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_msgpack_unpacker[] = {  {&_swigt__p_msgpack_unpacker, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_SECKEYPrivateKey[] = {  {&_swigt__p_p_SECKEYPrivateKey, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_SECKEYPublicKey[] = {  {&_swigt__p_p_SECKEYPublicKey, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_unsigned_char[] = {  {&_swigt__p_p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
@@ -4476,8 +4414,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_a_AES_128_KEY_LENGTH__unsigned_char,
   _swigc__p_bool,
   _swigc__p_char,
-  _swigc__p_msgpack_packer,
-  _swigc__p_msgpack_unpacker,
   _swigc__p_p_SECKEYPrivateKey,
   _swigc__p_p_SECKEYPublicKey,
   _swigc__p_p_unsigned_char,

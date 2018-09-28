@@ -88,7 +88,7 @@ async def main():
     sA = prio.Server(cfg, prio.PRIO_SERVER_A, skA, server_secret)
     sB = prio.Server(cfg, prio.PRIO_SERVER_B, skB, server_secret)
 
-    data_items = bytearray([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
+    data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_data)])
 
     logger.info("Starting asyncio prio pipeline.")
     client = prio.Client(cfg)
