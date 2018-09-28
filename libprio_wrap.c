@@ -3146,7 +3146,7 @@ PyObject* PrioTotalShare_write_wrapper(const_PrioTotalShare p) {
 SECStatus PrioPacketVerify1_read_wrapper(PrioPacketVerify1 p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    bool result = msgpack_unpacker_init(&upk, len);
+    bool result = msgpack_unpacker_init(&upk, len+1);
     if (result) {
         memcpy(msgpack_unpacker_buffer(&upk), data, len);
         msgpack_unpacker_buffer_consumed(&upk, len);
@@ -3316,7 +3316,7 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
 SECStatus PrioPacketVerify2_read_wrapper(PrioPacketVerify2 p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    bool result = msgpack_unpacker_init(&upk, len);
+    bool result = msgpack_unpacker_init(&upk, len+1);
     if (result) {
         memcpy(msgpack_unpacker_buffer(&upk), data, len);
         msgpack_unpacker_buffer_consumed(&upk, len);
@@ -3330,7 +3330,7 @@ SECStatus PrioPacketVerify2_read_wrapper(PrioPacketVerify2 p, const unsigned cha
 SECStatus PrioTotalShare_read_wrapper(PrioTotalShare p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    bool result = msgpack_unpacker_init(&upk, len);
+    bool result = msgpack_unpacker_init(&upk, len+1);
     if (result) {
         memcpy(msgpack_unpacker_buffer(&upk), data, len);
         msgpack_unpacker_buffer_consumed(&upk, len);

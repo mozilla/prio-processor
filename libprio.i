@@ -211,7 +211,7 @@ MSGPACK_WRITE_WRAPPER(PrioTotalShare)
 SECStatus type ## _read_wrapper(type p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    bool result = msgpack_unpacker_init(&upk, len);
+    bool result = msgpack_unpacker_init(&upk, len+1);
     if (result) {
         memcpy(msgpack_unpacker_buffer(&upk), data, len);
         msgpack_unpacker_buffer_consumed(&upk, len);
