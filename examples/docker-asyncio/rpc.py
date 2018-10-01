@@ -25,21 +25,23 @@ class Client:
             no_ack=True,
             queue_name=self.callback_queue
         )
-    
-    async def on_response(self, chennel, body, envelope, properties):
+
+    async def on_response(self, channel, body, envelope, properties):
         if self.corr_id == properties.correlation_id:
             self.response = bytes(body)
         self.waiter.set()
-    
-    async def call(self):
+
+    async def call(self, server_id):
+        await self.connect()
         self.corr_id = str(uuid.uuid4())
         self.response = None
         await self.channel.basic_publish(
+            payload=str(server_id),
             exchange_name='',
-            routing_key='rpc_queue',
+            routing_key='pubkey.{}'.format(server_id),
             properties={
                 'reply_to': self.callback_queue,
-                'correlation_id', self.corr_id,
+                'correlation_id': self.corr_id,
             }
         )
         await self.waiter.wait()
@@ -47,17 +49,18 @@ class Client:
 
 
 class Server:
-    def __init__(self, protocol, handler):
+    def __init__(self, protocol, handler, server_id):
         self.protocol = protocol
         self.channel = None
         self.handler = handler
-    
+        self.server_id = server_id
+
     async def connect(self):
-        self.channel = self.protocol.channel()
-        await self.channel.queue_declare(queue_name='rpc_queue')
-        await self.channel.basic_qos(prefetch_count=1, prefetch_size=0, connection_global=False)
-        await self.channel.basic_consume(self.on_request, queue_name='rpc_queue')
-    
+        self.channel = await self.protocol.channel()
+        queue_name = "pubkey.{}".format(self.server_id)
+        await self.channel.queue_declare(queue_name=queue_name)
+        await self.channel.basic_consume(self.on_request, queue_name=queue_name)
+
     async def on_request(self, channel, body, envelope, properties):
         response = self.handler()
         await self.channel.basic_publish(

@@ -2,6 +2,8 @@ import asyncio
 import aioamqp
 import logging
 
+import rpc
+
 logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -11,13 +13,15 @@ async def main():
     queue_name = "test"
 
     transport, protocol = await aioamqp.connect("rabbitmq", 5672, "guest", "guest")
-    channel = await protocol.channel()
-    await channel.queue_declare(queue_name=queue_name)
-    await channel.basic_publish(
-        payload="Hello World",
-        exchange_name="",
-        routing_key=queue_name
-    )
+
+    await asyncio.sleep(5)
+    logging.info("Collecting public keys")
+    key = await rpc.Client(protocol).call(0)
+    logging.info(key)
+
+    key1 = await rpc.Client(protocol).call(1)
+    logging.info(key1)
+
     await protocol.close()
     transport.close()
     logger.info("Client done!")
