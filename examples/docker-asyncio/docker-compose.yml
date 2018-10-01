@@ -3,24 +3,37 @@ version: '3.4'
 x-app: &app
   build: ../../
   volumes:
-    - .:/app/examples/docker-asyncio
+    - .:/app/examples/docker-asyncio:z
 
-services:  
+services:
   client:
     <<: *app
     depends_on:
       - rabbitmq
-      - server
+      - server_a
+      - server_b
     command: >
       bash -c "cd examples/docker-asyncio &&
       pipenv sync &&
-      sleep 5 && 
       wait-for-it rabbitmq:5672 -- pipenv run python client.py"
-  
-  server:
+
+  server_a:
     <<: *app
     depends_on:
       - rabbitmq
+    environment:
+      - SERVER_ID=0
+    command: >
+      bash -c "cd examples/docker-asyncio &&
+      pipenv sync &&
+      wait-for-it rabbitmq:5672 -- pipenv run python server.py"
+
+  server_b:
+    <<: *app
+    depends_on:
+      - rabbitmq
+    environment:
+      - SERVER_ID=1
     command: >
       bash -c "cd examples/docker-asyncio &&
       pipenv sync &&
