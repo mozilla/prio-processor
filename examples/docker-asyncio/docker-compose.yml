@@ -15,29 +15,34 @@ services:
     command: >
       bash -c "cd examples/docker-asyncio &&
       pipenv sync &&
-      wait-for-it rabbitmq:5672 -- pipenv run python client.py"
+      wait-for-it rabbitmq:5672 -- pipenv run \
+        python client.py \
+          --n-clients 3 \
+          --n-fields 133"
 
   server_a:
     <<: *app
     depends_on:
       - rabbitmq
-    environment:
-      - SERVER_ID=0
     command: >
       bash -c "cd examples/docker-asyncio &&
       pipenv sync &&
-      wait-for-it rabbitmq:5672 -- pipenv run python server.py"
+      wait-for-it rabbitmq:5672 -- pipenv run \
+        python server.py \
+          --server-id a \
+          --n-fields 133"
 
   server_b:
     <<: *app
     depends_on:
       - rabbitmq
-    environment:
-      - SERVER_ID=1
     command: >
       bash -c "cd examples/docker-asyncio &&
       pipenv sync &&
-      wait-for-it rabbitmq:5672 -- pipenv run python server.py"
+      wait-for-it rabbitmq:5672 -- pipenv run \
+        python server.py \
+          --server-id b \
+          --n-fields 133"
 
   rabbitmq:
     image: rabbitmq:latest

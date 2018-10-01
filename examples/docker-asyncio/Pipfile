@@ -9,6 +9,7 @@ docker-compose = ">= 1.10.0"
 [packages]
 "prio" = {path = "./../..", editable = true}
 aioamqp = "*"
+click = "*"
 
 [requires]
 python_version = "3.6"
