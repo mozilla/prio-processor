@@ -56,8 +56,7 @@ def test_client_agg(n_clients):
 
 def test_publickey_export():
     raw_bytes = bytes((3*x + 7) % 0xFF for x in range(libprio.CURVE25519_KEY_LEN))
-    pubkey = prio.PublicKey()
-    pubkey.import_bin(raw_bytes)
+    pubkey = prio.PublicKey().import_bin(raw_bytes)
     raw_bytes2 = pubkey.export_bin()
 
     assert raw_bytes == raw_bytes2
@@ -74,8 +73,7 @@ def test_publickey_import_hex(hex_bytes):
         0xAA, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11
     ])
 
-    pubkey = prio.PublicKey()
-    pubkey.import_hex(hex_bytes)
+    pubkey = prio.PublicKey().import_hex(hex_bytes)
     raw_bytes = pubkey.export_bin()
 
     assert raw_bytes == expect
@@ -96,8 +94,7 @@ def test_publickey_export_hex():
         0xC0, 0xD0, 0xE0, 0xF0, 0x00, 0x00, 0xFF, 0xEE, 0xDD, 0xCC, 0xBB,
         0xAA, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11
     ])
-    pubkey = prio.PublicKey()
-    pubkey.import_bin(raw_bytes)
+    pubkey = prio.PublicKey().import_bin(raw_bytes)
     hex_bytes = pubkey.export_hex()
     assert bytes(hex_bytes) == expect
 
@@ -106,3 +103,10 @@ def test_publickey_export_missing_key():
     pubkey = prio.PublicKey()
     assert pubkey.export_bin() is None
     assert pubkey.export_hex() is None
+
+def test_privatekey():
+    pvtkey, pubkey = prio.create_keypair()
+    pvtdata = pvtkey.export_bin()
+    pubdata = pubkey.export_bin()
+    new_pvtkey = prio.PrivateKey().import_bin(pvtdata, pubdata)
+    assert pvtdata == new_pvtkey.export_bin()

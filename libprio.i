@@ -67,7 +67,7 @@ OPAQUE_POINTER(PublicKey)
 OPAQUE_POINTER(PrivateKey)
 
 
-// The only way to generate a PRGSeed is to call randomize
+// PrioPRGSeed_randomize
 %typemap(in,numinputs=0) PrioPRGSeed * (PrioPRGSeed tmp) {
     $1 = &tmp;
 }
@@ -81,10 +81,11 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 
-// Read constant data into data-structures.
-// Note: In Python 3, strings are handled as unicode and need to be encoded as UTF-8
-// to work properly when matched against these function signature snippets.
-//
+// PrioConfig_new
+// PublicKey_import
+// PrivateKey_import
+// PublicKey_import_hex
+// PrivateKey_import_hex
 %typemap(in) (const unsigned char *, unsigned int) {
     if (!PyBytes_Check($input)) {
         PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
@@ -95,23 +96,47 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 %apply (const unsigned char *, unsigned int) {
-    (const unsigned char * batch_id, unsigned int batch_id_len),
+    (const unsigned char *batchId, unsigned int batchIdLen),
     (const unsigned char *data, unsigned int dataLen),
-    (const unsigned char *hex_data, unsigned int dataLen)
+    (const unsigned char *hexData, unsigned int dataLen),
+    (const unsigned char *privData, unsigned int privDataLen),
+    (const unsigned char *pubData, unsigned int pubDataLen),
+    (const unsigned char *privHexData, unsigned int privDataLen),
+    (const unsigned char *pubHexData, unsigned int pubDataLen)
 }
 
 
-// PublicKey_export
-%typemap(in,numinputs=0) unsigned char data[ANY] (unsigned char tmp[$1_dim0]) {
-    $1 = tmp;
+// We need to redefine the function so we can fix the buffer size at
+// compile time, using the Python object
+%define EXPORT_KEY(TYPE, ARGTYPE, FUNC, BUFSIZE)
+
+// Ignore the mprio.h functions
+%ignore TYPE ## _ ## FUNC;
+
+// Rename the wrapper function
+%rename(TYPE ## _ ## FUNC) TYPE ## _ ## FUNC ## _wrapper;
+
+// Define the wrapper function
+%inline {
+    PyObject* TYPE ## _ ## FUNC ## _wrapper(ARGTYPE key) {
+        SECStatus rv = SECFailure;
+        unsigned char data[BUFSIZE];
+
+        rv = TYPE ## _ ## FUNC(key, data, BUFSIZE);
+        if (rv != SECSuccess) {
+            PyErr_SetString(PyExc_RuntimeError, "Error exporting TYPE");
+            return NULL;
+        }
+        return PyBytes_FromStringAndSize((char *)data, BUFSIZE);
+    }
 }
 
-%typemap(argout) unsigned char data[ANY] {
-    $result = SWIG_Python_AppendOutput(
-        $result,
-        PyBytes_FromStringAndSize((const char*)$1, $1_dim0)
-    );
-}
+%enddef
+
+EXPORT_KEY(PublicKey, const_PublicKey, export, CURVE25519_KEY_LEN)
+EXPORT_KEY(PublicKey, const_PublicKey, export_hex, CURVE25519_KEY_LEN_HEX+1)
+EXPORT_KEY(PrivateKey, PrivateKey, export, CURVE25519_KEY_LEN)
+EXPORT_KEY(PrivateKey, PrivateKey, export_hex, CURVE25519_KEY_LEN_HEX+1)
 
 
 // PrioClient_encode
@@ -136,8 +161,8 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 %apply (unsigned char **, unsigned int *) {
-    (unsigned char **for_server_a, unsigned int *aLen),
-    (unsigned char **for_server_b, unsigned int *bLen)
+    (unsigned char **forServerA, unsigned int *aLen),
+    (unsigned char **forServerB, unsigned int *bLen)
 }
 
 
@@ -175,17 +200,18 @@ OPAQUE_POINTER(PrivateKey)
 // Memory shouldn't be moving around so much, but this wrapper function needs to exist in
 // order to marshal data due to typemaps not having side-effects
 
-%define MSGPACK_WRITE_WRAPPER(type)
-%ignore type ## _write;
+%define MSGPACK_WRITE(TYPE)
+%ignore TYPE ## _write;
+%rename(TYPE ## _write) TYPE ## _write_wrapper;
 %inline %{
-PyObject* type ## _write_wrapper(const_ ## type p) {
+PyObject* TYPE ## _write_wrapper(const_ ## TYPE p) {
     PyObject* data = NULL;
     msgpack_sbuffer sbuf;
     msgpack_packer pk;
     msgpack_sbuffer_init(&sbuf);
     msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
 
-    SECStatus rv = type ## _write(p, &pk);
+    SECStatus rv = TYPE ## _write(p, &pk);
     if (rv == SECSuccess) {
         // move the data outside of this wrapper
         data = PyBytes_FromStringAndSize(sbuf.data, sbuf.size);
@@ -199,9 +225,9 @@ PyObject* type ## _write_wrapper(const_ ## type p) {
 %}
 %enddef
 
-MSGPACK_WRITE_WRAPPER(PrioPacketVerify1)
-MSGPACK_WRITE_WRAPPER(PrioPacketVerify2)
-MSGPACK_WRITE_WRAPPER(PrioTotalShare)
+MSGPACK_WRITE(PrioPacketVerify1)
+MSGPACK_WRITE(PrioPacketVerify2)
+MSGPACK_WRITE(PrioTotalShare)
 
 
 // Unfortunately, unpacking also requires some manual work. We take the binary message and
@@ -211,17 +237,18 @@ MSGPACK_WRITE_WRAPPER(PrioTotalShare)
     (const unsigned char *data, unsigned int len)
 }
 
-%define MSGPACK_READ_WRAPPER(type)
-%ignore type ## _read;
+%define MSGPACK_READ(TYPE)
+%ignore TYPE ## _read;
+%rename(TYPE ## _read) TYPE ## _read_wrapper;
 %inline %{
-SECStatus type ## _read_wrapper(type p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
+SECStatus TYPE ## _read_wrapper(TYPE p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
     msgpack_unpacker upk;
     bool result = msgpack_unpacker_init(&upk, len+1);
     if (result) {
         memcpy(msgpack_unpacker_buffer(&upk), data, len);
         msgpack_unpacker_buffer_consumed(&upk, len);
-        rv = type ## _read(p, &upk, cfg);
+        rv = TYPE ## _read(p, &upk, cfg);
     }
     msgpack_unpacker_destroy(&upk);
     return rv;
@@ -229,9 +256,9 @@ SECStatus type ## _read_wrapper(type p, const unsigned char *data, unsigned int 
 %}
 %enddef
 
-MSGPACK_READ_WRAPPER(PrioPacketVerify1)
-MSGPACK_READ_WRAPPER(PrioPacketVerify2)
-MSGPACK_READ_WRAPPER(PrioTotalShare)
+MSGPACK_READ(PrioPacketVerify1)
+MSGPACK_READ(PrioPacketVerify2)
+MSGPACK_READ(PrioTotalShare)
 
 
 %include "libprio/include/mprio.h"

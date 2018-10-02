@@ -83,3 +83,11 @@ def test_publickey_export_hex():
     pubkey = prio.PublicKey_import(raw_bytes)
     hex_bytes = prio.PublicKey_export_hex(pubkey)
     assert bytes(hex_bytes) == expect
+
+
+def test_privatekey_export():
+    pvtkey, pubkey = prio.Keypair_new()
+    pubdata = prio.PublicKey_export(pubkey)
+    pvtdata = prio.PrivateKey_export(pvtkey)
+    new_pvtkey = prio.PrivateKey_import(pvtdata, pubdata)
+    assert pvtdata == prio.PrivateKey_export(new_pvtkey)
