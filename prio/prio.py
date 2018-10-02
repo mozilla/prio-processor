@@ -53,6 +53,7 @@ class PublicKey:
         :param data: a bytestring of length `CURVE25519_KEY_LEN`
         """
         self.instance = prio.PublicKey_import(data)
+        return self
 
     def import_hex(self, data):
         """Import a curve25519 key from a case-insenstive hex string.
@@ -60,6 +61,7 @@ class PublicKey:
         :param data: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
         """
         self.instance = prio.PublicKey_import_hex(data)
+        return self
 
     def export_bin(self):
         """Export a curve25519 public key as a bytestring."""
@@ -77,6 +79,36 @@ class PublicKey:
 class PrivateKey:
     def __init__(self, instance=None):
         self.instance = instance
+
+    def import_bin(self, pvtdata, pubdata):
+        """Import a curve25519 key from a raw byte string.
+
+        :param pvtdata: a bytestring of length `CURVE25519_KEY_LEN`
+        :param pubdata: a bytestring of length `CURVE25519_KEY_LEN`
+        """
+        self.instance = prio.PrivateKey_import(pvtdata, pubdata)
+        return self
+
+    def import_hex(self, pvtdata, pubdata):
+        """Import a curve25519 key from a case-insenstive hex string.
+
+        :param pvtdata: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
+        :param pubdata: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
+        """
+        self.instance = prio.PrivateKey_import_hex(pvtdata, pubdata)
+
+    def export_bin(self):
+        """Export a curve25519 public key as a bytestring."""
+        if not self.instance:
+            return None
+        return prio.PrivateKey_export(self.instance)
+
+    def export_hex(self):
+        """Export a curve25519 public key as a NULL-terminated hex bytestring."""
+        if not self.instance:
+            return None
+        return prio.PrivateKey_export_hex(self.instance)
+
 
 class Client:
     def __init__(self, config):
