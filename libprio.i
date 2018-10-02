@@ -67,7 +67,7 @@ OPAQUE_POINTER(PublicKey)
 OPAQUE_POINTER(PrivateKey)
 
 
-// The only way to generate a PRGSeed is to call randomize
+// PrioPRGSeed_randomize
 %typemap(in,numinputs=0) PrioPRGSeed * (PrioPRGSeed tmp) {
     $1 = &tmp;
 }
@@ -81,10 +81,11 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 
-// Read constant data into data-structures.
-// Note: In Python 3, strings are handled as unicode and need to be encoded as UTF-8
-// to work properly when matched against these function signature snippets.
-//
+// PrioConfig_new
+// PublicKey_import
+// PrivateKey_import
+// PublicKey_import_hex
+// PrivateKey_import_hex
 %typemap(in) (const unsigned char *, unsigned int) {
     if (!PyBytes_Check($input)) {
         PyErr_SetString(PyExc_ValueError, "Expecting a byte string");
@@ -95,23 +96,47 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 %apply (const unsigned char *, unsigned int) {
-    (const unsigned char * batch_id, unsigned int batch_id_len),
+    (const unsigned char *batchId, unsigned int batchIdLen),
     (const unsigned char *data, unsigned int dataLen),
-    (const unsigned char *hex_data, unsigned int dataLen)
+    (const unsigned char *hexData, unsigned int dataLen),
+    (const unsigned char *privData, unsigned int privDataLen),
+    (const unsigned char *pubData, unsigned int pubDataLen),
+    (const unsigned char *privHexData, unsigned int privDataLen),
+    (const unsigned char *pubHexData, unsigned int pubDataLen)
 }
 
 
-// PublicKey_export
-%typemap(in,numinputs=0) unsigned char data[ANY] (unsigned char tmp[$1_dim0]) {
-    $1 = tmp;
+// We need to redefine the function so we can fix the buffer size at
+// compile time, using the Python object
+%define EXPORT_KEY(TYPE, ARGTYPE, FUNC, BUFSIZE)
+
+// Ignore the mprio.h functions
+%ignore TYPE ## _ ## FUNC;
+
+// Rename the wrapper function
+%rename(TYPE ## _ ## FUNC) TYPE ## _ ## FUNC ## _wrapper;
+
+// Define the wrapper function
+%inline {
+    PyObject* TYPE ## _ ## FUNC ## _wrapper(ARGTYPE key) {
+        SECStatus rv = SECFailure;
+        unsigned char data[BUFSIZE];
+
+        rv = TYPE ## _ ## FUNC(key, data, BUFSIZE);
+        if (rv != SECSuccess) {
+            PyErr_SetString(PyExc_RuntimeError, "Error exporting TYPE");
+            return NULL;
+        }
+        return PyBytes_FromStringAndSize((char *)data, BUFSIZE);
+    }
 }
 
-%typemap(argout) unsigned char data[ANY] {
-    $result = SWIG_Python_AppendOutput(
-        $result,
-        PyBytes_FromStringAndSize((const char*)$1, $1_dim0)
-    );
-}
+%enddef
+
+EXPORT_KEY(PublicKey, const_PublicKey, export, CURVE25519_KEY_LEN)
+EXPORT_KEY(PublicKey, const_PublicKey, export_hex, CURVE25519_KEY_LEN_HEX+1)
+EXPORT_KEY(PrivateKey, PrivateKey, export, CURVE25519_KEY_LEN)
+EXPORT_KEY(PrivateKey, PrivateKey, export_hex, CURVE25519_KEY_LEN_HEX+1)
 
 
 // PrioClient_encode
@@ -136,8 +161,8 @@ OPAQUE_POINTER(PrivateKey)
 }
 
 %apply (unsigned char **, unsigned int *) {
-    (unsigned char **for_server_a, unsigned int *aLen),
-    (unsigned char **for_server_b, unsigned int *bLen)
+    (unsigned char **forServerA, unsigned int *aLen),
+    (unsigned char **forServerB, unsigned int *bLen)
 }
 
 

@@ -96,6 +96,22 @@ except __builtin__.Exception:
     _newclass = 0
 
 
+def PublicKey_export(key):
+    return _prio.PublicKey_export(key)
+PublicKey_export = _prio.PublicKey_export
+
+def PublicKey_export_hex(key):
+    return _prio.PublicKey_export_hex(key)
+PublicKey_export_hex = _prio.PublicKey_export_hex
+
+def PrivateKey_export(key):
+    return _prio.PrivateKey_export(key)
+PrivateKey_export = _prio.PrivateKey_export
+
+def PrivateKey_export_hex(key):
+    return _prio.PrivateKey_export_hex(key)
+PrivateKey_export_hex = _prio.PrivateKey_export_hex
+
 def PrioPacketVerify1_write_wrapper(p):
     return _prio.PrioPacketVerify1_write_wrapper(p)
 PrioPacketVerify1_write_wrapper = _prio.PrioPacketVerify1_write_wrapper
@@ -132,16 +148,16 @@ def Prio_clear():
     return _prio.Prio_clear()
 Prio_clear = _prio.Prio_clear
 
-def PrioConfig_new(n_fields, server_a, server_b, batch_id):
-    return _prio.PrioConfig_new(n_fields, server_a, server_b, batch_id)
+def PrioConfig_new(nFields, serverA, serverB, batchId):
+    return _prio.PrioConfig_new(nFields, serverA, serverB, batchId)
 PrioConfig_new = _prio.PrioConfig_new
 
 def PrioConfig_numDataFields(cfg):
     return _prio.PrioConfig_numDataFields(cfg)
 PrioConfig_numDataFields = _prio.PrioConfig_numDataFields
 
-def PrioConfig_newTest(n_fields):
-    return _prio.PrioConfig_newTest(n_fields)
+def PrioConfig_newTest(nFields):
+    return _prio.PrioConfig_newTest(nFields)
 PrioConfig_newTest = _prio.PrioConfig_newTest
 
 def Keypair_new():
@@ -152,17 +168,17 @@ def PublicKey_import(data):
     return _prio.PublicKey_import(data)
 PublicKey_import = _prio.PublicKey_import
 
-def PublicKey_import_hex(hex_data):
-    return _prio.PublicKey_import_hex(hex_data)
+def PrivateKey_import(privData, pubData):
+    return _prio.PrivateKey_import(privData, pubData)
+PrivateKey_import = _prio.PrivateKey_import
+
+def PublicKey_import_hex(hexData):
+    return _prio.PublicKey_import_hex(hexData)
 PublicKey_import_hex = _prio.PublicKey_import_hex
 
-def PublicKey_export(pk):
-    return _prio.PublicKey_export(pk)
-PublicKey_export = _prio.PublicKey_export
-
-def PublicKey_export_hex(pk):
-    return _prio.PublicKey_export_hex(pk)
-PublicKey_export_hex = _prio.PublicKey_export_hex
+def PrivateKey_import_hex(privHexData, pubHexData):
+    return _prio.PrivateKey_import_hex(privHexData, pubHexData)
+PrivateKey_import_hex = _prio.PrivateKey_import_hex
 
 def PrioClient_encode(cfg, data_in):
     return _prio.PrioClient_encode(cfg, data_in)
@@ -172,8 +188,8 @@ def PrioPRGSeed_randomize():
     return _prio.PrioPRGSeed_randomize()
 PrioPRGSeed_randomize = _prio.PrioPRGSeed_randomize
 
-def PrioServer_new(cfg, server_idx, server_priv, server_shared_secret):
-    return _prio.PrioServer_new(cfg, server_idx, server_priv, server_shared_secret)
+def PrioServer_new(cfg, serverIdx, serverPriv, serverSharedSecret):
+    return _prio.PrioServer_new(cfg, serverIdx, serverPriv, serverSharedSecret)
 PrioServer_new = _prio.PrioServer_new
 
 def PrioVerifier_new(s):
