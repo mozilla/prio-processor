@@ -3531,13 +3531,13 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PrioPacketVerify1_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_PrioPacketVerify1_write(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   const_PrioPacketVerify1 arg1 = (const_PrioPacketVerify1) 0 ;
   PyObject * obj0 = 0 ;
   PyObject *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify1_write_wrapper",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify1_write",&obj0)) SWIG_fail;
   {
     arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify1");
   }
@@ -3549,13 +3549,13 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PrioPacketVerify2_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_PrioPacketVerify2_write(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   const_PrioPacketVerify2 arg1 = (const_PrioPacketVerify2) 0 ;
   PyObject * obj0 = 0 ;
   PyObject *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify2_write_wrapper",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioPacketVerify2_write",&obj0)) SWIG_fail;
   {
     arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify2");
   }
@@ -3567,13 +3567,13 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PrioTotalShare_write_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_PrioTotalShare_write(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   const_PrioTotalShare arg1 = (const_PrioTotalShare) 0 ;
   PyObject * obj0 = 0 ;
   PyObject *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:PrioTotalShare_write_wrapper",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:PrioTotalShare_write",&obj0)) SWIG_fail;
   {
     arg1 = PyCapsule_GetPointer(obj0, "PrioTotalShare");
   }
@@ -3585,7 +3585,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   PrioPacketVerify1 arg1 = (PrioPacketVerify1) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
@@ -3596,7 +3596,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read_wrapper(PyObject *SWIGUNUSEDPA
   PyObject * obj2 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify1_read_wrapper",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify1_read",&obj0,&obj1,&obj2)) SWIG_fail;
   {
     arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify1");
   }
@@ -3614,7 +3614,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read_wrapper(PyObject *SWIGUNUSEDPA
   result = PrioPacketVerify1_read_wrapper(arg1,(unsigned char const *)arg2,arg3,(struct prio_config const *)arg4);
   {
     if (result != SECSuccess) {
-      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify1_read_wrapper was not succesful.");
+      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify1_read was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
@@ -3625,7 +3625,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   PrioPacketVerify2 arg1 = (PrioPacketVerify2) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
@@ -3636,7 +3636,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read_wrapper(PyObject *SWIGUNUSEDPA
   PyObject * obj2 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify2_read_wrapper",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioPacketVerify2_read",&obj0,&obj1,&obj2)) SWIG_fail;
   {
     arg1 = PyCapsule_GetPointer(obj0, "PrioPacketVerify2");
   }
@@ -3654,7 +3654,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read_wrapper(PyObject *SWIGUNUSEDPA
   result = PrioPacketVerify2_read_wrapper(arg1,(unsigned char const *)arg2,arg3,(struct prio_config const *)arg4);
   {
     if (result != SECSuccess) {
-      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify2_read_wrapper was not succesful.");
+      PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify2_read was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
@@ -3665,7 +3665,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_PrioTotalShare_read_wrapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_PrioTotalShare_read(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   PrioTotalShare arg1 = (PrioTotalShare) 0 ;
   unsigned char *arg2 = (unsigned char *) 0 ;
@@ -3676,7 +3676,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_read_wrapper(PyObject *SWIGUNUSEDPARM(
   PyObject * obj2 = 0 ;
   SECStatus result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_read_wrapper",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_read",&obj0,&obj1,&obj2)) SWIG_fail;
   {
     arg1 = PyCapsule_GetPointer(obj0, "PrioTotalShare");
   }
@@ -3694,7 +3694,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_read_wrapper(PyObject *SWIGUNUSEDPARM(
   result = PrioTotalShare_read_wrapper(arg1,(unsigned char const *)arg2,arg3,(struct prio_config const *)arg4);
   {
     if (result != SECSuccess) {
-      PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_read_wrapper was not succesful.");
+      PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_read was not succesful.");
       SWIG_fail;
     }
     resultobj = Py_None;
@@ -4468,12 +4468,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"PublicKey_export_hex", _wrap_PublicKey_export_hex, METH_VARARGS, NULL},
 	 { (char *)"PrivateKey_export", _wrap_PrivateKey_export, METH_VARARGS, NULL},
 	 { (char *)"PrivateKey_export_hex", _wrap_PrivateKey_export_hex, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_write_wrapper", _wrap_PrioPacketVerify1_write_wrapper, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_write_wrapper", _wrap_PrioPacketVerify2_write_wrapper, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_write_wrapper", _wrap_PrioTotalShare_write_wrapper, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_read_wrapper", _wrap_PrioPacketVerify1_read_wrapper, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_read_wrapper", _wrap_PrioPacketVerify2_read_wrapper, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_read_wrapper", _wrap_PrioTotalShare_read_wrapper, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify1_write", _wrap_PrioPacketVerify1_write, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify2_write", _wrap_PrioPacketVerify2_write, METH_VARARGS, NULL},
+	 { (char *)"PrioTotalShare_write", _wrap_PrioTotalShare_write, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify1_read", _wrap_PrioPacketVerify1_read, METH_VARARGS, NULL},
+	 { (char *)"PrioPacketVerify2_read", _wrap_PrioPacketVerify2_read, METH_VARARGS, NULL},
+	 { (char *)"PrioTotalShare_read", _wrap_PrioTotalShare_read, METH_VARARGS, NULL},
 	 { (char *)"Prio_init", _wrap_Prio_init, METH_VARARGS, NULL},
 	 { (char *)"Prio_clear", _wrap_Prio_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_new", _wrap_PrioConfig_new, METH_VARARGS, NULL},

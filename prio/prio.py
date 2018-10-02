@@ -155,11 +155,11 @@ class PacketVerify1:
 
     def deserialize(self, config):
         if self._serial_data:
-            prio.PrioPacketVerify1_read_wrapper(self.instance, self._serial_data, config.instance)
+            prio.PrioPacketVerify1_read(self.instance, self._serial_data, config.instance)
         self._serial_data = None
 
     def __getstate__(self):
-        return prio.PrioPacketVerify1_write_wrapper(self.instance)
+        return prio.PrioPacketVerify1_write(self.instance)
 
     def __setstate__(self, state):
         self.instance = prio.PrioPacketVerify1_new()
@@ -175,11 +175,11 @@ class PacketVerify2:
 
     def deserialize(self, config):
         if self._serial_data:
-            prio.PrioPacketVerify2_read_wrapper(self.instance, self._serial_data, config.instance)
+            prio.PrioPacketVerify2_read(self.instance, self._serial_data, config.instance)
         self._serial_data = None
 
     def __getstate__(self):
-        return prio.PrioPacketVerify2_write_wrapper(self.instance)
+        return prio.PrioPacketVerify2_write(self.instance)
 
     def __setstate__(self, state):
         self.instance = prio.PrioPacketVerify2_new()
@@ -195,11 +195,11 @@ class TotalShare:
 
     def deserialize(self, config):
         if self._serial_data:
-            prio.PrioTotalShare_read_wrapper(self.instance, self._serial_data, config.instance)
+            prio.PrioTotalShare_read(self.instance, self._serial_data, config.instance)
         self._serial_data = None
 
     def __getstate__(self):
-        return prio.PrioTotalShare_write_wrapper(self.instance)
+        return prio.PrioTotalShare_write(self.instance)
 
     def __setstate__(self, state):
         self.instance = prio.PrioTotalShare_new()

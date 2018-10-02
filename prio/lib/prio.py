@@ -112,29 +112,29 @@ def PrivateKey_export_hex(key):
     return _prio.PrivateKey_export_hex(key)
 PrivateKey_export_hex = _prio.PrivateKey_export_hex
 
-def PrioPacketVerify1_write_wrapper(p):
-    return _prio.PrioPacketVerify1_write_wrapper(p)
-PrioPacketVerify1_write_wrapper = _prio.PrioPacketVerify1_write_wrapper
+def PrioPacketVerify1_write(p):
+    return _prio.PrioPacketVerify1_write(p)
+PrioPacketVerify1_write = _prio.PrioPacketVerify1_write
 
-def PrioPacketVerify2_write_wrapper(p):
-    return _prio.PrioPacketVerify2_write_wrapper(p)
-PrioPacketVerify2_write_wrapper = _prio.PrioPacketVerify2_write_wrapper
+def PrioPacketVerify2_write(p):
+    return _prio.PrioPacketVerify2_write(p)
+PrioPacketVerify2_write = _prio.PrioPacketVerify2_write
 
-def PrioTotalShare_write_wrapper(p):
-    return _prio.PrioTotalShare_write_wrapper(p)
-PrioTotalShare_write_wrapper = _prio.PrioTotalShare_write_wrapper
+def PrioTotalShare_write(p):
+    return _prio.PrioTotalShare_write(p)
+PrioTotalShare_write = _prio.PrioTotalShare_write
 
-def PrioPacketVerify1_read_wrapper(p, data, cfg):
-    return _prio.PrioPacketVerify1_read_wrapper(p, data, cfg)
-PrioPacketVerify1_read_wrapper = _prio.PrioPacketVerify1_read_wrapper
+def PrioPacketVerify1_read(p, data, cfg):
+    return _prio.PrioPacketVerify1_read(p, data, cfg)
+PrioPacketVerify1_read = _prio.PrioPacketVerify1_read
 
-def PrioPacketVerify2_read_wrapper(p, data, cfg):
-    return _prio.PrioPacketVerify2_read_wrapper(p, data, cfg)
-PrioPacketVerify2_read_wrapper = _prio.PrioPacketVerify2_read_wrapper
+def PrioPacketVerify2_read(p, data, cfg):
+    return _prio.PrioPacketVerify2_read(p, data, cfg)
+PrioPacketVerify2_read = _prio.PrioPacketVerify2_read
 
-def PrioTotalShare_read_wrapper(p, data, cfg):
-    return _prio.PrioTotalShare_read_wrapper(p, data, cfg)
-PrioTotalShare_read_wrapper = _prio.PrioTotalShare_read_wrapper
+def PrioTotalShare_read(p, data, cfg):
+    return _prio.PrioTotalShare_read(p, data, cfg)
+PrioTotalShare_read = _prio.PrioTotalShare_read
 CURVE25519_KEY_LEN = _prio.CURVE25519_KEY_LEN
 CURVE25519_KEY_LEN_HEX = _prio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _prio.PRIO_SERVER_A
