@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+awscli = "*"
+
+[packages]
+"prio" = {path = "./../..", editable = true}
+"s3fs" = "*"
+pyarrow = "*"
+click = "*"
+
+[requires]
+python_version = "3.6"
