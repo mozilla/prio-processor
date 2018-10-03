@@ -96,6 +96,7 @@ class PrivateKey:
         :param pubdata: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
         """
         self.instance = prio.PrivateKey_import_hex(pvtdata, pubdata)
+        return self
 
     def export_bin(self):
         """Export a curve25519 public key as a bytestring."""
