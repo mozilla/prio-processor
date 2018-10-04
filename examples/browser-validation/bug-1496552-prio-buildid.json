@@ -1,0 +1,5397 @@
+{
+  "type": "main",
+  "id": "ece14fff-4e95-4b48-af4a-73e13d7270cb",
+  "creationDate": "2018-10-04T20:35:58.520Z",
+  "version": 4,
+  "application": {
+    "architecture": "x86-64",
+    "buildId": "20181004170009",
+    "name": "Firefox",
+    "version": "64.0a1",
+    "displayVersion": "64.0a1",
+    "vendor": "Mozilla",
+    "platformVersion": "64.0a1",
+    "xpcomAbi": "x86_64-gcc3",
+    "channel": "default"
+  },
+  "payload": {
+    "ver": 4,
+    "simpleMeasurements": {
+      "totalTime": 3,
+      "addonManager": {
+        "XPIDB_parseDB_MS": 5
+      },
+      "start": 15,
+      "main": 97,
+      "selectProfile": 246,
+      "startupCrashDetectionBegin": 305,
+      "firstPaint": 1082,
+      "sessionRestoreInit": 512,
+      "sessionRestored": 1345,
+      "createTopLevelWindow": 542,
+      "firstLoadURI": 3122,
+      "AMI_startup_begin": 318,
+      "XPI_startup_begin": 337,
+      "XPI_bootstrap_addons_begin": 345,
+      "XPI_bootstrap_addons_end": 377,
+      "XPI_startup_end": 377,
+      "AMI_startup_end": 383,
+      "XPI_finalUIStartup": 512,
+      "sessionRestoreInitialized": 533,
+      "delayedStartupStarted": 1179,
+      "delayedStartupFinished": 1241,
+      "startupInterrupted": 0,
+      "maximalNumberOfConcurrentThreads": 58,
+      "debuggerAttached": 0,
+      "shutdownDuration": 313,
+      "activeTicks": 1
+    },
+    "log": [],
+    "webrtc": {
+      "IceCandidatesStats": {
+        "webrtc": {}
+      }
+    },
+    "processes": {
+      "parent": {
+        "scalars": {
+          "images.webp.probe_observed": false,
+          "browser.engagement.active_ticks": 1,
+          "formautofill.availability": true,
+          "browser.engagement.max_concurrent_window_count": 1,
+          "timestamps.first_paint": 1082,
+          "browser.timings.last_shutdown": 313,
+          "images.webp.content_observed": false,
+          "browser.engagement.unfiltered_uri_count": 1,
+          "browser.engagement.restored_pinned_tabs_count": 0,
+          "browser.engagement.max_concurrent_tab_count": 1
+        },
+        "keyedScalars": {
+          "telemetry.accumulate_clamped_values": {
+            "HTTP_CACHE_IO_QUEUE_2_EVICT": 1
+          },
+          "images.webp.content_frequency": {
+            "other": 46
+          },
+          "security.pkcs11_modules_loaded": {
+            "NSS Internal PKCS #11 Module": true
+          }
+        },
+        "gc": {
+          "random": [],
+          "worst": []
+        }
+      },
+      "content": {
+        "histograms": {
+          "CYCLE_COLLECTOR_OOM": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "CYCLE_COLLECTOR_WORKER_OOM": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "GC_MINOR_REASON": {
+            "range": [
+              1,
+              100
+            ],
+            "bucket_count": 101,
+            "histogram_type": 1,
+            "values": {
+              "9": 0,
+              "10": 1,
+              "11": 0
+            },
+            "sum": 10
+          },
+          "GC_MINOR_REASON_LONG": {
+            "range": [
+              1,
+              100
+            ],
+            "bucket_count": 101,
+            "histogram_type": 1,
+            "values": {
+              "9": 0,
+              "10": 1,
+              "11": 0
+            },
+            "sum": 10
+          },
+          "GC_MINOR_US": {
+            "range": [
+              1,
+              1000000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "1963": 0,
+              "2235": 1,
+              "2545": 0
+            },
+            "sum": 2462
+          },
+          "GC_NURSERY_BYTES": {
+            "range": [
+              1,
+              16777216
+            ],
+            "bucket_count": 16,
+            "histogram_type": 1,
+            "values": {
+              "0": 0,
+              "1": 1,
+              "1198374": 0
+            },
+            "sum": 1048576
+          },
+          "GC_PRETENURE_COUNT": {
+            "range": [
+              1,
+              32
+            ],
+            "bucket_count": 33,
+            "histogram_type": 1,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "GEOLOCATION_ERROR": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "JS_PRIVILEGED_PARSER_COMPILE_LAZY_AFTER_MS": {
+            "range": [
+              10,
+              10000
+            ],
+            "bucket_count": 10,
+            "histogram_type": 0,
+            "values": {
+              "0": 161,
+              "10": 9,
+              "24": 19,
+              "57": 17,
+              "135": 7,
+              "319": 10,
+              "755": 8,
+              "1786": 6,
+              "4226": 0
+            },
+            "sum": 35467
+          },
+          "JS_WEB_PARSER_COMPILE_LAZY_AFTER_MS": {
+            "range": [
+              10,
+              10000
+            ],
+            "bucket_count": 10,
+            "histogram_type": 0,
+            "values": {
+              "0": 192,
+              "10": 153,
+              "24": 176,
+              "57": 88,
+              "135": 194,
+              "319": 25,
+              "755": 9,
+              "1786": 0
+            },
+            "sum": 76606
+          },
+          "XUL_CACHE_DISABLED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "MAC_INITFONTLIST_TOTAL": {
+            "range": [
+              1,
+              30000
+            ],
+            "bucket_count": 10,
+            "histogram_type": 0,
+            "values": {
+              "4": 0,
+              "14": 1,
+              "50": 0
+            },
+            "sum": 23
+          },
+          "FONT_CACHE_HIT": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 2,
+            "values": {
+              "0": 15,
+              "1": 1,
+              "2": 0
+            },
+            "sum": 1
+          },
+          "IMAGE_DECODE_TIME": {
+            "range": [
+              50,
+              50000000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "0": 3,
+              "236": 1,
+              "360": 1,
+              "415": 3,
+              "478": 1,
+              "633": 2,
+              "729": 2,
+              "839": 1,
+              "966": 1,
+              "1112": 0
+            },
+            "sum": 7378
+          },
+          "IMAGE_DECODE_CHUNKS": {
+            "range": [
+              1,
+              500
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 0,
+              "1": 15,
+              "2": 0
+            },
+            "sum": 15
+          },
+          "IMAGE_DECODE_SPEED_JPEG": {
+            "range": [
+              500,
+              50000000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "5506": 0,
+              "6998": 1,
+              "14370": 1,
+              "23216": 1,
+              "29509": 0
+            },
+            "sum": 53093
+          },
+          "IMAGE_DECODE_SPEED_PNG": {
+            "range": [
+              500,
+              50000000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "2109": 0,
+              "2681": 1,
+              "5506": 2,
+              "6998": 2,
+              "8895": 1,
+              "11306": 1,
+              "14370": 1,
+              "18265": 3,
+              "23216": 0
+            },
+            "sum": 135108
+          },
+          "HTTP_SCHEME_UPGRADE_TYPE": {
+            "range": [
+              1,
+              50
+            ],
+            "bucket_count": 51,
+            "histogram_type": 5,
+            "values": {
+              "0": 5,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "REFRESH_DRIVER_TICK": {
+            "range": [
+              1,
+              1000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 36,
+              "1": 21,
+              "2": 2,
+              "3": 1,
+              "4": 1,
+              "5": 1,
+              "11": 1,
+              "12": 1,
+              "14": 1,
+              "16": 1,
+              "20": 1,
+              "26": 1,
+              "47": 1,
+              "53": 1,
+              "75": 1,
+              "84": 0
+            },
+            "sum": 329
+          },
+          "PAINT_BUILD_DISPLAYLIST_TIME": {
+            "range": [
+              1,
+              1000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 51,
+              "1": 1,
+              "2": 0
+            },
+            "sum": 1
+          },
+          "PAINT_BUILD_LAYERS_TIME": {
+            "range": [
+              1,
+              1000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 38,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "PAINT_RASTERIZE_TIME": {
+            "range": [
+              1,
+              1000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 40,
+              "1": 2,
+              "2": 1,
+              "3": 2,
+              "4": 1,
+              "12": 1,
+              "14": 1,
+              "20": 2,
+              "23": 1,
+              "42": 1,
+              "47": 0
+            },
+            "sum": 149
+          },
+          "LINK_ICON_SIZES_ATTR_USAGE": {
+            "range": [
+              1,
+              4
+            ],
+            "bucket_count": 5,
+            "histogram_type": 1,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "FX_REFRESH_DRIVER_CONTENT_FRAME_DELAY_MS": {
+            "range": [
+              1,
+              10000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 69,
+              "2": 2,
+              "5": 2,
+              "8": 1,
+              "10": 1,
+              "14": 1,
+              "29": 2,
+              "40": 1,
+              "48": 1,
+              "57": 1,
+              "68": 0
+            },
+            "sum": 271
+          },
+          "INPUT_EVENT_RESPONSE_MS": {
+            "range": [
+              1,
+              10000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 40,
+              "1": 4,
+              "2": 2,
+              "17": 1,
+              "20": 1,
+              "40": 2,
+              "48": 0
+            },
+            "sum": 133
+          },
+          "INPUT_EVENT_RESPONSE_COALESCED_MS": {
+            "range": [
+              1,
+              10000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 38,
+              "1": 4,
+              "2": 2,
+              "17": 1,
+              "20": 1,
+              "40": 1,
+              "48": 0
+            },
+            "sum": 89
+          },
+          "LOAD_INPUT_EVENT_RESPONSE_MS": {
+            "range": [
+              1,
+              10000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 1,
+              "20": 1,
+              "40": 2,
+              "48": 0
+            },
+            "sum": 108
+          },
+          "INNERWINDOWS_WITH_MUTATION_LISTENERS": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 2,
+            "values": {
+              "0": 3,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "CHARSET_OVERRIDE_USED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "XMLHTTPREQUEST_ASYNC_OR_SYNC": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 2,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "STARTUP_CRASH_DETECTED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SEARCH_SERVICE_US_COUNTRY_MISMATCHED_TIMEZONE": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SEARCH_SERVICE_US_TIMEZONE_MISMATCHED_COUNTRY": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "ENABLE_PRIVILEGE_EVER_CALLED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "COMPONENTS_SHIM_ACCESSED_BY_CONTENT": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "DEVTOOLS_PERFTOOLS_RECORDING_IMPORT_FLAG": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "DEVTOOLS_PERFTOOLS_RECORDING_EXPORT_FLAG": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "MASTER_PASSWORD_ENABLED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SHOULD_TRANSLATION_UI_APPEAR": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SHOULD_AUTO_DETECT_LANGUAGE": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "FXA_CONFIGURED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "WEBFONT_PER_PAGE": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 4,
+            "values": {
+              "0": 3,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "WEBFONT_SIZE_PER_PAGE": {
+            "range": [
+              1,
+              5000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 3,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "DOM_SCRIPT_LOADING_SOURCE": {
+            "range": [
+              1,
+              50
+            ],
+            "bucket_count": 51,
+            "histogram_type": 5,
+            "values": {
+              "0": 2,
+              "2": 13,
+              "3": 0
+            },
+            "sum": 26
+          },
+          "TIME_TO_FIRST_INTERACTION_MS": {
+            "range": [
+              1,
+              50000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "55": 0,
+              "61": 1,
+              "67": 0
+            },
+            "sum": 66
+          },
+          "CONTENT_PAINT_TIME": {
+            "range": [
+              1,
+              1000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 8,
+              "1": 20,
+              "3": 2,
+              "4": 2,
+              "12": 1,
+              "14": 1,
+              "20": 2,
+              "26": 1,
+              "42": 1,
+              "47": 0
+            },
+            "sum": 174
+          },
+          "TIME_TO_NON_BLANK_PAINT_MS": {
+            "range": [
+              1,
+              100000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "27": 0,
+              "30": 1,
+              "125": 1,
+              "139": 0
+            },
+            "sum": 156
+          },
+          "TIME_TO_DOM_LOADING_MS": {
+            "range": [
+              1,
+              50000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "1": 0,
+              "2": 1,
+              "5": 1,
+              "6": 0
+            },
+            "sum": 7
+          },
+          "TIME_TO_DOM_INTERACTIVE_MS": {
+            "range": [
+              1,
+              50000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "17": 0,
+              "19": 1,
+              "108": 1,
+              "119": 0
+            },
+            "sum": 128
+          },
+          "TIME_TO_DOM_CONTENT_LOADED_END_MS": {
+            "range": [
+              1,
+              50000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "19": 0,
+              "21": 1,
+              "192": 1,
+              "211": 0
+            },
+            "sum": 220
+          },
+          "TIME_TO_DOM_COMPLETE_MS": {
+            "range": [
+              1,
+              50000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "25": 0,
+              "28": 1,
+              "192": 1,
+              "211": 0
+            },
+            "sum": 228
+          },
+          "TIME_TO_LOAD_EVENT_END_MS": {
+            "range": [
+              1,
+              50000
+            ],
+            "bucket_count": 100,
+            "histogram_type": 0,
+            "values": {
+              "25": 0,
+              "28": 1,
+              "192": 1,
+              "211": 0
+            },
+            "sum": 228
+          },
+          "GFX_OMTP_PAINT_TIME": {
+            "range": [
+              1,
+              10000
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 1,
+              "1": 1,
+              "2": 1,
+              "10": 3,
+              "12": 2,
+              "14": 1,
+              "24": 1,
+              "40": 1,
+              "81": 2,
+              "114": 1,
+              "190": 1,
+              "268": 1,
+              "318": 1,
+              "378": 0
+            },
+            "sum": 1303
+          },
+          "GFX_OMTP_PAINT_WAIT_TIME": {
+            "range": [
+              1,
+              200
+            ],
+            "bucket_count": 50,
+            "histogram_type": 0,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "GFX_OMTP_PAINT_TASK_COUNT": {
+            "range": [
+              1,
+              100
+            ],
+            "bucket_count": 25,
+            "histogram_type": 0,
+            "values": {
+              "0": 0,
+              "1": 2,
+              "2": 4,
+              "3": 1,
+              "6": 4,
+              "7": 2,
+              "9": 1,
+              "13": 1,
+              "15": 2,
+              "18": 0
+            },
+            "sum": 104
+          }
+        },
+        "keyedHistograms": {
+          "FX_TAB_REMOTE_NAVIGATION_DELAY_MS": {
+            "WebNavigation:LoadURI": {
+              "range": [
+                1,
+                4000
+              ],
+              "bucket_count": 100,
+              "histogram_type": 0,
+              "values": {
+                "0": 0,
+                "1": 1,
+                "2": 0
+              },
+              "sum": 1
+            }
+          },
+          "CONTENT_LARGE_PAINT_PHASE_WEIGHT": {
+            "fr": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "0": 3,
+                "1": 1,
+                "13": 0
+              },
+              "sum": 1
+            },
+            "r": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "75": 0,
+                "88": 4,
+                "100": 0
+              },
+              "sum": 370
+            },
+            "dl": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "0": 0,
+                "1": 4,
+                "13": 0
+              },
+              "sum": 12
+            },
+            "flb": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "0": 1,
+                "1": 3,
+                "13": 0
+              },
+              "sum": 4
+            }
+          },
+          "CONTENT_SMALL_PAINT_PHASE_WEIGHT": {
+            "fr": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "0": 34,
+                "1": 0
+              },
+              "sum": 0
+            },
+            "r": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "0": 1,
+                "1": 20,
+                "13": 5,
+                "26": 1,
+                "51": 1,
+                "63": 1,
+                "75": 2,
+                "88": 3,
+                "100": 0
+              },
+              "sum": 752
+            },
+            "dl": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "0": 1,
+                "1": 5,
+                "13": 3,
+                "26": 5,
+                "38": 4,
+                "51": 16,
+                "63": 0
+              },
+              "sum": 1302
+            },
+            "flb": {
+              "range": [
+                1,
+                100
+              ],
+              "bucket_count": 10,
+              "histogram_type": 1,
+              "values": {
+                "0": 2,
+                "1": 7,
+                "13": 12,
+                "26": 13,
+                "38": 0
+              },
+              "sum": 656
+            }
+          },
+          "NOTIFY_OBSERVERS_LATENCY_MS": {
+            "content-document-global-created": {
+              "range": [
+                3,
+                512
+              ],
+              "bucket_count": 20,
+              "histogram_type": 0,
+              "values": {
+                "0": 1,
+                "3": 0
+              },
+              "sum": 1
+            },
+            "document-element-inserted": {
+              "range": [
+                3,
+                512
+              ],
+              "bucket_count": 20,
+              "histogram_type": 0,
+              "values": {
+                "0": 1,
+                "3": 0
+              },
+              "sum": 1
+            }
+          }
+        },
+        "scalars": {
+          "images.webp.probe_observed": false,
+          "telemetry.discarded.keyed_accumulations": 0,
+          "gfx.omtp.paint_wait_ratio": 270,
+          "telemetry.discarded.accumulations": 0,
+          "telemetry.discarded.child_events": 0,
+          "images.webp.content_observed": false,
+          "telemetry.discarded.keyed_scalar_actions": 0,
+          "telemetry.discarded.scalar_actions": 0
+        },
+        "keyedScalars": {
+          "images.webp.content_frequency": {
+            "other": 30
+          }
+        },
+        "gc": {
+          "random": [],
+          "worst": []
+        }
+      },
+      "extension": {
+        "histograms": {
+          "CYCLE_COLLECTOR_OOM": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "CYCLE_COLLECTOR_WORKER_OOM": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "GEOLOCATION_ERROR": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "XUL_CACHE_DISABLED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "CHARSET_OVERRIDE_USED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "STARTUP_CRASH_DETECTED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SEARCH_SERVICE_US_COUNTRY_MISMATCHED_TIMEZONE": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SEARCH_SERVICE_US_TIMEZONE_MISMATCHED_COUNTRY": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "ENABLE_PRIVILEGE_EVER_CALLED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "COMPONENTS_SHIM_ACCESSED_BY_CONTENT": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "DEVTOOLS_PERFTOOLS_RECORDING_IMPORT_FLAG": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "DEVTOOLS_PERFTOOLS_RECORDING_EXPORT_FLAG": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "MASTER_PASSWORD_ENABLED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SHOULD_TRANSLATION_UI_APPEAR": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "SHOULD_AUTO_DETECT_LANGUAGE": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          },
+          "FXA_CONFIGURED": {
+            "range": [
+              1,
+              2
+            ],
+            "bucket_count": 3,
+            "histogram_type": 3,
+            "values": {
+              "0": 1,
+              "1": 0
+            },
+            "sum": 0
+          }
+        },
+        "keyedHistograms": {},
+        "scalars": {},
+        "keyedScalars": {}
+      },
+      "dynamic": {
+        "scalars": {}
+      },
+      "gpu": {
+        "histograms": {},
+        "keyedHistograms": {},
+        "scalars": {},
+        "keyedScalars": {}
+      }
+    },
+    "histograms": {
+      "A11Y_INSTANTIATED_FLAG": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "A11Y_ISIMPLEDOM_USAGE_FLAG": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "A11Y_IATABLE_USAGE_FLAG": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "COMPOSITE_TIME": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 9,
+          "3": 1,
+          "4": 1,
+          "5": 4,
+          "6": 2,
+          "7": 2,
+          "9": 3,
+          "10": 12,
+          "11": 29,
+          "12": 12,
+          "14": 8,
+          "16": 1,
+          "18": 2,
+          "20": 2,
+          "26": 1,
+          "29": 0
+        },
+        "sum": 905
+      },
+      "COMPOSITE_FRAME_ROUNDTRIP_TIME": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 9,
+          "6": 1,
+          "10": 11,
+          "11": 33,
+          "12": 17,
+          "14": 2,
+          "16": 5,
+          "18": 1,
+          "20": 1,
+          "26": 5,
+          "42": 3,
+          "47": 0
+        },
+        "sum": 1108
+      },
+      "CONTENT_PROCESS_LAUNCH_TIME_MS": {
+        "range": [
+          1,
+          64000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "34": 0,
+          "38": 1,
+          "42": 4,
+          "56": 1,
+          "62": 0
+        },
+        "sum": 268
+      },
+      "CYCLE_COLLECTOR_OOM": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "CYCLE_COLLECTOR_WORKER_OOM": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "GC_MINOR_REASON": {
+        "range": [
+          1,
+          100
+        ],
+        "bucket_count": 101,
+        "histogram_type": 1,
+        "values": {
+          "9": 0,
+          "10": 2,
+          "14": 1,
+          "15": 0
+        },
+        "sum": 34
+      },
+      "GC_MINOR_REASON_LONG": {
+        "range": [
+          1,
+          100
+        ],
+        "bucket_count": 101,
+        "histogram_type": 1,
+        "values": {
+          "9": 0,
+          "10": 2,
+          "14": 1,
+          "15": 0
+        },
+        "sum": 34
+      },
+      "GC_MINOR_US": {
+        "range": [
+          1,
+          1000000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "1026": 0,
+          "1168": 1,
+          "1963": 1,
+          "5548": 1,
+          "6317": 0
+        },
+        "sum": 9473
+      },
+      "GC_NURSERY_BYTES": {
+        "range": [
+          1,
+          16777216
+        ],
+        "bucket_count": 16,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "1198374": 1,
+          "3595119": 1,
+          "4793491": 0
+        },
+        "sum": 7340032
+      },
+      "GC_PRETENURE_COUNT": {
+        "range": [
+          1,
+          32
+        ],
+        "bucket_count": 33,
+        "histogram_type": 1,
+        "values": {
+          "0": 3,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "GEOLOCATION_ERROR": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "JS_PRIVILEGED_PARSER_COMPILE_LAZY_AFTER_MS": {
+        "range": [
+          10,
+          10000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 16,
+          "10": 2,
+          "24": 2,
+          "57": 21,
+          "135": 2,
+          "319": 2,
+          "755": 0
+        },
+        "sum": 2863
+      },
+      "XUL_CACHE_DISABLED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "MEMORY_RESIDENT_FAST": {
+        "range": [
+          32768,
+          16777216
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "324110": 0,
+          "345412": 1,
+          "368115": 0
+        },
+        "sum": 360144
+      },
+      "MEMORY_UNIQUE": {
+        "range": [
+          32768,
+          16777216
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "194772": 0,
+          "207574": 1,
+          "221217": 0
+        },
+        "sum": 209136
+      },
+      "MEMORY_VSIZE": {
+        "range": [
+          32768,
+          16777216
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "5685181": 0,
+          "6058846": 1,
+          "6457071": 0
+        },
+        "sum": 6402336
+      },
+      "MEMORY_JS_COMPARTMENTS_SYSTEM": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "18": 0,
+          "20": 1,
+          "23": 0
+        },
+        "sum": 21
+      },
+      "MEMORY_JS_COMPARTMENTS_USER": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "7": 0,
+          "8": 1,
+          "9": 0
+        },
+        "sum": 8
+      },
+      "MEMORY_JS_GC_HEAP": {
+        "range": [
+          1024,
+          16777216
+        ],
+        "bucket_count": 200,
+        "histogram_type": 0,
+        "values": {
+          "21379": 0,
+          "22453": 1,
+          "23581": 0
+        },
+        "sum": 22528
+      },
+      "MEMORY_STORAGE_SQLITE": {
+        "range": [
+          1024,
+          524288
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "4871": 0,
+          "5547": 1,
+          "6317": 0
+        },
+        "sum": 5786
+      },
+      "MEMORY_IMAGES_CONTENT_USED_UNCOMPRESSED": {
+        "range": [
+          1024,
+          1048576
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1024": 0
+        },
+        "sum": 33
+      },
+      "MEMORY_HEAP_OVERHEAD_FRACTION": {
+        "range": [
+          1,
+          100
+        ],
+        "bucket_count": 25,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "5": 0
+        },
+        "sum": 1
+      },
+      "GHOST_WINDOWS": {
+        "range": [
+          1,
+          128
+        ],
+        "bucket_count": 32,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "MAC_INITFONTLIST_TOTAL": {
+        "range": [
+          1,
+          30000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "1": 0,
+          "4": 1,
+          "14": 1,
+          "50": 0
+        },
+        "sum": 37
+      },
+      "FONT_CACHE_HIT": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 19,
+          "1": 5,
+          "2": 0
+        },
+        "sum": 5
+      },
+      "SHUTDOWN_OK": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "2": 0
+        },
+        "sum": 1
+      },
+      "IMAGE_DECODE_TIME": {
+        "range": [
+          50,
+          50000000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "0": 8,
+          "58": 2,
+          "77": 2,
+          "102": 2,
+          "117": 0
+        },
+        "sum": 760
+      },
+      "IMAGE_DECODE_CHUNKS": {
+        "range": [
+          1,
+          500
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 14,
+          "2": 0
+        },
+        "sum": 14
+      },
+      "IMAGE_DECODE_SPEED_PNG": {
+        "range": [
+          500,
+          50000000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "8895": 0,
+          "11306": 3,
+          "14370": 1,
+          "18265": 1,
+          "23216": 2,
+          "29509": 0
+        },
+        "sum": 118812
+      },
+      "HTTP_REQUEST_PER_CONN": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 6,
+          "1": 2,
+          "2": 0
+        },
+        "sum": 2
+      },
+      "HTTP_PROXY_TYPE": {
+        "range": [
+          1,
+          8
+        ],
+        "bucket_count": 9,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 17,
+          "2": 0
+        },
+        "sum": 17
+      },
+      "HTTP_TRANSACTION_IS_SSL": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 7,
+          "1": 6,
+          "2": 0
+        },
+        "sum": 6
+      },
+      "HTTP_TRANSACTION_USE_ALTSVC": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 21,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "HTTP_SCHEME_UPGRADE_TYPE": {
+        "range": [
+          1,
+          50
+        ],
+        "bucket_count": 51,
+        "histogram_type": 5,
+        "values": {
+          "0": 0,
+          "1": 7,
+          "2": 0
+        },
+        "sum": 7
+      },
+      "HTTP_NET_VS_CACHE_ONSTART_QSMALL_NORMALPRI_V2": {
+        "range": [
+          1,
+          80
+        ],
+        "bucket_count": 81,
+        "histogram_type": 1,
+        "values": {
+          "48": 0,
+          "49": 1,
+          "50": 1,
+          "51": 2,
+          "52": 0
+        },
+        "sum": 201
+      },
+      "HTTP_NET_VS_CACHE_ONSTOP_QSMALL_NORMALPRI_V2": {
+        "range": [
+          1,
+          80
+        ],
+        "bucket_count": 81,
+        "histogram_type": 1,
+        "values": {
+          "48": 0,
+          "49": 1,
+          "50": 1,
+          "51": 2,
+          "52": 0
+        },
+        "sum": 201
+      },
+      "HTTP_NET_VS_CACHE_ONSTOP_SMALL_V2": {
+        "range": [
+          1,
+          80
+        ],
+        "bucket_count": 81,
+        "histogram_type": 1,
+        "values": {
+          "48": 0,
+          "49": 1,
+          "50": 1,
+          "51": 2,
+          "52": 0
+        },
+        "sum": 201
+      },
+      "HTTP_NET_VS_CACHE_ONSTART_NOTREVALIDATED_V2": {
+        "range": [
+          1,
+          80
+        ],
+        "bucket_count": 81,
+        "histogram_type": 1,
+        "values": {
+          "48": 0,
+          "49": 1,
+          "50": 1,
+          "51": 2,
+          "52": 0
+        },
+        "sum": 201
+      },
+      "HTTP_NET_VS_CACHE_ONSTOP_NOTREVALIDATED_V2": {
+        "range": [
+          1,
+          80
+        ],
+        "bucket_count": 81,
+        "histogram_type": 1,
+        "values": {
+          "48": 0,
+          "49": 1,
+          "50": 1,
+          "51": 2,
+          "52": 0
+        },
+        "sum": 201
+      },
+      "HTTP_ONSTART_SUSPEND_TOTAL_TIME": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "0": 17,
+          "5": 1,
+          "6": 1,
+          "17": 1,
+          "51": 1,
+          "56": 0
+        },
+        "sum": 79
+      },
+      "NETWORK_RACE_CACHE_WITH_NETWORK_USAGE_2": {
+        "range": [
+          1,
+          50
+        ],
+        "bucket_count": 51,
+        "histogram_type": 5,
+        "values": {
+          "0": 17,
+          "1": 4,
+          "2": 0
+        },
+        "sum": 4
+      },
+      "NETWORK_RACE_CACHE_BANDWIDTH_NOT_RACE": {
+        "range": [
+          32,
+          16777216
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "0": 8,
+          "162": 4,
+          "363": 1,
+          "543": 1,
+          "621": 2,
+          "710": 5,
+          "812": 0
+        },
+        "sum": 7052
+      },
+      "TCP_FAST_OPEN_3": {
+        "range": [
+          1,
+          32
+        ],
+        "bucket_count": 33,
+        "histogram_type": 1,
+        "values": {
+          "5": 0,
+          "6": 7,
+          "7": 0
+        },
+        "sum": 42
+      },
+      "ESNI_NOESNI_TLS_SUCCESS_RATE": {
+        "range": [
+          1,
+          50
+        ],
+        "bucket_count": 51,
+        "histogram_type": 5,
+        "values": {
+          "1": 0,
+          "2": 8,
+          "3": 0
+        },
+        "sum": 16
+      },
+      "SSL_HANDSHAKE_VERSION": {
+        "range": [
+          1,
+          16
+        ],
+        "bucket_count": 17,
+        "histogram_type": 1,
+        "values": {
+          "2": 0,
+          "3": 8,
+          "4": 0
+        },
+        "sum": 24
+      },
+      "SSL_HANDSHAKE_RESULT": {
+        "range": [
+          1,
+          672
+        ],
+        "bucket_count": 673,
+        "histogram_type": 1,
+        "values": {
+          "0": 7,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SSL_TIME_UNTIL_READY": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 200,
+        "histogram_type": 0,
+        "values": {
+          "73": 0,
+          "76": 1,
+          "198": 1,
+          "237": 1,
+          "248": 1,
+          "486": 1,
+          "665": 1,
+          "728": 1,
+          "912": 1,
+          "954": 0
+        },
+        "sum": 3657
+      },
+      "SSL_TIME_UNTIL_HANDSHAKE_FINISHED": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 200,
+        "histogram_type": 0,
+        "values": {
+          "110": 0,
+          "115": 1,
+          "248": 1,
+          "310": 1,
+          "324": 1,
+          "486": 1,
+          "665": 1,
+          "728": 1,
+          "912": 1,
+          "954": 0
+        },
+        "sum": 3895
+      },
+      "SSL_BYTES_BEFORE_CERT_CALLBACK": {
+        "range": [
+          1,
+          32000
+        ],
+        "bucket_count": 64,
+        "histogram_type": 0,
+        "values": {
+          "1810": 0,
+          "2105": 4,
+          "2449": 1,
+          "2849": 4,
+          "3314": 1,
+          "3855": 1,
+          "4484": 0
+        },
+        "sum": 31967
+      },
+      "SSL_NPN_TYPE": {
+        "range": [
+          1,
+          16
+        ],
+        "bucket_count": 17,
+        "histogram_type": 1,
+        "values": {
+          "0": 4,
+          "3": 4,
+          "4": 0
+        },
+        "sum": 12
+      },
+      "SSL_RESUMED_SESSION": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 8,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "CERT_VALIDATION_HTTP_REQUEST_RESULT": {
+        "range": [
+          1,
+          16
+        ],
+        "bucket_count": 17,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 6,
+          "2": 0
+        },
+        "sum": 6
+      },
+      "CERT_VALIDATION_HTTP_REQUEST_SUCCEEDED_TIME": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 200,
+        "histogram_type": 0,
+        "values": {
+          "181": 0,
+          "189": 1,
+          "237": 1,
+          "283": 1,
+          "296": 1,
+          "465": 1,
+          "665": 1,
+          "696": 0
+        },
+        "sum": 2166
+      },
+      "SSL_KEY_EXCHANGE_ALGORITHM_FULL": {
+        "range": [
+          1,
+          16
+        ],
+        "bucket_count": 17,
+        "histogram_type": 1,
+        "values": {
+          "3": 0,
+          "4": 8,
+          "5": 0
+        },
+        "sum": 32
+      },
+      "SPDY_VERSION2": {
+        "range": [
+          1,
+          48
+        ],
+        "bucket_count": 49,
+        "histogram_type": 1,
+        "values": {
+          "4": 0,
+          "5": 3,
+          "6": 0
+        },
+        "sum": 15
+      },
+      "SPDY_PARALLEL_STREAMS": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SPDY_REQUEST_PER_CONN": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "6": 0,
+          "7": 1,
+          "8": 0
+        },
+        "sum": 7
+      },
+      "SPDY_SERVER_INITIATED_STREAMS": {
+        "range": [
+          1,
+          100000
+        ],
+        "bucket_count": 250,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SPDY_CHUNK_RECVD": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "0": 3,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SPDY_SYN_SIZE": {
+        "range": [
+          20,
+          20000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "31": 0,
+          "36": 1,
+          "150": 1,
+          "173": 0
+        },
+        "sum": 189
+      },
+      "SPDY_SYN_RATIO": {
+        "range": [
+          1,
+          99
+        ],
+        "bucket_count": 20,
+        "histogram_type": 1,
+        "values": {
+          "1": 0,
+          "6": 1,
+          "45": 1,
+          "50": 0
+        },
+        "sum": 57
+      },
+      "SPDY_SYN_REPLY_SIZE": {
+        "range": [
+          16,
+          20000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "212": 0,
+          "245": 1,
+          "284": 0
+        },
+        "sum": 267
+      },
+      "SPDY_SYN_REPLY_RATIO": {
+        "range": [
+          1,
+          99
+        ],
+        "bucket_count": 20,
+        "histogram_type": 1,
+        "values": {
+          "50": 0,
+          "55": 1,
+          "61": 0
+        },
+        "sum": 57
+      },
+      "SPDY_NPN_CONNECT": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 5,
+          "1": 3,
+          "2": 0
+        },
+        "sum": 3
+      },
+      "SPDY_SETTINGS_MAX_STREAMS": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "93": 0,
+          "100": 1,
+          "123": 1,
+          "132": 0
+        },
+        "sum": 228
+      },
+      "SPDY_SETTINGS_IW": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "53": 0,
+          "60": 1,
+          "1000": 1
+        },
+        "sum": 1088
+      },
+      "SPDY_GOAWAY_LOCAL": {
+        "range": [
+          1,
+          32
+        ],
+        "bucket_count": 33,
+        "histogram_type": 1,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SPDY_GOAWAY_PEER": {
+        "range": [
+          1,
+          32
+        ],
+        "bucket_count": 33,
+        "histogram_type": 1,
+        "values": {
+          "30": 0,
+          "31": 1,
+          "32": 0
+        },
+        "sum": 31
+      },
+      "HPACK_ELEMENTS_EVICTED_DECOMPRESSOR": {
+        "range": [
+          1,
+          256
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 12,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "HPACK_BYTES_EVICTED_DECOMPRESSOR": {
+        "range": [
+          1,
+          8192
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 12,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "HPACK_BYTES_EVICTED_RATIO_DECOMPRESSOR": {
+        "range": [
+          1,
+          256
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 12,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "HPACK_ELEMENTS_EVICTED_COMPRESSOR": {
+        "range": [
+          1,
+          256
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 6,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "HPACK_BYTES_EVICTED_COMPRESSOR": {
+        "range": [
+          1,
+          8192
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 6,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "HPACK_BYTES_EVICTED_RATIO_COMPRESSOR": {
+        "range": [
+          1,
+          256
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 6,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "HTTP_CHANNEL_DISPOSITION": {
+        "range": [
+          1,
+          16
+        ],
+        "bucket_count": 17,
+        "histogram_type": 1,
+        "values": {
+          "1": 0,
+          "2": 7,
+          "8": 5,
+          "9": 4,
+          "10": 5,
+          "11": 0
+        },
+        "sum": 140
+      },
+      "HTTP_CHANNEL_ONSTART_SUCCESS": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 4,
+          "1": 17,
+          "2": 0
+        },
+        "sum": 17
+      },
+      "HTTP_CONNECTION_ENTRY_CACHE_HIT_1": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 8,
+          "1": 18,
+          "2": 0
+        },
+        "sum": 18
+      },
+      "HTTP_CACHE_DISPOSITION_2_V2": {
+        "range": [
+          1,
+          5
+        ],
+        "bucket_count": 6,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 4,
+          "2": 0
+        },
+        "sum": 4
+      },
+      "TRANSACTION_WAIT_TIME_HTTP": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "0": 2,
+          "1": 1,
+          "2": 1,
+          "107": 1,
+          "115": 1,
+          "123": 1,
+          "188": 1,
+          "202": 1,
+          "217": 1,
+          "250": 1,
+          "287": 1,
+          "330": 1,
+          "380": 1,
+          "407": 0
+        },
+        "sum": 2271
+      },
+      "TRANSACTION_WAIT_TIME_SPDY": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "0": 2,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "DNS_LOOKUP_METHOD2": {
+        "range": [
+          1,
+          16
+        ],
+        "bucket_count": 17,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 20,
+          "6": 8,
+          "7": 0
+        },
+        "sum": 68
+      },
+      "DNS_LOOKUP_TIME": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "95": 1,
+          "118": 1,
+          "146": 1,
+          "181": 1,
+          "224": 3,
+          "278": 0
+        },
+        "sum": 1332
+      },
+      "DNS_NATIVE_LOOKUP_TIME": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "95": 1,
+          "118": 1,
+          "146": 1,
+          "181": 1,
+          "224": 3,
+          "278": 0
+        },
+        "sum": 1333
+      },
+      "DNS_NATIVE_QUEUING": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 8,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "DNS_LOOKUP_ALGORITHM": {
+        "range": [
+          1,
+          50
+        ],
+        "bucket_count": 51,
+        "histogram_type": 5,
+        "values": {
+          "0": 8,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "DNS_LOOKUP_DISPOSITION": {
+        "range": [
+          1,
+          50
+        ],
+        "bucket_count": 51,
+        "histogram_type": 5,
+        "values": {
+          "5": 0,
+          "6": 8,
+          "7": 0
+        },
+        "sum": 48
+      },
+      "REFRESH_DRIVER_TICK": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 76,
+          "1": 19,
+          "2": 16,
+          "3": 3,
+          "4": 4,
+          "5": 2,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "12": 1,
+          "20": 1,
+          "23": 1,
+          "26": 1,
+          "47": 1,
+          "53": 0
+        },
+        "sum": 247
+      },
+      "PAINT_BUILD_DISPLAYLIST_TIME": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 131,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "PAINT_RASTERIZE_TIME": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 108,
+          "1": 6,
+          "2": 4,
+          "3": 5,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "8": 1,
+          "10": 1,
+          "20": 3,
+          "23": 0
+        },
+        "sum": 126
+      },
+      "HTTPCONNMGR_TOTAL_SPECULATIVE_CONN": {
+        "range": [
+          1,
+          1000000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 21,
+          "2": 0
+        },
+        "sum": 21
+      },
+      "HTTPCONNMGR_USED_SPECULATIVE_CONN": {
+        "range": [
+          1,
+          1000000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 11,
+          "2": 0
+        },
+        "sum": 11
+      },
+      "HTTPCONNMGR_UNUSED_SPECULATIVE_CONN": {
+        "range": [
+          1,
+          1000000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "2": 0
+        },
+        "sum": 1
+      },
+      "FIND_PLUGINS": {
+        "range": [
+          1,
+          3000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "3": 0,
+          "8": 1,
+          "21": 0
+        },
+        "sum": 10
+      },
+      "MOZ_SQLITE_OPEN_MS": {
+        "range": [
+          1,
+          3000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 87,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "MOZ_SQLITE_COOKIES_OPEN_READAHEAD_MS": {
+        "range": [
+          1,
+          3000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "MOZ_SQLITE_COOKIES_BLOCK_MAIN_THREAD_MS_V2": {
+        "range": [
+          1,
+          3000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 3,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "MOZ_SQLITE_COOKIES_TIME_TO_BLOCK_MAIN_THREAD_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 30,
+        "histogram_type": 0,
+        "values": {
+          "600": 0,
+          "820": 1,
+          "1121": 0
+        },
+        "sum": 853
+      },
+      "MOZ_SQLITE_OTHER_SYNC_MS": {
+        "range": [
+          1,
+          3000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 4,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "MOZ_SQLITE_OTHER_READ_B": {
+        "range": [
+          1,
+          32768
+        ],
+        "bucket_count": 3,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 88,
+          "32768": 21
+        },
+        "sum": 940340
+      },
+      "MOZ_SQLITE_OTHER_WRITE_B": {
+        "range": [
+          1,
+          32768
+        ],
+        "bucket_count": 3,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 85,
+          "32768": 0
+        },
+        "sum": 201584
+      },
+      "NETWORK_DISK_CACHE_TRASHRENAME": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "URLCLASSIFIER_LOOKUP_TIME_2": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 30,
+        "histogram_type": 0,
+        "values": {
+          "0": 14,
+          "1": 1,
+          "2": 0
+        },
+        "sum": 1
+      },
+      "URLCLASSIFIER_CL_CHECK_TIME": {
+        "range": [
+          1,
+          500
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 15,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "URLCLASSIFIER_PS_FILELOAD_TIME": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 23,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "URLCLASSIFIER_PS_FALLOCATE_TIME": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 7,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "URLCLASSIFIER_PS_CONSTRUCT_TIME": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 15,
+        "histogram_type": 0,
+        "values": {
+          "0": 7,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "URLCLASSIFIER_LC_PREFIXES": {
+        "range": [
+          1,
+          1500000
+        ],
+        "bucket_count": 15,
+        "histogram_type": 1,
+        "values": {
+          "0": 7,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "URLCLASSIFIER_LC_COMPLETIONS": {
+        "range": [
+          1,
+          200
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 6,
+          "2": 1,
+          "4": 0
+        },
+        "sum": 8
+      },
+      "PLACES_AUTOCOMPLETE_1ST_RESULT_TIME_MS": {
+        "range": [
+          50,
+          500
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 10,
+          "50": 0
+        },
+        "sum": 37
+      },
+      "PLACES_AUTOCOMPLETE_6_FIRST_RESULTS_TIME_MS": {
+        "range": [
+          50,
+          1000
+        ],
+        "bucket_count": 30,
+        "histogram_type": 0,
+        "values": {
+          "50": 0,
+          "56": 1,
+          "164": 1,
+          "182": 0
+        },
+        "sum": 234
+      },
+      "FX_REFRESH_DRIVER_CHROME_FRAME_DELAY_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 37,
+          "1": 5,
+          "2": 6,
+          "3": 10,
+          "4": 9,
+          "5": 3,
+          "6": 1,
+          "7": 1,
+          "8": 2,
+          "10": 2,
+          "12": 1,
+          "14": 2,
+          "17": 1,
+          "20": 1,
+          "34": 4,
+          "40": 1,
+          "48": 2,
+          "57": 1,
+          "68": 2,
+          "114": 1,
+          "135": 1,
+          "190": 1,
+          "226": 0
+        },
+        "sum": 1217
+      },
+      "FX_PAGE_LOAD_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 20,
+        "histogram_type": 0,
+        "values": {
+          "37": 0,
+          "62": 2,
+          "171": 1,
+          "284": 0
+        },
+        "sum": 337
+      },
+      "FX_TOTAL_TOP_VISITS": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 0,
+          "1": 3,
+          "2": 0
+        },
+        "sum": 3
+      },
+      "INPUT_EVENT_RESPONSE_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 54,
+          "1": 2,
+          "2": 4,
+          "4": 4,
+          "5": 1,
+          "6": 1,
+          "7": 2,
+          "8": 2,
+          "10": 2,
+          "12": 1,
+          "17": 1,
+          "20": 1,
+          "24": 3,
+          "29": 3,
+          "34": 2,
+          "57": 2,
+          "68": 5,
+          "81": 0
+        },
+        "sum": 879
+      },
+      "INPUT_EVENT_RESPONSE_COALESCED_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 47,
+          "1": 1,
+          "2": 2,
+          "4": 3,
+          "6": 1,
+          "7": 2,
+          "8": 2,
+          "17": 1,
+          "20": 1,
+          "29": 1,
+          "34": 1,
+          "40": 1,
+          "57": 1,
+          "68": 1,
+          "81": 1,
+          "96": 1,
+          "114": 0
+        },
+        "sum": 542
+      },
+      "LOAD_INPUT_EVENT_RESPONSE_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 3,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "FX_SESSION_RESTORE_STARTUP_INIT_SESSION_MS": {
+        "range": [
+          1,
+          30000
+        ],
+        "bucket_count": 20,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "FX_SESSION_RESTORE_STARTUP_ONLOAD_INITIAL_WINDOW_MS": {
+        "range": [
+          1,
+          30000
+        ],
+        "bucket_count": 20,
+        "histogram_type": 0,
+        "values": {
+          "7": 0,
+          "12": 1,
+          "21": 0
+        },
+        "sum": 20
+      },
+      "FX_SESSION_RESTORE_READ_FILE_MS": {
+        "range": [
+          1,
+          3000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "154": 0,
+          "414": 1,
+          "1114": 0
+        },
+        "sum": 810
+      },
+      "FX_SESSION_RESTORE_CORRUPT_FILE": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 2,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "FX_SESSION_RESTORE_ALL_FILES_CORRUPT": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "FX_URLBAR_SELECTED_RESULT_INDEX": {
+        "range": [
+          1,
+          17
+        ],
+        "bucket_count": 18,
+        "histogram_type": 1,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "FX_URLBAR_SELECTED_RESULT_TYPE": {
+        "range": [
+          1,
+          14
+        ],
+        "bucket_count": 15,
+        "histogram_type": 1,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "FX_URLBAR_SELECTED_RESULT_METHOD": {
+        "range": [
+          1,
+          50
+        ],
+        "bucket_count": 51,
+        "histogram_type": 5,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "INNERWINDOWS_WITH_MUTATION_LISTENERS": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 16,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "CHARSET_OVERRIDE_USED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "XMLHTTPREQUEST_ASYNC_OR_SYNC": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 44,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "TELEMETRY_ARCHIVE_DIRECTORIES_COUNT": {
+        "range": [
+          1,
+          13
+        ],
+        "bucket_count": 12,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "2": 0
+        },
+        "sum": 1
+      },
+      "TELEMETRY_ARCHIVE_SCAN_PING_COUNT": {
+        "range": [
+          1,
+          100000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "5": 0,
+          "6": 1,
+          "7": 0
+        },
+        "sum": 6
+      },
+      "TELEMETRY_SESSIONDATA_FAILED_LOAD": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "TELEMETRY_SESSIONDATA_FAILED_PARSE": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "TELEMETRY_SESSIONDATA_FAILED_VALIDATION": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "TELEMETRY_SESSIONDATA_FAILED_SAVE": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "STARTUP_CRASH_DETECTED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SAFE_MODE_USAGE": {
+        "range": [
+          1,
+          3
+        ],
+        "bucket_count": 4,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "2": 0
+        },
+        "sum": 1
+      },
+      "SEARCH_SERVICE_INIT_MS": {
+        "range": [
+          1,
+          1000
+        ],
+        "bucket_count": 15,
+        "histogram_type": 0,
+        "values": {
+          "119": 0,
+          "203": 1,
+          "345": 0
+        },
+        "sum": 270
+      },
+      "SEARCH_SERVICE_INIT_SYNC": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SEARCH_SERVICE_US_COUNTRY_MISMATCHED_TIMEZONE": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SEARCH_SERVICE_US_TIMEZONE_MISMATCHED_COUNTRY": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "ENABLE_PRIVILEGE_EVER_CALLED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "COMPONENTS_SHIM_ACCESSED_BY_CONTENT": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "TELEMETRY_MEMORY_REPORTER_MS": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "1": 0,
+          "3": 1,
+          "9": 0
+        },
+        "sum": 3
+      },
+      "SSL_SUCCESFUL_CERT_VALIDATION_TIME_MOZILLAPKIX": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "2": 1,
+          "17": 1,
+          "77": 1,
+          "118": 1,
+          "181": 1,
+          "224": 1,
+          "278": 2,
+          "428": 1,
+          "658": 1,
+          "816": 0
+        },
+        "sum": 2443
+      },
+      "DEVTOOLS_PERFTOOLS_RECORDING_IMPORT_FLAG": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "DEVTOOLS_PERFTOOLS_RECORDING_EXPORT_FLAG": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "BROWSER_IS_USER_DEFAULT": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "BROWSER_IS_USER_DEFAULT_ERROR": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "BROWSER_SET_DEFAULT_DIALOG_PROMPT_RAWCOUNT": {
+        "range": [
+          1,
+          250
+        ],
+        "bucket_count": 15,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "BROWSER_SET_DEFAULT_ALWAYS_CHECK": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "NETWORK_CACHE_V2_OUTPUT_STREAM_STATUS": {
+        "range": [
+          1,
+          7
+        ],
+        "bucket_count": 8,
+        "histogram_type": 1,
+        "values": {
+          "0": 11,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "NETWORK_CACHE_V2_INPUT_STREAM_STATUS": {
+        "range": [
+          1,
+          7
+        ],
+        "bucket_count": 8,
+        "histogram_type": 1,
+        "values": {
+          "0": 5,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "NETWORK_CACHE_METADATA_FIRST_READ_TIME_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 5,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "NETWORK_CACHE_METADATA_SECOND_READ_TIME_MS": {
+        "range": [
+          1,
+          10000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 5,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "NETWORK_CACHE_METADATA_FIRST_READ_SIZE": {
+        "range": [
+          1,
+          5119
+        ],
+        "bucket_count": 256,
+        "histogram_type": 1,
+        "values": {
+          "1311": 0,
+          "1331": 1,
+          "1391": 1,
+          "3023": 1,
+          "4273": 1,
+          "4313": 1,
+          "4333": 0
+        },
+        "sum": 14382
+      },
+      "NETWORK_CACHE_METADATA_SIZE": {
+        "range": [
+          1,
+          5119
+        ],
+        "bucket_count": 256,
+        "histogram_type": 1,
+        "values": {
+          "5099": 0,
+          "5119": 5
+        },
+        "sum": 41247
+      },
+      "SSL_CIPHER_SUITE_FULL": {
+        "range": [
+          1,
+          128
+        ],
+        "bucket_count": 129,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 6,
+          "2": 2,
+          "3": 0
+        },
+        "sum": 10
+      },
+      "SSL_KEA_ECDHE_CURVE_FULL": {
+        "range": [
+          1,
+          36
+        ],
+        "bucket_count": 37,
+        "histogram_type": 1,
+        "values": {
+          "0": 2,
+          "23": 6,
+          "24": 0
+        },
+        "sum": 138
+      },
+      "SSL_AUTH_ALGORITHM_FULL": {
+        "range": [
+          1,
+          16
+        ],
+        "bucket_count": 17,
+        "histogram_type": 1,
+        "values": {
+          "3": 0,
+          "4": 2,
+          "7": 6,
+          "8": 0
+        },
+        "sum": 50
+      },
+      "SSL_AUTH_RSA_KEY_SIZE_FULL": {
+        "range": [
+          1,
+          24
+        ],
+        "bucket_count": 25,
+        "histogram_type": 1,
+        "values": {
+          "11": 0,
+          "12": 6,
+          "13": 0
+        },
+        "sum": 72
+      },
+      "SSL_AUTH_ECDSA_CURVE_FULL": {
+        "range": [
+          1,
+          36
+        ],
+        "bucket_count": 37,
+        "histogram_type": 1,
+        "values": {
+          "22": 0,
+          "23": 2,
+          "24": 0
+        },
+        "sum": 46
+      },
+      "SSL_SYMMETRIC_CIPHER_FULL": {
+        "range": [
+          1,
+          32
+        ],
+        "bucket_count": 33,
+        "histogram_type": 1,
+        "values": {
+          "9": 0,
+          "10": 8,
+          "11": 0
+        },
+        "sum": 80
+      },
+      "SSL_REASONS_FOR_NOT_FALSE_STARTING": {
+        "range": [
+          1,
+          512
+        ],
+        "bucket_count": 513,
+        "histogram_type": 1,
+        "values": {
+          "0": 3,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SSL_HANDSHAKE_TYPE": {
+        "range": [
+          1,
+          8
+        ],
+        "bucket_count": 9,
+        "histogram_type": 1,
+        "values": {
+          "1": 0,
+          "2": 3,
+          "4": 5,
+          "5": 0
+        },
+        "sum": 26
+      },
+      "SSL_OCSP_STAPLING": {
+        "range": [
+          1,
+          8
+        ],
+        "bucket_count": 9,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 2,
+          "2": 9,
+          "3": 0
+        },
+        "sum": 20
+      },
+      "SSL_CERT_ERROR_OVERRIDES": {
+        "range": [
+          1,
+          24
+        ],
+        "bucket_count": 25,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 11,
+          "2": 0
+        },
+        "sum": 11
+      },
+      "SSL_PERMANENT_CERT_ERROR_OVERRIDES": {
+        "range": [
+          1,
+          1024
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SSL_SERVER_AUTH_EKU": {
+        "range": [
+          1,
+          10
+        ],
+        "bucket_count": 11,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 5,
+          "2": 6,
+          "3": 0
+        },
+        "sum": 17
+      },
+      "CERT_OCSP_ENABLED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 0,
+          "1": 1,
+          "2": 0
+        },
+        "sum": 1
+      },
+      "CERT_OCSP_REQUIRED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "OSFILE_WORKER_LAUNCH_MS": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "26": 0,
+          "74": 1,
+          "212": 0
+        },
+        "sum": 122
+      },
+      "OSFILE_WORKER_READY_MS": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "212": 0,
+          "608": 1,
+          "1744": 0
+        },
+        "sum": 686
+      },
+      "OSFILE_WRITEATOMIC_JANK_MS": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 10,
+        "histogram_type": 0,
+        "values": {
+          "0": 3,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "CERT_EV_STATUS": {
+        "range": [
+          1,
+          10
+        ],
+        "bucket_count": 11,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 11,
+          "2": 0
+        },
+        "sum": 11
+      },
+      "CERT_VALIDATION_SUCCESS_BY_CA": {
+        "range": [
+          1,
+          256
+        ],
+        "bucket_count": 257,
+        "histogram_type": 1,
+        "values": {
+          "6": 0,
+          "7": 5,
+          "49": 6,
+          "50": 0
+        },
+        "sum": 329
+      },
+      "CERT_PINNING_RESULTS": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 0,
+          "1": 5,
+          "2": 0
+        },
+        "sum": 5
+      },
+      "CERT_PINNING_MOZ_RESULTS": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 0,
+          "1": 2,
+          "2": 0
+        },
+        "sum": 2
+      },
+      "CERT_PINNING_MOZ_RESULTS_BY_HOST": {
+        "range": [
+          1,
+          512
+        ],
+        "bucket_count": 513,
+        "histogram_type": 1,
+        "values": {
+          "12": 0,
+          "13": 4,
+          "14": 0
+        },
+        "sum": 52
+      },
+      "CERT_CHAIN_KEY_SIZE_STATUS": {
+        "range": [
+          1,
+          4
+        ],
+        "bucket_count": 5,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 11,
+          "2": 0
+        },
+        "sum": 11
+      },
+      "CERT_CHAIN_SHA1_POLICY_STATUS": {
+        "range": [
+          1,
+          6
+        ],
+        "bucket_count": 7,
+        "histogram_type": 1,
+        "values": {
+          "0": 0,
+          "1": 11,
+          "2": 0
+        },
+        "sum": 11
+      },
+      "MASTER_PASSWORD_ENABLED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "DISPLAY_SCALING": {
+        "range": [
+          1,
+          500
+        ],
+        "bucket_count": 100,
+        "histogram_type": 1,
+        "values": {
+          "194": 0,
+          "200": 1,
+          "205": 0
+        },
+        "sum": 200
+      },
+      "BR_9_2_1_SUBJECT_ALT_NAMES": {
+        "range": [
+          1,
+          8
+        ],
+        "bucket_count": 9,
+        "histogram_type": 1,
+        "values": {
+          "0": 11,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "BR_9_2_2_SUBJECT_COMMON_NAME": {
+        "range": [
+          1,
+          8
+        ],
+        "bucket_count": 9,
+        "histogram_type": 1,
+        "values": {
+          "0": 11,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "TRACKING_PROTECTION_ENABLED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "TRACKING_PROTECTION_PBM_DISABLED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 2,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SERVICE_WORKER_REGISTRATION_LOADING": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 20,
+        "histogram_type": 0,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "DATA_STORAGE_ENTRIES": {
+        "range": [
+          1,
+          1024
+        ],
+        "bucket_count": 16,
+        "histogram_type": 1,
+        "values": {
+          "0": 3,
+          "1": 1,
+          "74": 0
+        },
+        "sum": 10
+      },
+      "SHOULD_TRANSLATION_UI_APPEAR": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "SHOULD_AUTO_DETECT_LANGUAGE": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "FXA_CONFIGURED": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 3,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "WEBFONT_PER_PAGE": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 4,
+        "values": {
+          "0": 11,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "WEBFONT_SIZE_PER_PAGE": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "0": 11,
+          "1": 0
+        },
+        "sum": 0
+      },
+      "NUMBER_OF_PROFILES": {
+        "range": [
+          1,
+          2
+        ],
+        "bucket_count": 3,
+        "histogram_type": 4,
+        "values": {
+          "0": 1,
+          "1": 0
+        },
+        "sum": 6
+      },
+      "TIME_TO_FIRST_INTERACTION_MS": {
+        "range": [
+          1,
+          50000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "15": 0,
+          "17": 1,
+          "19": 0
+        },
+        "sum": 18
+      },
+      "CONTENT_FRAME_TIME": {
+        "range": [
+          1,
+          5000
+        ],
+        "bucket_count": 50,
+        "histogram_type": 0,
+        "values": {
+          "55": 0,
+          "64": 1,
+          "88": 3,
+          "140": 1,
+          "164": 20,
+          "192": 3,
+          "224": 1,
+          "262": 2,
+          "357": 1,
+          "417": 2,
+          "487": 1,
+          "569": 1,
+          "665": 0
+        },
+        "sum": 7726
+      },
+      "TIME_TO_NON_BLANK_PAINT_MS": {
+        "range": [
+          1,
+          100000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "18": 0,
+          "20": 1,
+          "92": 1,
+          "102": 0
+        },
+        "sum": 117
+      },
+      "WEBEXT_BACKGROUND_PAGE_LOAD_MS": {
+        "range": [
+          1,
+          60000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "122": 0,
+          "135": 1,
+          "269": 1,
+          "362": 1,
+          "399": 0
+        },
+        "sum": 784
+      },
+      "WEBEXT_EXTENSION_STARTUP_MS": {
+        "range": [
+          1,
+          50000
+        ],
+        "bucket_count": 100,
+        "histogram_type": 0,
+        "values": {
+          "281": 0,
+          "309": 1,
+          "550": 1,
+          "1183": 1,
+          "1302": 0
+        },
+        "sum": 2177
+      }
+    },
+    "keyedHistograms": {
+      "HTTP_CHANNEL_DISPOSITION_UPGRADE": {
+        "disabledNoReason": {
+          "range": [
+            1,
+            50
+          ],
+          "bucket_count": 51,
+          "histogram_type": 5,
+          "values": {
+            "0": 5,
+            "1": 4,
+            "2": 5,
+            "3": 0
+          },
+          "sum": 14
+        },
+        "disabledWont": {
+          "range": [
+            1,
+            50
+          ],
+          "bucket_count": 51,
+          "histogram_type": 5,
+          "values": {
+            "1": 0,
+            "2": 7,
+            "3": 0
+          },
+          "sum": 14
+        }
+      },
+      "URLCLASSIFIER_CL_KEYED_UPDATE_TIME": {
+        "test": {
+          "range": [
+            20,
+            120000
+          ],
+          "bucket_count": 30,
+          "histogram_type": 0,
+          "values": {
+            "20": 0,
+            "27": 1,
+            "37": 0
+          },
+          "sum": 27
+        }
+      },
+      "FX_TAB_REMOTE_NAVIGATION_DELAY_MS": {
+        "SessionStore:restoreTabContent": {
+          "range": [
+            1,
+            4000
+          ],
+          "bucket_count": 100,
+          "histogram_type": 0,
+          "values": {
+            "16": 0,
+            "17": 1,
+            "18": 0
+          },
+          "sum": 17
+        }
+      },
+      "FX_URLBAR_SELECTED_RESULT_INDEX_BY_TYPE": {
+        "autofill": {
+          "range": [
+            1,
+            14
+          ],
+          "bucket_count": 15,
+          "histogram_type": 1,
+          "values": {
+            "0": 1,
+            "1": 0
+          },
+          "sum": 0
+        }
+      },
+      "SYNC_WORKER_OPERATION": {
+        "XHR": {
+          "range": [
+            1,
+            5000
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 27,
+            "1": 1,
+            "2": 1,
+            "3": 2,
+            "5": 4,
+            "8": 1,
+            "13": 2,
+            "21": 1,
+            "52": 1,
+            "82": 1,
+            "129": 1,
+            "204": 0
+          },
+          "sum": 416
+        }
+      },
+      "OPENGL_COMPOSITING_FAILURE_ID": {
+        "SUCCESS": {
+          "range": [
+            1,
+            2
+          ],
+          "bucket_count": 3,
+          "histogram_type": 4,
+          "values": {
+            "0": 1,
+            "1": 0
+          },
+          "sum": 1
+        }
+      },
+      "IPC_SYNC_RECEIVE_MS": {
+        "PCompositorBridge::Msg_FlushRendering": {
+          "range": [
+            32,
+            750
+          ],
+          "bucket_count": 40,
+          "histogram_type": 0,
+          "values": {
+            "0": 1,
+            "32": 0
+          },
+          "sum": 12
+        }
+      },
+      "WEBEXT_BACKGROUND_PAGE_LOAD_MS_BY_ADDONID": {
+        "screenshots@mozilla.org": {
+          "range": [
+            1,
+            60000
+          ],
+          "bucket_count": 100,
+          "histogram_type": 0,
+          "values": {
+            "122": 0,
+            "135": 1,
+            "149": 0
+          },
+          "sum": 137
+        },
+        "webcompat@mozilla.org": {
+          "range": [
+            1,
+            60000
+          ],
+          "bucket_count": 100,
+          "histogram_type": 0,
+          "values": {
+            "328": 0,
+            "362": 1,
+            "399": 0
+          },
+          "sum": 366
+        },
+        "formautofill@mozilla.org": {
+          "range": [
+            1,
+            60000
+          ],
+          "bucket_count": 100,
+          "histogram_type": 0,
+          "values": {
+            "244": 0,
+            "269": 1,
+            "297": 0
+          },
+          "sum": 281
+        }
+      },
+      "WEBEXT_EXTENSION_STARTUP_MS_BY_ADDONID": {
+        "screenshots@mozilla.org": {
+          "range": [
+            1,
+            50000
+          ],
+          "bucket_count": 100,
+          "histogram_type": 0,
+          "values": {
+            "500": 0,
+            "550": 1,
+            "605": 0
+          },
+          "sum": 577
+        },
+        "webcompat@mozilla.org": {
+          "range": [
+            1,
+            50000
+          ],
+          "bucket_count": 100,
+          "histogram_type": 0,
+          "values": {
+            "281": 0,
+            "309": 1,
+            "340": 0
+          },
+          "sum": 320
+        },
+        "formautofill@mozilla.org": {
+          "range": [
+            1,
+            50000
+          ],
+          "bucket_count": 100,
+          "histogram_type": 0,
+          "values": {
+            "1075": 0,
+            "1183": 1,
+            "1302": 0
+          },
+          "sum": 1280
+        }
+      },
+      "NOTIFY_OBSERVERS_LATENCY_MS": {
+        "profile-after-change": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 1,
+            "3": 0
+          },
+          "sum": 1
+        },
+        "browser-window-before-show": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 1,
+            "3": 0
+          },
+          "sum": 1
+        },
+        "document-element-inserted": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 5,
+            "5": 1,
+            "7": 0
+          },
+          "sum": 12
+        },
+        "useragentoverrides-initialized": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 1,
+            "3": 0
+          },
+          "sum": 1
+        },
+        "sessionstore-windows-restored": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "12": 0,
+            "16": 1,
+            "21": 0
+          },
+          "sum": 20
+        },
+        "handlersvc-store-initialized": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 1,
+            "3": 0
+          },
+          "sum": 1
+        },
+        "browser-search-service": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 1,
+            "3": 0
+          },
+          "sum": 1
+        },
+        "final-ui-startup": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "16": 0,
+            "21": 1,
+            "28": 0
+          },
+          "sum": 26
+        },
+        "domwindowopened": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 3,
+            "3": 0
+          },
+          "sum": 3
+        },
+        "message-manager-disconnect": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "0": 1,
+            "3": 0
+          },
+          "sum": 1
+        },
+        "browser-delayed-startup-finished": {
+          "range": [
+            3,
+            512
+          ],
+          "bucket_count": 20,
+          "histogram_type": 0,
+          "values": {
+            "12": 0,
+            "16": 1,
+            "21": 0
+          },
+          "sum": 20
+        }
+      }
+    },
+    "info": {
+      "reason": "gather-subsession-payload",
+      "revision": "",
+      "timezoneOffset": -420,
+      "previousBuildId": "20181004154920",
+      "sessionId": "147b3d15-f808-ce4d-98a3-b3e6497b1d37",
+      "subsessionId": "2788a9ca-ec67-c448-b619-b0d5d92a00c2",
+      "previousSessionId": null,
+      "previousSubsessionId": null,
+      "subsessionCounter": 1,
+      "profileSubsessionCounter": 1,
+      "sessionStartDate": "2018-10-04T13:00:00.0-07:00",
+      "subsessionStartDate": "2018-10-04T13:00:00.0-07:00",
+      "sessionLength": 3,
+      "subsessionLength": 2,
+      "addons": "firefox%40getpocket.com:1.0.5,formautofill%40mozilla.org:1.0,onboarding%40mozilla.org:1.0,screenshots%40mozilla.org:33.0.0,webcompat-reporter%40mozilla.org:1.0.0,webcompat%40mozilla.org:2.0.1"
+    },
+    "prio": {
+      "a": {
+        "0": 161,
+        "1": 181,
+        "2": 121,
+        "3": 173,
+        "4": 83,
+        "5": 2,
+        "6": 143,
+        "7": 205,
+        "8": 201,
+        "9": 112,
+        "10": 234,
+        "11": 122,
+        "12": 138,
+        "13": 216,
+        "14": 162,
+        "15": 3,
+        "16": 18,
+        "17": 140,
+        "18": 163,
+        "19": 93,
+        "20": 29,
+        "21": 201,
+        "22": 204,
+        "23": 123,
+        "24": 168,
+        "25": 59,
+        "26": 142,
+        "27": 135,
+        "28": 113,
+        "29": 137,
+        "30": 114,
+        "31": 85,
+        "32": 169,
+        "33": 147,
+        "34": 160,
+        "35": 47,
+        "36": 7,
+        "37": 21,
+        "38": 59,
+        "39": 236,
+        "40": 207,
+        "41": 223,
+        "42": 118,
+        "43": 97,
+        "44": 47,
+        "45": 252,
+        "46": 109,
+        "47": 165,
+        "48": 98,
+        "49": 160,
+        "50": 196,
+        "51": 135,
+        "52": 133,
+        "53": 9,
+        "54": 236,
+        "55": 8,
+        "56": 85,
+        "57": 50,
+        "58": 91,
+        "59": 223,
+        "60": 59,
+        "61": 214,
+        "62": 17,
+        "63": 8,
+        "64": 207,
+        "65": 138,
+        "66": 30,
+        "67": 160,
+        "68": 184,
+        "69": 221,
+        "70": 21,
+        "71": 30,
+        "72": 177,
+        "73": 219,
+        "74": 4,
+        "75": 93,
+        "76": 41,
+        "77": 169,
+        "78": 93,
+        "79": 209,
+        "80": 160,
+        "81": 235,
+        "82": 79,
+        "83": 29,
+        "84": 132,
+        "85": 164,
+        "86": 198,
+        "87": 107,
+        "88": 80,
+        "89": 87,
+        "90": 209,
+        "91": 252,
+        "92": 95,
+        "93": 244,
+        "94": 174,
+        "95": 241,
+        "96": 38,
+        "97": 225,
+        "98": 32,
+        "99": 101,
+        "100": 241,
+        "101": 253,
+        "102": 166,
+        "103": 50,
+        "104": 186,
+        "105": 28,
+        "106": 27,
+        "107": 218,
+        "108": 229,
+        "109": 143,
+        "110": 255,
+        "111": 63,
+        "112": 133,
+        "113": 65,
+        "114": 20,
+        "115": 221,
+        "116": 103,
+        "117": 240,
+        "118": 148,
+        "119": 210,
+        "120": 221,
+        "121": 207,
+        "122": 65,
+        "123": 252,
+        "124": 8,
+        "125": 235,
+        "126": 132,
+        "127": 158,
+        "128": 136,
+        "129": 81,
+        "130": 248,
+        "131": 154,
+        "132": 255,
+        "133": 244,
+        "134": 142,
+        "135": 119,
+        "136": 126,
+        "137": 189,
+        "138": 107,
+        "139": 147,
+        "140": 0,
+        "141": 232,
+        "142": 12,
+        "143": 123,
+        "144": 54,
+        "145": 7,
+        "146": 254,
+        "147": 41,
+        "148": 255,
+        "149": 234,
+        "150": 225,
+        "151": 197,
+        "152": 18,
+        "153": 148,
+        "154": 172,
+        "155": 125,
+        "156": 40,
+        "157": 234,
+        "158": 131,
+        "159": 3,
+        "160": 20,
+        "161": 205,
+        "162": 2,
+        "163": 248,
+        "164": 185,
+        "165": 48,
+        "166": 51,
+        "167": 44,
+        "168": 55,
+        "169": 95,
+        "170": 47,
+        "171": 239,
+        "172": 166,
+        "173": 36,
+        "174": 188,
+        "175": 159,
+        "176": 9,
+        "177": 218,
+        "178": 235,
+        "179": 251,
+        "180": 58,
+        "181": 53,
+        "182": 133,
+        "183": 245,
+        "184": 104,
+        "185": 130,
+        "186": 99,
+        "187": 36,
+        "188": 107,
+        "189": 108,
+        "190": 120,
+        "191": 5,
+        "192": 38,
+        "193": 211,
+        "194": 114,
+        "195": 201,
+        "196": 211,
+        "197": 243,
+        "198": 146,
+        "199": 11,
+        "200": 70,
+        "201": 189,
+        "202": 27,
+        "203": 226,
+        "204": 230,
+        "205": 86,
+        "206": 136,
+        "207": 51,
+        "208": 208,
+        "209": 3,
+        "210": 180,
+        "211": 203,
+        "212": 62,
+        "213": 127,
+        "214": 251,
+        "215": 107,
+        "216": 33,
+        "217": 139,
+        "218": 81,
+        "219": 149,
+        "220": 237,
+        "221": 48,
+        "222": 125,
+        "223": 215,
+        "224": 254,
+        "225": 218,
+        "226": 151,
+        "227": 95,
+        "228": 52,
+        "229": 32,
+        "230": 177,
+        "231": 64,
+        "232": 214,
+        "233": 229
+      },
+      "b": {
+        "0": 162,
+        "1": 45,
+        "2": 246,
+        "3": 231,
+        "4": 16,
+        "5": 225,
+        "6": 84,
+        "7": 101,
+        "8": 179,
+        "9": 197,
+        "10": 242,
+        "11": 5,
+        "12": 95,
+        "13": 4,
+        "14": 126,
+        "15": 225,
+        "16": 76,
+        "17": 99,
+        "18": 36,
+        "19": 237,
+        "20": 72,
+        "21": 252,
+        "22": 198,
+        "23": 107,
+        "24": 44,
+        "25": 28,
+        "26": 64,
+        "27": 229,
+        "28": 95,
+        "29": 115,
+        "30": 169,
+        "31": 62,
+        "32": 248,
+        "33": 231,
+        "34": 86,
+        "35": 147,
+        "36": 100,
+        "37": 170,
+        "38": 167,
+        "39": 91,
+        "40": 45,
+        "41": 119,
+        "42": 110,
+        "43": 122,
+        "44": 170,
+        "45": 206,
+        "46": 254,
+        "47": 204,
+        "48": 226,
+        "49": 87,
+        "50": 156,
+        "51": 107,
+        "52": 131,
+        "53": 89,
+        "54": 39,
+        "55": 87,
+        "56": 154,
+        "57": 102,
+        "58": 96,
+        "59": 188,
+        "60": 222,
+        "61": 121,
+        "62": 60,
+        "63": 120,
+        "64": 111,
+        "65": 243,
+        "66": 113,
+        "67": 43,
+        "68": 118,
+        "69": 83,
+        "70": 139,
+        "71": 243,
+        "72": 188,
+        "73": 20,
+        "74": 10,
+        "75": 191,
+        "76": 93,
+        "77": 145,
+        "78": 217,
+        "79": 69,
+        "80": 112,
+        "81": 10,
+        "82": 92,
+        "83": 229,
+        "84": 119,
+        "85": 113,
+        "86": 172,
+        "87": 81,
+        "88": 178,
+        "89": 68,
+        "90": 193,
+        "91": 7,
+        "92": 34,
+        "93": 200,
+        "94": 36,
+        "95": 43,
+        "96": 44,
+        "97": 186,
+        "98": 26,
+        "99": 13,
+        "100": 226,
+        "101": 188,
+        "102": 100,
+        "103": 51,
+        "104": 252,
+        "105": 176,
+        "106": 2,
+        "107": 145,
+        "108": 237,
+        "109": 2,
+        "110": 26,
+        "111": 96,
+        "112": 184,
+        "113": 251,
+        "114": 162,
+        "115": 106,
+        "116": 222,
+        "117": 211,
+        "118": 226,
+        "119": 34,
+        "120": 239,
+        "121": 230,
+        "122": 226,
+        "123": 111,
+        "124": 65,
+        "125": 192,
+        "126": 26,
+        "127": 38,
+        "128": 107,
+        "129": 161,
+        "130": 165,
+        "131": 77,
+        "132": 74,
+        "133": 173,
+        "134": 15,
+        "135": 221,
+        "136": 122,
+        "137": 115,
+        "138": 86,
+        "139": 34,
+        "140": 45,
+        "141": 190,
+        "142": 7,
+        "143": 17,
+        "144": 9,
+        "145": 99,
+        "146": 46,
+        "147": 99,
+        "148": 195,
+        "149": 231,
+        "150": 234,
+        "151": 190,
+        "152": 140,
+        "153": 148,
+        "154": 198,
+        "155": 150,
+        "156": 147,
+        "157": 11,
+        "158": 126,
+        "159": 251,
+        "160": 255,
+        "161": 133,
+        "162": 98,
+        "163": 38,
+        "164": 88
+      }
+    },
+    "slowSQL": {
+      "mainThread": {},
+      "otherThreads": {}
+    },
+    "fileIOReports": {},
+    "lateWrites": {
+      "memoryMap": [],
+      "stacks": []
+    },
+    "addonDetails": {
+      "XPI": {
+        "firefox@getpocket.com": {
+          "location": "app-system-defaults"
+        },
+        "formautofill@mozilla.org": {
+          "location": "app-system-defaults"
+        },
+        "onboarding@mozilla.org": {
+          "location": "app-system-defaults"
+        },
+        "screenshots@mozilla.org": {
+          "location": "app-system-defaults"
+        },
+        "webcompat-reporter@mozilla.org": {
+          "location": "app-system-defaults"
+        },
+        "webcompat@mozilla.org": {
+          "location": "app-system-defaults"
+        }
+      }
+    }
+  },
+  "clientId": "1c3e9b7f-b843-b445-9d8a-07835d4b2504",
+  "environment": {
+    "build": {
+      "applicationId": "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}",
+      "applicationName": "Firefox",
+      "architecture": "x86-64",
+      "buildId": "20181004170009",
+      "version": "64.0a1",
+      "vendor": "Mozilla",
+      "displayVersion": "64.0a1",
+      "platformVersion": "64.0a1",
+      "xpcomAbi": "x86_64-gcc3",
+      "updaterAvailable": true
+    },
+    "partner": {
+      "distributionId": null,
+      "distributionVersion": null,
+      "partnerId": null,
+      "distributor": null,
+      "distributorChannel": null,
+      "partnerNames": []
+    },
+    "system": {
+      "memoryMB": 32768,
+      "virtualMaxMB": null,
+      "cpu": {
+        "count": 12,
+        "cores": 6,
+        "vendor": "GenuineIntel",
+        "family": 6,
+        "model": 158,
+        "stepping": 10,
+        "l2cacheKB": 256,
+        "l3cacheKB": 12288,
+        "speedMHz": 2900,
+        "extensions": [
+          "hasMMX",
+          "hasSSE",
+          "hasSSE2",
+          "hasSSE3",
+          "hasSSSE3",
+          "hasSSE4_1",
+          "hasSSE4_2",
+          "hasAVX",
+          "hasAVX2",
+          "hasAES"
+        ]
+      },
+      "os": {
+        "name": "Darwin",
+        "version": "17.7.0",
+        "locale": "en-US"
+      },
+      "hdd": {
+        "profile": {
+          "model": null,
+          "revision": null
+        },
+        "binary": {
+          "model": null,
+          "revision": null
+        },
+        "system": {
+          "model": null,
+          "revision": null
+        }
+      },
+      "gfx": {
+        "D2DEnabled": null,
+        "DWriteEnabled": null,
+        "ContentBackend": "Skia",
+        "adapters": [
+          {
+            "description": null,
+            "vendorID": "0x1002",
+            "deviceID": "0x67ef",
+            "subsysID": null,
+            "RAM": null,
+            "driver": null,
+            "driverVersion": null,
+            "driverDate": null,
+            "GPUActive": true
+          }
+        ],
+        "monitors": [
+          {
+            "screenWidth": 1680,
+            "screenHeight": 1050,
+            "scale": 2
+          }
+        ],
+        "features": {
+          "compositor": "opengl",
+          "gpuProcess": {
+            "status": "unused"
+          },
+          "wrQualified": {
+            "status": "blocked"
+          },
+          "webrender": {
+            "status": "blocked"
+          }
+        }
+      },
+      "appleModelId": "MacBookPro15,1"
+    },
+    "settings": {
+      "blocklistEnabled": true,
+      "e10sEnabled": true,
+      "e10sMultiProcesses": 4,
+      "telemetryEnabled": false,
+      "locale": "en-US",
+      "update": {
+        "channel": "default",
+        "enabled": true,
+        "autoDownload": true
+      },
+      "userPrefs": {
+        "browser.cache.disk.capacity": 1048576,
+        "browser.shell.checkDefaultBrowser": false,
+        "browser.search.region": "US",
+        "browser.search.widget.inNavBar": false
+      },
+      "sandbox": {
+        "effectiveContentProcessLevel": 3
+      },
+      "addonCompatibilityCheckEnabled": true,
+      "isDefaultBrowser": false,
+      "defaultSearchEngine": "google-2018",
+      "defaultSearchEngineData": {
+        "name": "Google",
+        "loadPath": "[app]/chrome/browser/searchplugins/google-2018.xml",
+        "origin": "default",
+        "submissionURL": "https://www.google.com/search?q=&ie=utf-8&oe=utf-8&client=firefox-b-1"
+      },
+      "searchCohort": "nov17-2"
+    },
+    "profile": {
+      "creationDate": 17808
+    },
+    "addons": {
+      "activeAddons": {
+        "firefox@getpocket.com": {
+          "version": "1.0.5",
+          "scope": 1,
+          "type": "extension",
+          "updateDay": 17808,
+          "isSystem": true,
+          "isWebExtension": false,
+          "multiprocessCompatible": true,
+          "blocklisted": false,
+          "description": "When you find something you want to view later, put it in Pocket.",
+          "name": "Pocket",
+          "userDisabled": false,
+          "appDisabled": false,
+          "foreignInstall": false,
+          "hasBinaryComponents": false,
+          "installDay": 17808
+        },
+        "formautofill@mozilla.org": {
+          "version": "1.0",
+          "scope": 1,
+          "type": "extension",
+          "updateDay": 17808,
+          "isSystem": true,
+          "isWebExtension": true,
+          "multiprocessCompatible": true,
+          "blocklisted": false,
+          "description": null,
+          "name": "Form Autofill",
+          "userDisabled": false,
+          "appDisabled": false,
+          "foreignInstall": false,
+          "hasBinaryComponents": false,
+          "installDay": 17808
+        },
+        "onboarding@mozilla.org": {
+          "version": "1.0",
+          "scope": 1,
+          "type": "extension",
+          "updateDay": 17808,
+          "isSystem": true,
+          "isWebExtension": false,
+          "multiprocessCompatible": true,
+          "blocklisted": false,
+          "description": "Photon onboarding",
+          "name": "Photon onboarding",
+          "userDisabled": false,
+          "appDisabled": false,
+          "foreignInstall": false,
+          "hasBinaryComponents": false,
+          "installDay": 17808
+        },
+        "screenshots@mozilla.org": {
+          "version": "33.0.0",
+          "scope": 1,
+          "type": "extension",
+          "updateDay": 17808,
+          "isSystem": true,
+          "isWebExtension": false,
+          "multiprocessCompatible": true,
+          "blocklisted": false,
+          "description": null,
+          "name": "Firefox Screenshots",
+          "userDisabled": false,
+          "appDisabled": false,
+          "foreignInstall": false,
+          "hasBinaryComponents": false,
+          "installDay": 17808
+        },
+        "webcompat-reporter@mozilla.org": {
+          "version": "1.0.0",
+          "scope": 1,
+          "type": "extension",
+          "updateDay": 17808,
+          "isSystem": true,
+          "isWebExtension": false,
+          "multiprocessCompatible": true,
+          "blocklisted": false,
+          "description": "Report site compatibility issues on webcompat.com.",
+          "name": "WebCompat Reporter",
+          "userDisabled": false,
+          "appDisabled": false,
+          "foreignInstall": false,
+          "hasBinaryComponents": false,
+          "installDay": 17808
+        },
+        "webcompat@mozilla.org": {
+          "version": "2.0.1",
+          "scope": 1,
+          "type": "extension",
+          "updateDay": 17808,
+          "isSystem": true,
+          "isWebExtension": false,
+          "multiprocessCompatible": true,
+          "blocklisted": false,
+          "description": "Urgent post-release fixes for web compatibility.",
+          "name": "Web Compat",
+          "userDisabled": false,
+          "appDisabled": false,
+          "foreignInstall": false,
+          "hasBinaryComponents": false,
+          "installDay": 17808
+        }
+      },
+      "theme": {
+        "id": "default-theme@mozilla.org",
+        "blocklisted": false,
+        "description": "The default theme.",
+        "name": "Default",
+        "userDisabled": false,
+        "appDisabled": false,
+        "version": "",
+        "scope": 1,
+        "foreignInstall": false,
+        "hasBinaryComponents": false,
+        "installDay": 0,
+        "updateDay": 0
+      },
+      "activePlugins": [],
+      "activeGMPlugins": {
+        "gmp-gmpopenh264": {
+          "version": null,
+          "userDisabled": false,
+          "applyBackgroundUpdates": 1
+        },
+        "gmp-widevinecdm": {
+          "version": null,
+          "userDisabled": false,
+          "applyBackgroundUpdates": 1
+        }
+      },
+      "persona": "default-theme@mozilla.org"
+    },
+    "experiments": {
+      "searchCohort": {
+        "branch": "nov17-2"
+      }
+    }
+  }
+}

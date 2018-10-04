@@ -1,8 +1,11 @@
 import logging
+import json
 
 import click
 import s3fs
 import pyarrow.parquet as pq
+import pandas as pd
+import numpy as np
 
 from prio import prio
 
@@ -24,6 +27,23 @@ def extract(submission_date, bucket, prefix):
         .to_pandas()
     )
     return df
+
+
+def get_values_sorted(d):
+  tuples = [(int(k), int(v)) for k, v in d.items()]
+  return [x[1] for x in sorted(tuples)]
+
+
+def extract_ping(f):
+    ping = json.load(f)
+    prio_data = ping['payload']['prio']
+
+    # Spark stores arrays using numpy
+    data = {
+        'prio_data_a': np.array(get_values_sorted(prio_data['a'])),
+        'prio_data_b': np.array(get_values_sorted(prio_data['b'])),
+    }
+    return pd.DataFrame([data])
 
 
 def prio_pipeline(df, config, server_a, server_b):
@@ -56,9 +76,10 @@ def prio_pipeline(df, config, server_a, server_b):
 @click.option("--pvtkey-A", required=True)
 @click.option("--pubkey-B", required=True)
 @click.option("--pvtkey-B", required=True)
+@click.option("--ping", type=click.File('r'))
 @click.option("--bucket", default="net-mozaws-prod-us-west-2-pipeline-analysis")
 @click.option("--prefix", default="amiyaguchi/prio/v1")
-def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, bucket, prefix):
+def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, ping, bucket, prefix):
     pubkey_a = bytes(pubkey_a, "utf-8")
     pvtkey_a = bytes(pvtkey_a, "utf-8")
     pubkey_b = bytes(pubkey_b, "utf-8")
@@ -75,7 +96,11 @@ def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, bucket, prefix):
     server_a = prio.Server(config, prio.PRIO_SERVER_A, skA, server_secret)
     server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, server_secret)
 
-    df = extract(date, bucket, prefix)
+    if ping:
+        df = extract_ping(ping)
+    else:
+        df = extract(date, bucket, prefix)
+
     output = prio_pipeline(df, config, server_a, server_b)
     logger.info(output)
 
