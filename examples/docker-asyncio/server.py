@@ -112,15 +112,14 @@ async def run_server(server_id, n_fields, batch_id, shared_seed):
     logger.info("Starting server {}".format(server_id))
     transport, protocol = await aioamqp.connect("rabbitmq", 5672, "guest", "guest")
 
-    await rpc.Server(protocol, lambda: pubkey.export_hex(), server_id).connect()
+    await rpc.Server(protocol, lambda: pubkey.export_hex()[:-1], server_id).connect()
     # wait for the other server to come online
     await asyncio.sleep(3)
 
     # get the other pubkey to start the process
     data = await rpc.Client(protocol).call(other_server_id)
     logger.info("Fetched key for server {}: {}".format(other_server_id, data))
-    other_pubkey = prio.PublicKey()
-    other_pubkey.import_hex(data[:-1])
+    other_pubkey = prio.PublicKey().import_hex(data)
 
     seed = prio.PRGSeed()
     seed.instance = shared_seed
