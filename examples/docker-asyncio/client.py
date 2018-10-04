@@ -21,10 +21,8 @@ async def run_client(n_clients, n_fields, batch_id):
     logging.info(
         "Public keys:\n Server A: {}\nServer B: {}"
         .format(server_a_data, server_b_data))
-    server_a_pubkey = prio.PublicKey()
-    server_a_pubkey.import_hex(server_a_data[:-1])
-    server_b_pubkey = prio.PublicKey()
-    server_b_pubkey.import_hex(server_b_data[:-1])
+    server_a_pubkey = prio.PublicKey().import_hex(server_a_data)
+    server_b_pubkey = prio.PublicKey().import_hex(server_b_data)
 
     config = prio.Config(n_fields, server_a_pubkey, server_b_pubkey, batch_id)
     client = prio.Client(config)
