@@ -27,11 +27,10 @@ def extract(submission_date, bucket, prefix):
 
 
 def prio_pipeline(df, config, server_a, server_b):
-
     error_count = 0
     for _, row in df.iterrows():
-        vA = server_a.create_verifier(bytes(row.prio_data_a))
-        vB = server_b.create_verifier(bytes(row.prio_data_b))
+        vA = server_a.create_verifier(bytes(row.prio_data_a.astype('uint8')))
+        vB = server_b.create_verifier(bytes(row.prio_data_b.astype('uint8')))
 
         p1A = vA.create_verify1()
         p1B = vB.create_verify1()
