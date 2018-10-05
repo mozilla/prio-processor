@@ -64,7 +64,7 @@ class Server:
     async def on_request(self, channel, body, envelope, properties):
         response = self.handler()
         await self.channel.basic_publish(
-            payload=bytes(response),
+            payload=response,
             exchange_name='',
             routing_key=properties.reply_to,
             properties={

@@ -51,10 +51,6 @@ class PrioHandler:
         def log(line):
             logger.info("Message {}: {}".format(pid, line))
 
-        log(len(body))
-        if self.server.server_id == 1:
-            log(body)
-
         ptype = properties.type
         routing_key = "prio.{}".format(get_other_server(self.server.server_id))
 
@@ -68,7 +64,7 @@ class PrioHandler:
             )
         elif ptype == 'data':
             log("Generating verify packet 1")
-            v = self.server.create_verifier(body)
+            v = self.server.create_verifier(bytes(body))
             p1 = v.create_verify1()
             await self.channel.basic_publish(
                 payload=pickle.dumps(p1),
@@ -106,35 +102,23 @@ class PrioHandler:
 
 
 async def run_server(server_id, n_fields, batch_id, shared_seed):
-    other_server_id = get_other_server(server_id)
-    pvtkey, pubkey = prio.create_keypair()
-
-    logger.info("Starting server {}".format(server_id))
-    transport, protocol = await aioamqp.connect("rabbitmq", 5672, "guest", "guest")
-
-    await rpc.Server(protocol, lambda: pubkey.export_hex()[:-1], server_id).connect()
-    # wait for the other server to come online
-    await asyncio.sleep(3)
-
-    # get the other pubkey to start the process
-    data = await rpc.Client(protocol).call(other_server_id)
-    logger.info("Fetched key for server {}: {}".format(other_server_id, data))
-    other_pubkey = prio.PublicKey().import_hex(data)
+    skey_a = b'7A0AA608C08CB74A86409F5026865435B2F17F40B20636CEFD2656585097FBE0'
+    pkey_a = b'F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51'
+    skey_b = b'50C7329DE18DE3087A0DE963D5585A4DB7A156C7A29FA854760373B053D86919'
+    pkey_b = b'15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07'
+    pkA = prio.PublicKey().import_hex(pkey_a)
+    pkB = prio.PublicKey().import_hex(pkey_b)
+    skA = prio.PrivateKey().import_hex(skey_a, pkey_a)
+    skB = prio.PrivateKey().import_hex(skey_b, pkey_b)
 
     seed = prio.PRGSeed()
     seed.instance = shared_seed
 
-    # does the order of private keys really matter?
-    if server_id == prio.PRIO_SERVER_A:
-        server_a_pubkey = pubkey
-        server_b_pubkey = other_pubkey
-    else:
-        server_a_pubkey = other_pubkey
-        server_b_pubkey = pubkey
-
-    config = prio.Config(n_fields, server_a_pubkey, server_b_pubkey, batch_id)
+    config = prio.Config(n_fields, pkA, pkB, batch_id)
+    pvtkey = skA if server_id == prio.PRIO_SERVER_A else skB
     server = prio.Server(config, server_id, pvtkey, seed)
 
+    transport, protocol = await aioamqp.connect("rabbitmq", 5672, "guest", "guest")
     await PrioHandler(protocol, server).connect()
 
 
