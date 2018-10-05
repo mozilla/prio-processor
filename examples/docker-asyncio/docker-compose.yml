@@ -17,7 +17,7 @@ services:
       pipenv sync &&
       wait-for-it rabbitmq:5672 -- pipenv run \
         python client.py \
-          --n-clients 3 \
+          --n-clients 10 \
           --n-fields 133"
 
   server_a:
