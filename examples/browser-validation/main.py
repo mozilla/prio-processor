@@ -14,19 +14,24 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def extract(submission_date, bucket, prefix):
+def extract(build_id, bucket, prefix):
+    # The data is partitioned by submission date for easy-to-reason about backfills.
+    # However, this won't scale to release, but we probably don't need to.
     fs = s3fs.S3FileSystem()
-    globs = f"submission_date={submission_date}/*.parquet"
+    globs = f"*/*.parquet"
     files = fs.glob(f"s3://{bucket}/{prefix}/{globs}")
 
-    logger.info(f"Loading data for {submission_date} from s3://{bucket}/{prefix}")
-    df = (
-        pq
-        .ParquetDataset(files, filesystem=fs)
-        .read()
-        .to_pandas()
-    )
-    return df
+    # filter out possible dates
+    def in_range(path):
+        submission_date = path.split("submission_date=")[1].split("/")[0]
+        return submission_date >= build_id[:8]
+
+    logger.info(f"Loading data for build-id {build_id} from s3://{bucket}/{prefix}")
+    files = [f for f in files if in_range(f)]
+    df = pq.ParquetDataset(files, filesystem=fs).read().to_pandas()
+    filtered = df.loc[df['build_id'] == build_id]
+
+    return filtered
 
 
 def get_values_sorted(d):
@@ -71,7 +76,7 @@ def prio_pipeline(df, config, server_a, server_b):
 
 
 @click.command()
-@click.option("--date", required=True)
+@click.option("--build-id", required=True)
 @click.option("--pubkey-A", required=True)
 @click.option("--pvtkey-A", required=True)
 @click.option("--pubkey-B", required=True)
@@ -79,7 +84,7 @@ def prio_pipeline(df, config, server_a, server_b):
 @click.option("--ping", type=click.File('r'))
 @click.option("--bucket", default="net-mozaws-prod-us-west-2-pipeline-analysis")
 @click.option("--prefix", default="amiyaguchi/prio/v1")
-def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, ping, bucket, prefix):
+def main(build_id, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, ping, bucket, prefix):
     pubkey_a = bytes(pubkey_a, "utf-8")
     pvtkey_a = bytes(pvtkey_a, "utf-8")
     pubkey_b = bytes(pubkey_b, "utf-8")
@@ -91,7 +96,7 @@ def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, ping, bucket, prefix):
     skB = prio.PrivateKey().import_hex(pvtkey_b, pubkey_b)
 
     # The pilot includes 3 boolean histograms
-    config = prio.Config(3, pkA, pkB, bytes(date, "utf-8"))
+    config = prio.Config(3, pkA, pkB, bytes(build_id, "utf-8"))
     server_secret = prio.PRGSeed()
     server_a = prio.Server(config, prio.PRIO_SERVER_A, skA, server_secret)
     server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, server_secret)
@@ -99,7 +104,7 @@ def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, ping, bucket, prefix):
     if ping:
         df = extract_ping(ping)
     else:
-        df = extract(date, bucket, prefix)
+        df = extract(build_id, bucket, prefix)
 
     output = prio_pipeline(df, config, server_a, server_b)
     logger.info(output)
