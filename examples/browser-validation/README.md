@@ -39,3 +39,19 @@ $ python main.py \
     --pubkey-B <HEXKEY> \
     --pvtkey-B <HEXKEY>
 ```
+
+### Docker
+This image may also be run via docker. Pass the appropriate environment variables as follows:
+
+```bash
+$ make build
+
+$ AWS_ACCESS_KEY_ID= \
+AWS_SECRET_ACCESS_KEY= \
+PRIO_BUILD_ID= \
+PRIO_PUBKEY_A= \
+PRIO_PVTKEY_A= \
+PRIO_PUBKEY_B= \
+PRIO_PVTKEY_B= \
+make run
+```

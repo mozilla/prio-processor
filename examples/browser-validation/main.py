@@ -127,4 +127,4 @@ def main(build_id, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, ping, bucket, 
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix="PRIO")
