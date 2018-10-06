@@ -1,5 +1,6 @@
 import logging
 import json
+import os
 
 import click
 import s3fs
@@ -14,7 +15,18 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def extract(build_id, bucket, prefix):
+def extract(build_id, bucket, prefix, cache=False):
+    # NOTE: 20181005220146 is the first valid build_id
+    # see: https://hg.mozilla.org/mozilla-central/rev/3e1d1b6a529e
+    if build_id < "20181005220146":
+        logging.warning(f"build-id {build_id} is out-of-date")
+
+    cache_file = f".cache/{build_id}.parquet"
+    if cache and os.path.exists(cache_file):
+        logger.info(f"Using cached dataframe at {cache_file}")
+        df = pd.read_parquet(cache_file)
+        return df
+
     # The data is partitioned by submission date for easy-to-reason about backfills.
     # However, this won't scale to release, but we probably don't need to.
     fs = s3fs.S3FileSystem()
@@ -30,6 +42,12 @@ def extract(build_id, bucket, prefix):
     files = [f for f in files if in_range(f)]
     df = pq.ParquetDataset(files, filesystem=fs).read().to_pandas()
     filtered = df.loc[df['build_id'] == build_id]
+
+    if cache:
+        logging.info(f"Caching dataframe at {cache_file}")
+        if not os.path.exists(".cache"):
+            os.mkdir(".cache")
+        filtered.to_parquet(cache_file)
 
     return filtered
 
@@ -81,10 +99,11 @@ def prio_pipeline(df, config, server_a, server_b):
 @click.option("--pvtkey-A", required=True)
 @click.option("--pubkey-B", required=True)
 @click.option("--pvtkey-B", required=True)
+@click.option("--cache/--no-cache", default=False)
 @click.option("--ping", type=click.File('r'))
 @click.option("--bucket", default="net-mozaws-prod-us-west-2-pipeline-analysis")
 @click.option("--prefix", default="amiyaguchi/prio/v1")
-def main(build_id, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, ping, bucket, prefix):
+def main(build_id, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, ping, bucket, prefix):
     pubkey_a = bytes(pubkey_a, "utf-8")
     pvtkey_a = bytes(pvtkey_a, "utf-8")
     pubkey_b = bytes(pubkey_b, "utf-8")
@@ -101,12 +120,9 @@ def main(build_id, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, ping, bucket, prefix)
     server_a = prio.Server(config, prio.PRIO_SERVER_A, skA, server_secret)
     server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, server_secret)
 
-    if ping:
-        df = extract_ping(ping)
-    else:
-        df = extract(build_id, bucket, prefix)
-
+    df = extract_ping(ping) if ping else extract(build_id, bucket, prefix, cache)
     output = prio_pipeline(df, config, server_a, server_b)
+
     logger.info(output)
 
 
