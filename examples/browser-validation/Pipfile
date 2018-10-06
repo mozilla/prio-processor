@@ -11,6 +11,7 @@ awscli = "*"
 "s3fs" = "*"
 pyarrow = "*"
 click = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.6"
