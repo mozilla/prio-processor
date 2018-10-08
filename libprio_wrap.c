@@ -3617,7 +3617,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_read(PyObject *SWIGUNUSEDPARM(self)
       PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify1_read was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -3657,7 +3657,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_read(PyObject *SWIGUNUSEDPARM(self)
       PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify2_read was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -3697,7 +3697,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_read(PyObject *SWIGUNUSEDPARM(self), P
       PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_read was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -3716,7 +3716,7 @@ SWIGINTERN PyObject *_wrap_Prio_init(PyObject *SWIGUNUSEDPARM(self), PyObject *a
       PyErr_SetString(PyExc_RuntimeError, "Prio_init was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -3844,7 +3844,7 @@ SWIGINTERN PyObject *_wrap_Keypair_new(PyObject *SWIGUNUSEDPARM(self), PyObject 
       PyErr_SetString(PyExc_RuntimeError, "Keypair_new was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PrivateKey", PrivateKey_PyCapsule_clear));
@@ -3885,7 +3885,7 @@ SWIGINTERN PyObject *_wrap_PublicKey_import(PyObject *SWIGUNUSEDPARM(self), PyOb
       PyErr_SetString(PyExc_RuntimeError, "PublicKey_import was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PublicKey", PublicKey_PyCapsule_clear));
@@ -3934,7 +3934,7 @@ SWIGINTERN PyObject *_wrap_PrivateKey_import(PyObject *SWIGUNUSEDPARM(self), PyO
       PyErr_SetString(PyExc_RuntimeError, "PrivateKey_import was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PrivateKey", PrivateKey_PyCapsule_clear));
@@ -3972,7 +3972,7 @@ SWIGINTERN PyObject *_wrap_PublicKey_import_hex(PyObject *SWIGUNUSEDPARM(self), 
       PyErr_SetString(PyExc_RuntimeError, "PublicKey_import_hex was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PublicKey", PublicKey_PyCapsule_clear));
@@ -4021,7 +4021,7 @@ SWIGINTERN PyObject *_wrap_PrivateKey_import_hex(PyObject *SWIGUNUSEDPARM(self),
       PyErr_SetString(PyExc_RuntimeError, "PrivateKey_import_hex was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyCapsule_New(*arg1, "PrivateKey", PrivateKey_PyCapsule_clear));
@@ -4073,7 +4073,7 @@ SWIGINTERN PyObject *_wrap_PrioClient_encode(PyObject *SWIGUNUSEDPARM(self), PyO
       PyErr_SetString(PyExc_RuntimeError, "PrioClient_encode was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(
@@ -4109,7 +4109,7 @@ SWIGINTERN PyObject *_wrap_PrioPRGSeed_randomize(PyObject *SWIGUNUSEDPARM(self),
       PyErr_SetString(PyExc_RuntimeError, "PrioPRGSeed_randomize was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(resultobj,PyBytes_FromStringAndSize((const char*)*arg1, PRG_SEED_LENGTH));
@@ -4206,7 +4206,7 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_set_data(PyObject *SWIGUNUSEDPARM(self),
       PyErr_SetString(PyExc_RuntimeError, "PrioVerifier_set_data was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -4250,7 +4250,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify1_set_data(PyObject *SWIGUNUSEDPARM(s
       PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify1_set_data was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -4304,7 +4304,7 @@ SWIGINTERN PyObject *_wrap_PrioPacketVerify2_set_data(PyObject *SWIGUNUSEDPARM(s
       PyErr_SetString(PyExc_RuntimeError, "PrioPacketVerify2_set_data was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -4338,7 +4338,7 @@ SWIGINTERN PyObject *_wrap_PrioVerifier_isValid(PyObject *SWIGUNUSEDPARM(self), 
       PyErr_SetString(PyExc_RuntimeError, "PrioVerifier_isValid was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -4367,7 +4367,7 @@ SWIGINTERN PyObject *_wrap_PrioServer_aggregate(PyObject *SWIGUNUSEDPARM(self), 
       PyErr_SetString(PyExc_RuntimeError, "PrioServer_aggregate was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -4411,7 +4411,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_set_data(PyObject *SWIGUNUSEDPARM(self
       PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_set_data was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   return resultobj;
 fail:
@@ -4447,7 +4447,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
       PyErr_SetString(PyExc_RuntimeError, "PrioTotalShare_final was not succesful.");
       SWIG_fail;
     }
-    resultobj = Py_None;
+    resultobj = Py_BuildValue("");
   }
   {
     resultobj = SWIG_Python_AppendOutput(
