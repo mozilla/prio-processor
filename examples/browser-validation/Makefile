@@ -5,7 +5,8 @@ run:
 	docker run -v `pwd`:/app/examples/browser-validation \
 		-e AWS_ACCESS_KEY_ID \
 		-e AWS_SECRET_ACCESS_KEY \
-		-e PRIO_BUILD_ID \
+		-e PRIO_DATE \
+		-e PRIO_PINGS \
 		-e PRIO_PUBKEY_A \
 		-e PRIO_PVTKEY_A \
 		-e PRIO_PUBKEY_B \
