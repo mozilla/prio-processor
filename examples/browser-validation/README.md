@@ -14,14 +14,20 @@ $ pipenv shell
 To run against a single ping:
 ```
 $ python main.py \
-    --ping bug-1496552-prio-buildid.json \
-    --date 20181002 \
+    --pings sample.json.batch \
     --pubkey-A <HEXKEY> \
     --pvtkey-A <HEXKEY> \
     --pubkey-B <HEXKEY> \
     --pvtkey-B <HEXKEY>
 ```
-Note that the `--date` option is ignored in this case.
+
+The `--pings` argument generally takes a set of json documents; one per line and delimited by a new line.
+You can test a single document by compacting it.
+
+```
+# use `jq -c` to compact a json document
+$ cat my-ping.json | jq -c . > my-ping.json.batch
+```
 
 To run against the parquet dataset, make sure you have AWS credentials with access to the appropriate bucket. To verify that everything is set up correctly:
 

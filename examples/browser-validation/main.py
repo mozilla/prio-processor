@@ -28,13 +28,18 @@ def extract(date, bucket, prefix, cache=False):
     files = fs.glob(f"s3://{bucket}/{prefix}/submission_date={date}/*.parquet")
     df = pq.ParquetDataset(files, filesystem=fs).read().to_pandas()
 
+    # NOTE: 20181005220146 is the first valid build_id
+    # see: https://hg.mozilla.org/mozilla-central/rev/3e1d1b6a529e
+    min_build_id = "20181005220146"
+    filtered = df.loc[df['build_id'] >= min_build_id]
+
     if cache:
         logging.info(f"Caching dataframe at {cache_file}")
         if not os.path.exists(".cache"):
             os.mkdir(".cache")
-        df.to_parquet(cache_file)
+        filtered.to_parquet(cache_file)
 
-    return df
+    return filtered
 
 
 def get_values_sorted(d):
@@ -43,15 +48,27 @@ def get_values_sorted(d):
 
 
 def extract_ping(f):
-    ping = json.load(f)
-    prio_data = ping['payload']['prio']
+    data = []
+    for line in f.readlines():
+        ping = json.loads(line)
+        payload = ping["payload"]
+        row = {}
 
-    # Spark stores arrays using numpy
-    data = {
-        'prio_data_a': np.array(get_values_sorted(prio_data['a'])),
-        'prio_data_b': np.array(get_values_sorted(prio_data['b'])),
-    }
-    return pd.DataFrame([data])
+        row['build_id'] = ping["environment"]["build"]["buildId"]
+
+        names = ['browser_is_user_default', 'newtab_page_enabled', 'pdf_viewer_used']
+        for name in names:
+            hist = payload['histograms'].get(name.upper())
+            bucket_sum = (hist or {}).get('sum', 0)
+            row[name] = int(bool(bucket_sum))
+
+        prio_data = payload['prio']
+        row['prio_data_a'] = np.array(get_values_sorted(prio_data['a']))
+        row['prio_data_b'] = np.array(get_values_sorted(prio_data['b']))
+
+        data.append(row)
+
+    return pd.DataFrame(data)
 
 
 def prio_aggregate(init_func, group):
@@ -96,6 +113,7 @@ def prio_aggregate(init_func, group):
         "prio_diff": (control - total).astype('int'),
         "prio_null_data": prio_null_data,
         "prio_invalid": prio_invalid,
+        "count": len(group.index),
     }
     return pd.Series(d, index=d.keys())
 
@@ -107,10 +125,13 @@ def prio_aggregate(init_func, group):
 @click.option("--pubkey-B", required=True)
 @click.option("--pvtkey-B", required=True)
 @click.option("--cache/--no-cache", default=False)
-@click.option("--ping", type=click.File('r'))
+@click.option("--pings", type=click.File('r'))
 @click.option("--bucket", default="net-mozaws-prod-us-west-2-pipeline-analysis")
 @click.option("--prefix", default="amiyaguchi/prio/v1")
-def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, ping, bucket, prefix):
+def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, pings, bucket, prefix):
+    if not (date or pings):
+        raise click.BadOptionUsage("date", "Specify either a submission-date or a local ping-set!")
+
     pubkey_a = bytes(pubkey_a, "utf-8")
     pvtkey_a = bytes(pvtkey_a, "utf-8")
     pubkey_b = bytes(pubkey_b, "utf-8")
@@ -131,15 +152,10 @@ def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, ping, bucket, pref
         server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, server_secret)
         return config, server_a, server_b
 
-    df = extract_ping(ping) if ping else extract(date, bucket, prefix, cache)
-
-    # NOTE: 20181005220146 is the first valid build_id
-    # see: https://hg.mozilla.org/mozilla-central/rev/3e1d1b6a529e
-    min_build_id = "20181005220146"
-    filtered = df.loc[df['build_id'] >= min_build_id]
+    df = extract_ping(pings) if pings else extract(date, bucket, prefix, cache)
 
     output = (
-        filtered
+        df
         .groupby("build_id")
         .apply(partial(prio_aggregate, init_servers))
         .sort_values("build_id", ascending=False)
