@@ -1,6 +1,7 @@
 import logging
 import json
 import os
+from functools import partial
 
 import click
 import s3fs
@@ -15,41 +16,25 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def extract(build_id, bucket, prefix, cache=False):
-    # NOTE: 20181005220146 is the first valid build_id
-    # see: https://hg.mozilla.org/mozilla-central/rev/3e1d1b6a529e
-    if build_id < "20181005220146":
-        logging.warning(f"build-id {build_id} is out-of-date")
-
-    cache_file = f".cache/{build_id}.parquet"
+def extract(date, bucket, prefix, cache=False):
+    cache_file = f".cache/{date}.parquet"
     if cache and os.path.exists(cache_file):
         logger.info(f"Using cached dataframe at {cache_file}")
         df = pd.read_parquet(cache_file)
         return df
 
-    # The data is partitioned by submission date for easy-to-reason about backfills.
-    # However, this won't scale to release, but we probably don't need to.
+    logger.info(f"Loading data for submission date {date} from s3://{bucket}/{prefix}")
     fs = s3fs.S3FileSystem()
-    globs = f"*/*.parquet"
-    files = fs.glob(f"s3://{bucket}/{prefix}/{globs}")
-
-    # filter out possible dates
-    def in_range(path):
-        submission_date = path.split("submission_date=")[1].split("/")[0]
-        return submission_date >= build_id[:8]
-
-    logger.info(f"Loading data for build-id {build_id} from s3://{bucket}/{prefix}")
-    files = [f for f in files if in_range(f)]
+    files = fs.glob(f"s3://{bucket}/{prefix}/submission_date={date}/*.parquet")
     df = pq.ParquetDataset(files, filesystem=fs).read().to_pandas()
-    filtered = df.loc[df['build_id'] == build_id]
 
     if cache:
         logging.info(f"Caching dataframe at {cache_file}")
         if not os.path.exists(".cache"):
             os.mkdir(".cache")
-        filtered.to_parquet(cache_file)
+        df.to_parquet(cache_file)
 
-    return filtered
+    return df
 
 
 def get_values_sorted(d):
@@ -69,19 +54,27 @@ def extract_ping(f):
     return pd.DataFrame([data])
 
 
-def prio_pipeline(df, config, server_a, server_b):
-    error_count = 0
-    for _, row in df.iterrows():
-        vA = server_a.create_verifier(bytes(row.prio_data_a.astype('uint8')))
-        vB = server_b.create_verifier(bytes(row.prio_data_b.astype('uint8')))
+def prio_aggregate(init_func, group):
+    config, server_a, server_b = init_func(group.name)
 
+    prio_null_data = 0
+    prio_invalid = 0
+    def compact(x): return bytes(x.astype('uint8'))
+    data = zip(group.prio_data_a.apply(compact), group.prio_data_b.apply(compact))
+    for data_a, data_b in data:
+        if not data_a or not data_b:
+            prio_null_data += 1
+            continue
+
+        vA = server_a.create_verifier(data_a)
+        vB = server_b.create_verifier(data_b)
         p1A = vA.create_verify1()
         p1B = vB.create_verify1()
         p2A = vA.create_verify2(p1A, p1B)
         p2B = vB.create_verify2(p1A, p1B)
 
         if not (vA.is_valid(p2A, p2B) and vB.is_valid(p2A, p2B)):
-            error_count += 1
+            prio_invalid += 1
             continue
 
         server_a.aggregate(vA)
@@ -89,12 +82,26 @@ def prio_pipeline(df, config, server_a, server_b):
 
     tA = server_a.total_shares()
     tB = server_b.total_shares()
-    output = prio.total_share_final(config, tA, tB)
-    return output
+    total = np.array(prio.total_share_final(config, tA, tB))
+
+    # control values
+    default = group.browser_is_user_default.sum()
+    pdf = group.pdf_viewer_used.sum()
+    newtab = group.newtab_page_enabled.sum()
+    control = np.array([default, newtab, pdf])
+
+    d = {
+        "prio_control": control,
+        "prio_observed": total,
+        "prio_diff": (control - total).astype('int'),
+        "prio_null_data": prio_null_data,
+        "prio_invalid": prio_invalid,
+    }
+    return pd.Series(d, index=d.keys())
 
 
 @click.command()
-@click.option("--build-id", required=True)
+@click.option("--date")
 @click.option("--pubkey-A", required=True)
 @click.option("--pvtkey-A", required=True)
 @click.option("--pubkey-B", required=True)
@@ -103,7 +110,7 @@ def prio_pipeline(df, config, server_a, server_b):
 @click.option("--ping", type=click.File('r'))
 @click.option("--bucket", default="net-mozaws-prod-us-west-2-pipeline-analysis")
 @click.option("--prefix", default="amiyaguchi/prio/v1")
-def main(build_id, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, ping, bucket, prefix):
+def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, ping, bucket, prefix):
     pubkey_a = bytes(pubkey_a, "utf-8")
     pvtkey_a = bytes(pvtkey_a, "utf-8")
     pubkey_b = bytes(pubkey_b, "utf-8")
@@ -114,16 +121,30 @@ def main(build_id, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, ping, bucket, 
     pkB = prio.PublicKey().import_hex(pubkey_b)
     skB = prio.PrivateKey().import_hex(pvtkey_b, pubkey_b)
 
-    # The pilot includes 3 boolean histograms
-    config = prio.Config(3, pkA, pkB, bytes(build_id, "utf-8"))
     server_secret = prio.PRGSeed()
-    server_a = prio.Server(config, prio.PRIO_SERVER_A, skA, server_secret)
-    server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, server_secret)
 
-    df = extract_ping(ping) if ping else extract(build_id, bucket, prefix, cache)
-    output = prio_pipeline(df, config, server_a, server_b)
+    # use lexical closure to create an initialization callback
+    def init_servers(build_id):
+        # The pilot includes 3 boolean histograms
+        config = prio.Config(3, pkA, pkB, bytes(build_id, "utf-8"))
+        server_a = prio.Server(config, prio.PRIO_SERVER_A, skA, server_secret)
+        server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, server_secret)
+        return config, server_a, server_b
 
-    logger.info(output)
+    df = extract_ping(ping) if ping else extract(date, bucket, prefix, cache)
+
+    # NOTE: 20181005220146 is the first valid build_id
+    # see: https://hg.mozilla.org/mozilla-central/rev/3e1d1b6a529e
+    min_build_id = "20181005220146"
+    filtered = df.loc[df['build_id'] >= min_build_id]
+
+    output = (
+        filtered
+        .groupby("build_id")
+        .apply(partial(prio_aggregate, init_servers))
+        .sort_values("build_id", ascending=False)
+    )
+    print(output.to_string())
 
 
 if __name__ == '__main__':

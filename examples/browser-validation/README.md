@@ -33,7 +33,7 @@ Then run the following command:
 
 ```
 $ python main.py \
-    --date 20181002 \
+    --date 20181007 \
     --pubkey-A <HEXKEY> \
     --pvtkey-A <HEXKEY> \
     --pubkey-B <HEXKEY> \
@@ -48,7 +48,7 @@ $ make build
 
 $ AWS_ACCESS_KEY_ID= \
 AWS_SECRET_ACCESS_KEY= \
-PRIO_BUILD_ID= \
+PRIO_DATE= \
 PRIO_PUBKEY_A= \
 PRIO_PVTKEY_A= \
 PRIO_PUBKEY_B= \
