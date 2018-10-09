@@ -1,3 +1,4 @@
+import code
 import logging
 import json
 import os
@@ -72,7 +73,8 @@ def extract_ping(f):
 
 
 def prio_aggregate(init_func, group):
-    config, server_a, server_b = init_func(group.name)
+    batch_id = group.name if isinstance(group.name, str) else group.name[0]
+    config, server_a, server_b = init_func(batch_id)
 
     prio_null_data = 0
     prio_invalid = 0
@@ -124,11 +126,13 @@ def prio_aggregate(init_func, group):
 @click.option("--pvtkey-A", required=True)
 @click.option("--pubkey-B", required=True)
 @click.option("--pvtkey-B", required=True)
+@click.option("--groupby", type=str, help="comma-delimited groupby keys")
+@click.option("--interactive/--no-interactive", default=False)
 @click.option("--cache/--no-cache", default=False)
 @click.option("--pings", type=click.File('r'))
 @click.option("--bucket", default="net-mozaws-prod-us-west-2-pipeline-analysis")
 @click.option("--prefix", default="amiyaguchi/prio/v1")
-def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, pings, bucket, prefix):
+def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, groupby, interactive, cache, pings, bucket, prefix):
     if not (date or pings):
         raise click.BadOptionUsage("date", "Specify either a submission-date or a local ping-set!")
 
@@ -152,15 +156,18 @@ def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, cache, pings, bucket, pre
         server_b = prio.Server(config, prio.PRIO_SERVER_B, skB, server_secret)
         return config, server_a, server_b
 
-    df = extract_ping(pings) if pings else extract(date, bucket, prefix, cache)
+    input_df = extract_ping(pings) if pings else extract(date, bucket, prefix, cache)
 
-    output = (
-        df
-        .groupby("build_id")
+    keys = [key.strip() for key in groupby.split()] if groupby else []
+    df = (
+        input_df
+        .groupby(["build_id"] + keys)
         .apply(partial(prio_aggregate, init_servers))
         .sort_values("build_id", ascending=False)
     )
-    print(output.to_string())
+    print(df.to_string())
+    if interactive:
+        code.interact(local=locals())
 
 
 if __name__ == '__main__':
