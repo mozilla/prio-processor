@@ -11,10 +11,23 @@ $ pipenv sync --dev
 $ pipenv shell
 ```
 
-To run against a single ping:
+To test against generated data, run the `generate.py` script.
+
+```
+$ python generate.py --path test.batch.json
+```
+
+This will generate the corresponding command for validation.
+Verify the output of this command before running it.
+
+```
+$ python generate.py --path test.batch.json | bash
+```
+
+To run against a real browser ping, you can run a command in the following form:
 ```
 $ python main.py \
-    --pings sample.json.batch \
+    --pings sample.batch.json \
     --pubkey-A <HEXKEY> \
     --pvtkey-A <HEXKEY> \
     --pubkey-B <HEXKEY> \
@@ -22,11 +35,11 @@ $ python main.py \
 ```
 
 The `--pings` argument generally takes a set of json documents; one per line and delimited by a new line.
-You can test a single document by compacting it.
 
+The ping should be compacted before being presented to the program.
 ```
 # use `jq -c` to compact a json document
-$ cat my-ping.json | jq -c . > my-ping.json.batch
+$ cat my-ping.json | jq -c . > my-ping.batch.json
 ```
 
 To run against the parquet dataset, make sure you have AWS credentials with access to the appropriate bucket. To verify that everything is set up correctly:
@@ -51,6 +64,8 @@ This image may also be run via docker. Pass the appropriate environment variable
 
 ```bash
 $ make build
+
+$ make test
 
 $ AWS_ACCESS_KEY_ID= \
 AWS_SECRET_ACCESS_KEY= \

@@ -16,3 +16,13 @@ run:
 			pipenv lock && \
 			pipenv sync && \
 			pipenv run python main.py'
+
+test:
+	docker run \
+		-v `pwd`:/app/examples/browser-validation \
+		-it prio-validate \
+			sh -c 'cd /app/examples/browser-validation && \
+			pipenv lock && \
+			pipenv sync && \
+			pipenv run \
+				bash -c "python generate.py --path test.batch.json | bash"'
