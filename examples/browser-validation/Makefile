@@ -12,7 +12,7 @@ run:
 		-e PRIO_PUBKEY_B \
 		-e PRIO_PVTKEY_B \
 		-it prio-validate \
-			cd /app/examples/browser-validation && \
+			sh -c 'cd /app/examples/browser-validation && \
 			pipenv lock && \
 			pipenv sync && \
-			pipenv run python main.py
+			pipenv run python main.py'
