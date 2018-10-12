@@ -18,7 +18,7 @@ atexit(Prio_clear);
        PyErr_SetString(PyExc_RuntimeError, "$symname was not succesful.");
        SWIG_fail;
    }
-   $result = Py_None;
+   $result = Py_BuildValue("");
 }
 
 
