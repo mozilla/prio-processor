@@ -1,5 +1,5 @@
 import json
-from itertools import product, count
+from itertools import product
 
 import click
 from prio import prio
@@ -19,8 +19,8 @@ def construct(build_id, user_default, newtab, pdf, data_a, data_b):
                 "PDF_VIEWER_USED": {"sum": pdf}
             },
             "prio": {
-                "a": {k: int(v) for k, v in zip(count(), data_a)},
-                "b": {k: int(v) for k, v in zip(count(), data_b)}
+                "a": {k: int(v) for k, v in enumerate(data_a)},
+                "b": {k: int(v) for k, v in enumerate(data_b)}
             }
         }
     }
