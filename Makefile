@@ -1,7 +1,7 @@
 all:
 	cd libprio && CCFLAGS='-fPIC' scons && cd ..
 	mkdir -p build
-	swig -python -outdir prio/lib -o libprio_wrap.c libprio.i
+	swig -python -outdir prio -o libprio_wrap.c libprio.i
 	python3 setup.py build_ext
 
 clean:
