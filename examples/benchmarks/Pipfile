@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
+[packages]
+prio = {path = "./../..", editable = true}
+jupyter = "*"
+matplotlib = "*"
+numpy = "*"
+
+[requires]
+python_version = "3.6"
