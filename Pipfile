@@ -10,6 +10,8 @@ prio = {path = ".", editable = true}
 pytest = "*"
 coverage = "*"
 pytest-cov = "*"
+setuptools = "*"
+twine = "*"
 
 [requires]
 python_version = "3.6"

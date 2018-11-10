@@ -4,7 +4,7 @@
 
 import pytest
 from prio import prio
-from prio.lib import prio as libprio
+from prio import libprio
 
 @pytest.mark.parametrize("n_clients", [1, 2, 10])
 def test_client_agg(n_clients):

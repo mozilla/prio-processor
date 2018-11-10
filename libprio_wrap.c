@@ -3011,16 +3011,16 @@ static swig_module_info swig_module = {swig_types, 18, 0, 0, 0, 0};
 #endif
 
 /*-----------------------------------------------
-              @(target):= _prio.so
+              @(target):= _libprio.so
   ------------------------------------------------*/
 #if PY_VERSION_HEX >= 0x03000000
-#  define SWIG_init    PyInit__prio
+#  define SWIG_init    PyInit__libprio
 
 #else
-#  define SWIG_init    init_prio
+#  define SWIG_init    init_libprio
 
 #endif
-#define SWIG_name    "_prio"
+#define SWIG_name    "_libprio"
 
 #define SWIGVERSION 0x030012 
 #define SWIG_VERSION SWIGVERSION

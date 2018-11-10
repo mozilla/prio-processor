@@ -2,17 +2,17 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from .lib import prio
+from . import libprio
 from array import array
 
 # re-export enums
-PRIO_SERVER_A = prio.PRIO_SERVER_A
-PRIO_SERVER_B = prio.PRIO_SERVER_B
+PRIO_SERVER_A = libprio.PRIO_SERVER_A
+PRIO_SERVER_B = libprio.PRIO_SERVER_B
 
 # Serializable
 class PRGSeed:
     def __init__(self):
-        self.instance = prio.PrioPRGSeed_randomize()
+        self.instance = libprio.PrioPRGSeed_randomize()
 
 # Serializable
 class Config:
@@ -28,19 +28,19 @@ class Config:
     :param batch_id: Which batch of aggregate statistics we are computing.
     """
     def __init__(self, n_fields, server_a, server_b, batch_id):
-        self.instance = prio.PrioConfig_new(
+        self.instance = libprio.PrioConfig_new(
             n_fields,
             server_a.instance,
             server_b.instance,
             batch_id)
 
     def num_data_fields(self):
-        return prio.PrioConfig_numDataFields(self.instance)
+        return libprio.PrioConfig_numDataFields(self.instance)
 
 
 class TestConfig(Config):
     def __init__(self, n_fields):
-        self.instance = prio.PrioConfig_newTest(n_fields)
+        self.instance = libprio.PrioConfig_newTest(n_fields)
 
 
 class PublicKey:
@@ -52,7 +52,7 @@ class PublicKey:
 
         :param data: a bytestring of length `CURVE25519_KEY_LEN`
         """
-        self.instance = prio.PublicKey_import(data)
+        self.instance = libprio.PublicKey_import(data)
         return self
 
     def import_hex(self, data):
@@ -60,20 +60,20 @@ class PublicKey:
 
         :param data: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
         """
-        self.instance = prio.PublicKey_import_hex(data)
+        self.instance = libprio.PublicKey_import_hex(data)
         return self
 
     def export_bin(self):
         """Export a curve25519 public key as a bytestring."""
         if not self.instance:
             return None
-        return prio.PublicKey_export(self.instance)
+        return libprio.PublicKey_export(self.instance)
 
     def export_hex(self):
         """Export a curve25519 public key as a NULL-terminated hex bytestring."""
         if not self.instance:
             return None
-        return prio.PublicKey_export_hex(self.instance)
+        return libprio.PublicKey_export_hex(self.instance)
 
 
 class PrivateKey:
@@ -86,7 +86,7 @@ class PrivateKey:
         :param pvtdata: a bytestring of length `CURVE25519_KEY_LEN`
         :param pubdata: a bytestring of length `CURVE25519_KEY_LEN`
         """
-        self.instance = prio.PrivateKey_import(pvtdata, pubdata)
+        self.instance = libprio.PrivateKey_import(pvtdata, pubdata)
         return self
 
     def import_hex(self, pvtdata, pubdata):
@@ -95,20 +95,20 @@ class PrivateKey:
         :param pvtdata: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
         :param pubdata: a hex bytestring of length `CURVE25519_KEY_LEN_HEX`
         """
-        self.instance = prio.PrivateKey_import_hex(pvtdata, pubdata)
+        self.instance = libprio.PrivateKey_import_hex(pvtdata, pubdata)
         return self
 
     def export_bin(self):
         """Export a curve25519 public key as a bytestring."""
         if not self.instance:
             return None
-        return prio.PrivateKey_export(self.instance)
+        return libprio.PrivateKey_export(self.instance)
 
     def export_hex(self):
         """Export a curve25519 public key as a NULL-terminated hex bytestring."""
         if not self.instance:
             return None
-        return prio.PrivateKey_export_hex(self.instance)
+        return libprio.PrivateKey_export_hex(self.instance)
 
 
 class Client:
@@ -116,7 +116,7 @@ class Client:
         self.config = config
 
     def encode(self, data):
-        return prio.PrioClient_encode(self.config.instance, data)
+        return libprio.PrioClient_encode(self.config.instance, data)
 
 
 class Server:
@@ -130,7 +130,7 @@ class Server:
         """
         self.config = config
         self.server_id = server_id
-        self.instance = prio.PrioServer_new(
+        self.instance = libprio.PrioServer_new(
             config.instance,
             server_id,
             private_key.instance,
@@ -140,7 +140,7 @@ class Server:
         return Verifier(self, data)
 
     def aggregate(self, verifier):
-        prio.PrioServer_aggregate(self.instance, verifier.instance)
+        libprio.PrioServer_aggregate(self.instance, verifier.instance)
 
     def total_shares(self):
         return TotalShare(self)
@@ -152,8 +152,8 @@ class Verifier:
     """
     def __init__(self, server, data):
         self.server = server
-        self.instance = prio.PrioVerifier_new(server.instance)
-        prio.PrioVerifier_set_data(self.instance, data)
+        self.instance = libprio.PrioVerifier_new(server.instance)
+        libprio.PrioVerifier_set_data(self.instance, data)
 
     def create_verify1(self):
         return PacketVerify1(self)
@@ -173,7 +173,7 @@ class Verifier:
 
         # TODO: replace try except block by wrapping function in swig typemap
         try:
-            prio.PrioVerifier_isValid(self.instance, verify2A.instance, verify2B.instance)
+            libprio.PrioVerifier_isValid(self.instance, verify2A.instance, verify2B.instance)
             return True
         except RuntimeError:
             return False
@@ -182,70 +182,70 @@ class Verifier:
 # Serializable
 class PacketVerify1:
     def __init__(self, verifier):
-        self.instance = prio.PrioPacketVerify1_new()
-        prio.PrioPacketVerify1_set_data(self.instance, verifier.instance)
+        self.instance = libprio.PrioPacketVerify1_new()
+        libprio.PrioPacketVerify1_set_data(self.instance, verifier.instance)
         self._serial_data = None
 
     def deserialize(self, config):
         if self._serial_data:
-            prio.PrioPacketVerify1_read(self.instance, self._serial_data, config.instance)
+            libprio.PrioPacketVerify1_read(self.instance, self._serial_data, config.instance)
         self._serial_data = None
 
     def __getstate__(self):
-        return prio.PrioPacketVerify1_write(self.instance)
+        return libprio.PrioPacketVerify1_write(self.instance)
 
     def __setstate__(self, state):
-        self.instance = prio.PrioPacketVerify1_new()
+        self.instance = libprio.PrioPacketVerify1_new()
         self._serial_data = state
 
 
 # Serializable
 class PacketVerify2:
     def __init__(self, verifier, A, B):
-        self.instance = prio.PrioPacketVerify2_new()
-        prio.PrioPacketVerify2_set_data(self.instance, verifier.instance, A.instance, B.instance)
+        self.instance = libprio.PrioPacketVerify2_new()
+        libprio.PrioPacketVerify2_set_data(self.instance, verifier.instance, A.instance, B.instance)
         self._serial_data = None
 
     def deserialize(self, config):
         if self._serial_data:
-            prio.PrioPacketVerify2_read(self.instance, self._serial_data, config.instance)
+            libprio.PrioPacketVerify2_read(self.instance, self._serial_data, config.instance)
         self._serial_data = None
 
     def __getstate__(self):
-        return prio.PrioPacketVerify2_write(self.instance)
+        return libprio.PrioPacketVerify2_write(self.instance)
 
     def __setstate__(self, state):
-        self.instance = prio.PrioPacketVerify2_new()
+        self.instance = libprio.PrioPacketVerify2_new()
         self._serial_data = state
 
 
 # Serializable
 class TotalShare:
     def __init__(self, server):
-        self.instance = prio.PrioTotalShare_new()
-        prio.PrioTotalShare_set_data(self.instance, server.instance)
+        self.instance = libprio.PrioTotalShare_new()
+        libprio.PrioTotalShare_set_data(self.instance, server.instance)
         self._serial_data = None
 
     def deserialize(self, config):
         if self._serial_data:
-            prio.PrioTotalShare_read(self.instance, self._serial_data, config.instance)
+            libprio.PrioTotalShare_read(self.instance, self._serial_data, config.instance)
         self._serial_data = None
 
     def __getstate__(self):
-        return prio.PrioTotalShare_write(self.instance)
+        return libprio.PrioTotalShare_write(self.instance)
 
     def __setstate__(self, state):
-        self.instance = prio.PrioTotalShare_new()
+        self.instance = libprio.PrioTotalShare_new()
         self._serial_data = state
 
 
 def create_keypair():
-    secret, public = prio.Keypair_new()
+    secret, public = libprio.Keypair_new()
     return PrivateKey(secret), PublicKey(public)
 
 
 def total_share_final(config, tA, tB):
     tA.deserialize(config)
     tB.deserialize(config)
-    final = prio.PrioTotalShare_final(config.instance, tA.instance, tB.instance)
+    final = libprio.PrioTotalShare_final(config.instance, tA.instance, tB.instance)
     return array('L', final)

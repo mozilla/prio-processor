@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from prio.lib import prio
+from prio import libprio as prio
 import array
 
 
