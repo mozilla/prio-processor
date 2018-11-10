@@ -4,10 +4,11 @@ import logging
 import os
 import sys
 import pickle
+from functools import partial
 
 import click
 from prio import prio
-import rpc
+# import rpc
 
 logging.basicConfig()
 logger = logging.getLogger()
@@ -24,14 +25,24 @@ def get_other_server(server_id):
 
 
 async def run_server(server_id, n_fields, batch_id, shared_seed):
-    skey_a = b'7A0AA608C08CB74A86409F5026865435B2F17F40B20636CEFD2656585097FBE0'
-    pkey_a = b'F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51'
-    skey_b = b'50C7329DE18DE3087A0DE963D5585A4DB7A156C7A29FA854760373B053D86919'
-    pkey_b = b'15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07'
-    pkA = prio.PublicKey().import_hex(pkey_a)
-    pkB = prio.PublicKey().import_hex(pkey_b)
-    skA = prio.PrivateKey().import_hex(skey_a, pkey_a)
-    skB = prio.PrivateKey().import_hex(skey_b, pkey_b)
+    # skey_a = b'7A0AA608C08CB74A86409F5026865435B2F17F40B20636CEFD2656585097FBE0'
+    # pkey_a = b'F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51'
+    # skey_b = b'50C7329DE18DE3087A0DE963D5585A4DB7A156C7A29FA854760373B053D86919'
+    # pkey_b = b'15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07'
+    # pkA = prio.PublicKey().import_hex(pkey_a)
+    # pkB = prio.PublicKey().import_hex(pkey_b)
+    # skA = prio.PrivateKey().import_hex(skey_a, pkey_a)
+    # skB = prio.PrivateKey().import_hex(skey_b, pkey_b)
+
+    connection = await aio_pika.connect_robust("amqp://guest:guest@rabbitmq:5672/")
+    channel = await connection.channel()
+    queue = await channel.declare_queue(f"prio.{server_id}")
+
+    rpc = aio_pika.patterns.RPC.create(channel)
+
+    pkA, skA = prio.create_keypair()
+    await rpc.register("publickey", lambda: pkA.export_hex(), {"name": f"prio.rpc.{server_id}"})
+    pkB = await rpc.proxy.publickey(get_other_server(server_id))
 
     seed = prio.PRGSeed()
     seed.instance = shared_seed
@@ -41,10 +52,6 @@ async def run_server(server_id, n_fields, batch_id, shared_seed):
     server = prio.Server(config, server_id, pvtkey, seed)
 
     cache = {}
-
-    connection = await aio_pika.connect_robust("amqp://guest:guest@rabbitmq:5672/")
-    channel = await connection.channel()
-    queue = await channel.declare_queue("prio.{}".format(server_id))
 
     async for message in queue:
         with message.process():
