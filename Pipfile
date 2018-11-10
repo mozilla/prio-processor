@@ -11,7 +11,6 @@ pytest = "*"
 coverage = "*"
 pytest-cov = "*"
 setuptools = "*"
-wheel = "*"
 twine = "*"
 
 [requires]
