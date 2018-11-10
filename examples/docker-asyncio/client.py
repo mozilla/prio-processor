@@ -12,8 +12,16 @@ logger.setLevel(logging.INFO)
 
 async def run_client(n_clients, n_fields, batch_id):
     await asyncio.sleep(3)
-    pkey_a = b'F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51'
-    pkey_b = b'15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07'
+    # pkey_a = b'F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51'
+    # pkey_b = b'15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07'
+
+    connection = await aio_pika.connect_robust("amqp://guest:guest@rabbitmq:5672/")
+    channel = await connection.channel()
+    rpc = aio_pika.patterns.RPC.create(channel)
+
+    await channel.declare_queue("prio.0")
+    await channel.declare_queue("prio.1")
+
     pkA = prio.PublicKey().import_hex(pkey_a)
     pkB = prio.PublicKey().import_hex(pkey_b)
 
@@ -21,11 +29,6 @@ async def run_client(n_clients, n_fields, batch_id):
     client = prio.Client(config)
 
     data_items = bytes([(i % 3 == 1) or (i % 5 == 1) for i in range(n_fields)])
-
-    connection = await aio_pika.connect_robust("amqp://guest:guest@rabbitmq:5672/")
-    channel = await connection.channel()
-    await channel.declare_queue("prio.0")
-    await channel.declare_queue("prio.1")
 
     for i in range(n_clients):
 
