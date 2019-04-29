@@ -3,31 +3,49 @@
 
 A python wrapper around libprio.
 
-This library provides low-level bindings to the reference C implementation of the [Prio system](https://github.com/mozilla/libprio) and a high-level Python interface.
+This library provides low-level bindings to the reference C implementation of
+the [Prio system](https://github.com/mozilla/libprio) and a high-level Python
+interface.
 
 
 ## Build
 
+The `libprio` submodule must be initialized before building. Run the following
+command to initialize the modules.
+
+```bash
+$ git submodule update --init --recursive
+```
+
 ### Docker (recommended)
 
-This project contains a pre-configured build and test environment through docker.
+This project contains a pre-configured build and test environment through
+docker.
 
-```
+```bash
 $ docker build -t prio .
 $ docker run -it prio
 ```
-This will build the package and run the tests.
-You can mount your working directory and shell into the container for development work.
+This will build the package and run the tests. You can mount your working
+directory and shell into the container for development work.
 
-```
+```bash
 $ docker run -v `pwd`:/app -it prio bash
 ```
 
 ### Local
 
-Refer to the Dockerfile and the `libprio` submodule for dependencies.
+Refer to the Dockerfile and the `libprio` submodule for dependencies. If you are
+running on macOS, you will need need to export the following flags for linking and
+including the necessary nss and nspr dependencies.
 
+```bash
+$ brew install nss nspr scons msgpack swig
+$ export LINKFLAGS="-L/usr/local/opt/nss/lib"
+$ export CPPFLAGS="-I/usr/local/opt/nss/include/nss -I/usr/local/opt/nspr/include/nspr"
 ```
+
+```bash
 $ make
 $ make test
 ```
