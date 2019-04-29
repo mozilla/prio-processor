@@ -2996,7 +2996,7 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_prio_verifier swig_types[14]
 #define SWIGTYPE_p_unsigned_char swig_types[15]
 #define SWIGTYPE_p_unsigned_int swig_types[16]
-#define SWIGTYPE_p_unsigned_long swig_types[17]
+#define SWIGTYPE_p_unsigned_long_long swig_types[17]
 static swig_type_info *swig_types[19];
 static swig_module_info swig_module = {swig_types, 18, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
@@ -3799,6 +3799,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_PrioConfig_maxDataFields(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)":PrioConfig_maxDataFields")) SWIG_fail;
+  result = (int)PrioConfig_maxDataFields();
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_PrioConfig_newTest(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -4422,7 +4435,7 @@ fail:
 SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   const_PrioConfig arg1 = (const_PrioConfig) 0 ;
-  unsigned long *arg2 = (unsigned long *) 0 ;
+  unsigned long long *arg2 = (unsigned long long *) 0 ;
   const_PrioTotalShare arg3 = (const_PrioTotalShare) 0 ;
   const_PrioTotalShare arg4 = (const_PrioTotalShare) 0 ;
   PyObject * obj0 = 0 ;
@@ -4433,7 +4446,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
   if (!PyArg_ParseTuple(args,(char *)"OOO:PrioTotalShare_final",&obj0,&obj1,&obj2)) SWIG_fail;
   {
     arg1 = PyCapsule_GetPointer(obj0, "PrioConfig");
-    arg2 = malloc(sizeof(long)*PrioConfig_numDataFields(arg1));
+    arg2 = malloc(sizeof(long long)*PrioConfig_numDataFields(arg1));
   }
   {
     arg3 = PyCapsule_GetPointer(obj1, "PrioTotalShare");
@@ -4452,7 +4465,7 @@ SWIGINTERN PyObject *_wrap_PrioTotalShare_final(PyObject *SWIGUNUSEDPARM(self), 
   {
     resultobj = SWIG_Python_AppendOutput(
       resultobj,
-      PyByteArray_FromStringAndSize((const char*)arg2, sizeof(long)*PrioConfig_numDataFields(arg1))
+      PyByteArray_FromStringAndSize((const char*)arg2, sizeof(long long)*PrioConfig_numDataFields(arg1))
       );
     if (arg2) free(arg2);
   }
@@ -4478,6 +4491,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Prio_clear", _wrap_Prio_clear, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_new", _wrap_PrioConfig_new, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_numDataFields", _wrap_PrioConfig_numDataFields, METH_VARARGS, NULL},
+	 { (char *)"PrioConfig_maxDataFields", _wrap_PrioConfig_maxDataFields, METH_VARARGS, NULL},
 	 { (char *)"PrioConfig_newTest", _wrap_PrioConfig_newTest, METH_VARARGS, NULL},
 	 { (char *)"Keypair_new", _wrap_Keypair_new, METH_VARARGS, NULL},
 	 { (char *)"PublicKey_import", _wrap_PublicKey_import, METH_VARARGS, NULL},
@@ -4521,7 +4535,7 @@ static swig_type_info _swigt__p_prio_total_share = {"_p_prio_total_share", "cons
 static swig_type_info _swigt__p_prio_verifier = {"_p_prio_verifier", "struct prio_verifier *|PrioVerifier|const_PrioVerifier", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "unsigned long long *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_PrioServerId,
@@ -4541,7 +4555,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_prio_verifier,
   &_swigt__p_unsigned_char,
   &_swigt__p_unsigned_int,
-  &_swigt__p_unsigned_long,
+  &_swigt__p_unsigned_long_long,
 };
 
 static swig_cast_info _swigc__p_PrioServerId[] = {  {&_swigt__p_PrioServerId, 0, 0, 0},{0, 0, 0, 0}};
@@ -4561,7 +4575,7 @@ static swig_cast_info _swigc__p_prio_total_share[] = {  {&_swigt__p_prio_total_s
 static swig_cast_info _swigc__p_prio_verifier[] = {  {&_swigt__p_prio_verifier, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_unsigned_long_long[] = {  {&_swigt__p_unsigned_long_long, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_PrioServerId,
@@ -4581,7 +4595,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_prio_verifier,
   _swigc__p_unsigned_char,
   _swigc__p_unsigned_int,
-  _swigc__p_unsigned_long,
+  _swigc__p_unsigned_long_long,
 };
 
 

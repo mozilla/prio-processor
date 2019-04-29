@@ -156,6 +156,10 @@ def PrioConfig_numDataFields(cfg):
     return _libprio.PrioConfig_numDataFields(cfg)
 PrioConfig_numDataFields = _libprio.PrioConfig_numDataFields
 
+def PrioConfig_maxDataFields():
+    return _libprio.PrioConfig_maxDataFields()
+PrioConfig_maxDataFields = _libprio.PrioConfig_maxDataFields
+
 def PrioConfig_newTest(nFields):
     return _libprio.PrioConfig_newTest(nFields)
 PrioConfig_newTest = _libprio.PrioConfig_newTest
