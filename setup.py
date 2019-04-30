@@ -6,33 +6,47 @@ import setuptools
 from distutils.core import setup, Extension
 from glob import glob
 from os import path
+from sys import platform
 
 
 this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
+
+
+# Add platform specific settings for building the extension module
+if platform == "darwin":
+    # macOS
+    library_dirs = ["/usr/local/opt/nss/lib"]
+    include_dirs = [
+        "/usr/local/opt/nss/include/nss",
+        "/usr/local/opt/nspr/include/nspr",
+    ]
+    libraries = ["nss", "nspr4"]
+else:
+    # Fedora
+    library_dirs = []
+    include_dirs = ["/usr/include/nspr", "/usr/include/nss"]
+    libraries = ["nss3", "nspr4"]
 
 
 extension_mod = Extension(
     "_libprio",
     ["libprio_wrap.c"],
-    library_dirs=[
-        "libprio/build/prio",
-        "libprio/build/mpi",
-    ],
-    include_dirs=["/usr/include/nspr", "/usr/include/nss"],
-    libraries=["mprio", "mpi", "nss3", "nspr4", "msgpackc"],
+    library_dirs=["libprio/build/prio", "libprio/build/mpi"] + library_dirs,
+    include_dirs=include_dirs,
+    libraries=["mprio", "mpi", "msgpackc"] + libraries,
 )
 
 setup(
     name="prio",
-    version = "0.3",
-    description = "An interface to libprio",
-    long_description = long_description,
-    long_description_content_type='text/markdown',
-    author = "Anthony Miyaguchi",
-    author_email = "amiyaguchi@mozilla.com",
-    url = "https://github.com/acmiyaguchi/python-libprio",
-    packages = ["prio"],
+    version="0.3",
+    description="An interface to libprio",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    author="Anthony Miyaguchi",
+    author_email="amiyaguchi@mozilla.com",
+    url="https://github.com/mozilla/python-libprio",
+    packages=["prio"],
     ext_modules=[extension_mod],
 )
