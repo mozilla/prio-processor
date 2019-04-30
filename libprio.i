@@ -178,21 +178,21 @@ EXPORT_KEY(PrivateKey, PrivateKey, export_hex, CURVE25519_KEY_LEN_HEX+1)
 
 
 // PrioTotalShare_final
-%typemap(in) (const_PrioConfig, unsigned long *) {
+%typemap(in) (const_PrioConfig, unsigned long long *) {
     $1 = PyCapsule_GetPointer($input, "PrioConfig");
-    $2 = malloc(sizeof(long)*PrioConfig_numDataFields($1));
+    $2 = malloc(sizeof(long long)*PrioConfig_numDataFields($1));
 }
 
-%typemap(argout) (const_PrioConfig, unsigned long *) {
+%typemap(argout) (const_PrioConfig, unsigned long long *) {
     $result = SWIG_Python_AppendOutput(
         $result,
-        PyByteArray_FromStringAndSize((const char*)$2, sizeof(long)*PrioConfig_numDataFields($1))
+        PyByteArray_FromStringAndSize((const char*)$2, sizeof(long long)*PrioConfig_numDataFields($1))
     );
     if ($2) free($2);
 }
 
-%apply (const_PrioConfig, unsigned long *) {
-    (const_PrioConfig cfg, unsigned long *output)
+%apply (const_PrioConfig, unsigned long long *) {
+    (const_PrioConfig cfg, unsigned long long *output)
 }
 
 
