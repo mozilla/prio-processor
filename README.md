@@ -1,5 +1,5 @@
 # python-libprio
-[![CircleCI](https://circleci.com/gh/acmiyaguchi/python-libprio.svg?style=svg)](https://circleci.com/gh/acmiyaguchi/python-libprio)
+[![CircleCI](https://circleci.com/gh/mozilla/python-libprio.svg?style=svg)](https://circleci.com/gh/mozilla/python-libprio)
 
 A python wrapper around libprio.
 
