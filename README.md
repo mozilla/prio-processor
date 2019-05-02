@@ -36,13 +36,10 @@ docker run -v `pwd`:/app -it prio bash
 ### Local
 
 Refer to the Dockerfile and the `libprio` submodule for dependencies. If you are
-running on macOS, you will need need to export the following flags for linking and
-including the necessary nss and nspr dependencies.
+running on macOS, the packages can be installed via homebrew.
 
 ```bash
 brew install nss nspr scons msgpack swig
-export LINKFLAGS="-L/usr/local/opt/nss/lib"
-export CPPFLAGS="-I/usr/local/opt/nss/include/nss -I/usr/local/opt/nspr/include/nspr"
 ```
 
 ```bash
