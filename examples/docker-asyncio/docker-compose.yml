@@ -3,7 +3,7 @@ version: '3.4'
 x-app: &app
   build: ../../
   volumes:
-    - .:/app/examples/docker-asyncio:z
+    - .:/app/examples/docker-asyncio
 
 services:
   client:
