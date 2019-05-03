@@ -24,26 +24,22 @@ def get_other_server(server_id):
     return mapping[server_id]
 
 
-async def run_server(server_id, n_fields, batch_id, shared_seed):
+async def run_server(
+    pubkey, pvtkey, pubkey_other, server_id, n_fields, batch_id, shared_seed
+):
     connection = await aio_pika.connect_robust("amqp://guest:guest@rabbitmq:5672/")
     channel = await connection.channel()
     queue = await channel.declare_queue(f"prio.{server_id}")
 
-    skey_a = b"7A0AA608C08CB74A86409F5026865435B2F17F40B20636CEFD2656585097FBE0"
-    pkey_a = b"F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51"
-    skey_b = b"50C7329DE18DE3087A0DE963D5585A4DB7A156C7A29FA854760373B053D86919"
-    pkey_b = b"15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07"
-    pkA = prio.PublicKey().import_hex(pkey_a)
-    pkB = prio.PublicKey().import_hex(pkey_b)
-    skA = prio.PrivateKey().import_hex(skey_a, pkey_a)
-    skB = prio.PrivateKey().import_hex(skey_b, pkey_b)
+    pk = prio.PublicKey().import_hex(pubkey)
+    sk = prio.PrivateKey().import_hex(pvtkey, pubkey)
+    pk_other = prio.PublicKey().import_hex(pubkey_other)
 
     seed = prio.PRGSeed()
     seed.instance = shared_seed
 
-    config = prio.Config(n_fields, pkA, pkB, batch_id)
-    pvtkey = skA if server_id == prio.PRIO_SERVER_A else skB
-    server = prio.Server(config, server_id, pvtkey, seed)
+    config = prio.Config(n_fields, pk, pk_other, batch_id)
+    server = prio.Server(config, server_id, sk, seed)
 
     cache = {}
 
@@ -105,14 +101,25 @@ async def run_server(server_id, n_fields, batch_id, shared_seed):
 
 
 @click.command()
+@click.option("--pubkey", type=str)
+@click.option("--pvtkey", type=str)
+@click.option("--pubkey-other", type=str)
 @click.option("--server-id", type=click.Choice(["a", "b"]), required=True)
 @click.option("--n-fields", type=int, required=True)
 @click.option("--batch-id", type=str, default="test_batch")
-def main(server_id, n_fields, batch_id):
+def main(pubkey, pvtkey, pubkey_other, server_id, n_fields, batch_id):
     loop = asyncio.get_event_loop()
     server_id = prio.PRIO_SERVER_A if server_id == "a" else prio.PRIO_SERVER_B
     loop.run_until_complete(
-        run_server(server_id, n_fields, bytes(batch_id, "utf-8"), DEFAULT_SHARED_SEED)
+        run_server(
+            bytes(pubkey, "utf-8"),
+            bytes(pvtkey, "utf-8"),
+            bytes(pubkey_other, "utf-8"),
+            server_id,
+            n_fields,
+            bytes(batch_id, "utf-8"),
+            DEFAULT_SHARED_SEED,
+        )
     )
     loop.run_forever()
 
