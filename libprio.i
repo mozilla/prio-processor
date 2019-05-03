@@ -7,10 +7,15 @@
 #include "libprio/include/mprio.h"
 %}
 
+%rename("%(strip:[Prio])s") "";
+
 %init %{
 Prio_init();
 atexit(Prio_clear);
 %}
+
+%ignore Prio_init;
+%ignore Prio_clear;
 
 // Handle SECStatus.
 %typemap(out) SECStatus {

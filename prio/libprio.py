@@ -140,29 +140,21 @@ CURVE25519_KEY_LEN_HEX = _libprio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _libprio.PRIO_SERVER_A
 PRIO_SERVER_B = _libprio.PRIO_SERVER_B
 
-def Prio_init():
-    return _libprio.Prio_init()
-Prio_init = _libprio.Prio_init
+def Config_new(nFields, serverA, serverB, batchId):
+    return _libprio.Config_new(nFields, serverA, serverB, batchId)
+Config_new = _libprio.Config_new
 
-def Prio_clear():
-    return _libprio.Prio_clear()
-Prio_clear = _libprio.Prio_clear
+def Config_numDataFields(cfg):
+    return _libprio.Config_numDataFields(cfg)
+Config_numDataFields = _libprio.Config_numDataFields
 
-def PrioConfig_new(nFields, serverA, serverB, batchId):
-    return _libprio.PrioConfig_new(nFields, serverA, serverB, batchId)
-PrioConfig_new = _libprio.PrioConfig_new
+def Config_maxDataFields():
+    return _libprio.Config_maxDataFields()
+Config_maxDataFields = _libprio.Config_maxDataFields
 
-def PrioConfig_numDataFields(cfg):
-    return _libprio.PrioConfig_numDataFields(cfg)
-PrioConfig_numDataFields = _libprio.PrioConfig_numDataFields
-
-def PrioConfig_maxDataFields():
-    return _libprio.PrioConfig_maxDataFields()
-PrioConfig_maxDataFields = _libprio.PrioConfig_maxDataFields
-
-def PrioConfig_newTest(nFields):
-    return _libprio.PrioConfig_newTest(nFields)
-PrioConfig_newTest = _libprio.PrioConfig_newTest
+def Config_newTest(nFields):
+    return _libprio.Config_newTest(nFields)
+Config_newTest = _libprio.Config_newTest
 
 def Keypair_new():
     return _libprio.Keypair_new()
@@ -184,61 +176,61 @@ def PrivateKey_import_hex(privHexData, pubHexData):
     return _libprio.PrivateKey_import_hex(privHexData, pubHexData)
 PrivateKey_import_hex = _libprio.PrivateKey_import_hex
 
-def PrioClient_encode(cfg, data_in):
-    return _libprio.PrioClient_encode(cfg, data_in)
-PrioClient_encode = _libprio.PrioClient_encode
+def Client_encode(cfg, data_in):
+    return _libprio.Client_encode(cfg, data_in)
+Client_encode = _libprio.Client_encode
 
-def PrioPRGSeed_randomize():
-    return _libprio.PrioPRGSeed_randomize()
-PrioPRGSeed_randomize = _libprio.PrioPRGSeed_randomize
+def PRGSeed_randomize():
+    return _libprio.PRGSeed_randomize()
+PRGSeed_randomize = _libprio.PRGSeed_randomize
 
-def PrioServer_new(cfg, serverIdx, serverPriv, serverSharedSecret):
-    return _libprio.PrioServer_new(cfg, serverIdx, serverPriv, serverSharedSecret)
-PrioServer_new = _libprio.PrioServer_new
+def Server_new(cfg, serverIdx, serverPriv, serverSharedSecret):
+    return _libprio.Server_new(cfg, serverIdx, serverPriv, serverSharedSecret)
+Server_new = _libprio.Server_new
 
-def PrioVerifier_new(s):
-    return _libprio.PrioVerifier_new(s)
-PrioVerifier_new = _libprio.PrioVerifier_new
+def Verifier_new(s):
+    return _libprio.Verifier_new(s)
+Verifier_new = _libprio.Verifier_new
 
-def PrioVerifier_set_data(v, data):
-    return _libprio.PrioVerifier_set_data(v, data)
-PrioVerifier_set_data = _libprio.PrioVerifier_set_data
+def Verifier_set_data(v, data):
+    return _libprio.Verifier_set_data(v, data)
+Verifier_set_data = _libprio.Verifier_set_data
 
-def PrioPacketVerify1_new():
-    return _libprio.PrioPacketVerify1_new()
-PrioPacketVerify1_new = _libprio.PrioPacketVerify1_new
+def PacketVerify1_new():
+    return _libprio.PacketVerify1_new()
+PacketVerify1_new = _libprio.PacketVerify1_new
 
-def PrioPacketVerify1_set_data(p1, v):
-    return _libprio.PrioPacketVerify1_set_data(p1, v)
-PrioPacketVerify1_set_data = _libprio.PrioPacketVerify1_set_data
+def PacketVerify1_set_data(p1, v):
+    return _libprio.PacketVerify1_set_data(p1, v)
+PacketVerify1_set_data = _libprio.PacketVerify1_set_data
 
-def PrioPacketVerify2_new():
-    return _libprio.PrioPacketVerify2_new()
-PrioPacketVerify2_new = _libprio.PrioPacketVerify2_new
+def PacketVerify2_new():
+    return _libprio.PacketVerify2_new()
+PacketVerify2_new = _libprio.PacketVerify2_new
 
-def PrioPacketVerify2_set_data(p2, v, p1A, p1B):
-    return _libprio.PrioPacketVerify2_set_data(p2, v, p1A, p1B)
-PrioPacketVerify2_set_data = _libprio.PrioPacketVerify2_set_data
+def PacketVerify2_set_data(p2, v, p1A, p1B):
+    return _libprio.PacketVerify2_set_data(p2, v, p1A, p1B)
+PacketVerify2_set_data = _libprio.PacketVerify2_set_data
 
-def PrioVerifier_isValid(v, pA, pB):
-    return _libprio.PrioVerifier_isValid(v, pA, pB)
-PrioVerifier_isValid = _libprio.PrioVerifier_isValid
+def Verifier_isValid(v, pA, pB):
+    return _libprio.Verifier_isValid(v, pA, pB)
+Verifier_isValid = _libprio.Verifier_isValid
 
-def PrioServer_aggregate(s, v):
-    return _libprio.PrioServer_aggregate(s, v)
-PrioServer_aggregate = _libprio.PrioServer_aggregate
+def Server_aggregate(s, v):
+    return _libprio.Server_aggregate(s, v)
+Server_aggregate = _libprio.Server_aggregate
 
-def PrioTotalShare_new():
-    return _libprio.PrioTotalShare_new()
-PrioTotalShare_new = _libprio.PrioTotalShare_new
+def TotalShare_new():
+    return _libprio.TotalShare_new()
+TotalShare_new = _libprio.TotalShare_new
 
-def PrioTotalShare_set_data(t, s):
-    return _libprio.PrioTotalShare_set_data(t, s)
-PrioTotalShare_set_data = _libprio.PrioTotalShare_set_data
+def TotalShare_set_data(t, s):
+    return _libprio.TotalShare_set_data(t, s)
+TotalShare_set_data = _libprio.TotalShare_set_data
 
-def PrioTotalShare_final(cfg, tA, tB):
-    return _libprio.PrioTotalShare_final(cfg, tA, tB)
-PrioTotalShare_final = _libprio.PrioTotalShare_final
+def TotalShare_final(cfg, tA, tB):
+    return _libprio.TotalShare_final(cfg, tA, tB)
+TotalShare_final = _libprio.TotalShare_final
 # This file is compatible with both classic and new-style classes.
 
 
