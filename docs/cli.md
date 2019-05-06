@@ -194,3 +194,37 @@ prio publish \
     --input-external    ${workdir}/server_a/intermediate/external/aggregate/* \
     --output            ${workdir}/server_a/processed/
 ```
+
+This concludes the script. If implemented correctly, two scripts in separate processes should complete a full pass of data processing.
+
+## Data format and schema
+
+The `prio` command-line tool handles batches of encoded data that are formatted as newline-delimited JSON payload. Each line contain a payload that validates against a known JSON Schema.
+
+As an example, the intermediate data formats are a wrapper around the serialized payloads. The payloads are treated as base64-encoded binary blobs with an associated `id` for matching corresponding payloads.
+
+```json
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "id": {
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "type": "string"
+        },
+        "payload": {
+            "type": "string"
+        }
+    }
+}
+```
+
+An example payload may take the following form:
+
+```
+{"id": "e7f2d398-9d42-4b03-aab9-67a9137e669d", "payload": "ZTdmMmQzOTgtOWQ0Mi00YjAzLWFhYjktNjdhOTEzN2U2Njlk"}
+{"id": "8176b1b2-0ad3-4bd0-bc2a-60bba996a6a3", "payload": "ODE3NmIxYjItMGFkMy00YmQwLWJjMmEtNjBiYmE5OTZhNmEz"}
+{"id": "dfd27f25-8f5a-4ed4-880e-02fb967855ec", "payload": "ZGZkMjdmMjUtOGY1YS00ZWQ0LTg4MGUtMDJmYjk2Nzg1NWVj"}
+{"id": "bd57e8bb-65f3-44a6-a0fe-456863139c23", "payload": "YmQ1N2U4YmItNjVmMy00NGE2LWEwZmUtNDU2ODYzMTM5YzIz"}
+{"id": "50cb4a3e-79d9-4097-987b-170325c5f544", "payload": "NTBjYjRhM2UtNzlkOS00MDk3LTk4N2ItMTcwMzI1YzVmNTQ0"}
+```
