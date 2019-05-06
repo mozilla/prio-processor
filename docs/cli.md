@@ -95,14 +95,15 @@ Data in `working/server_a/intermediate/internal` is copied to
 
 ## Implementation of the data flow
 
-```bash
+With the command-line interface in place, we script together the pipeline
+aggregating and publishing data.
 
+```bash
 # Variables that are loaded into the current scope.
 #
 # PRIO_SERVER_A_PUBKEY
 # PRIO_SERVER_A_PVTKEY
 # PRIO_SERVER_B_PUBKEY
-# PRIO_SERVER_B_PVTKEY
 # PRIO_BATCH_ID
 # PRIO_N_DATA
 
@@ -117,19 +118,29 @@ read -d '' config_server_a << EOF
 --batch-id              ${PRIO_BATCH_ID}
 --n-data                ${PRIO_N_DATA}
 EOF
+```
 
-# variable for interpolating common options for server B
-read -d '' config_server_b << EOF
---server-id             B
---public-key-internal   ${PRIO_SERVER_B_PUBKEY}
---public-key-external   ${PRIO_SERVER_A_PUBKEY}
---private-key           ${PRIO_SERVER_B_PVTKEY}
---batch-id              ${PRIO_BATCH_ID}
---n-data                ${PRIO_N_DATA}
-EOF
+First we define some variables that are passed into the script. We read common
+options into a variable to re-use across the commands.
+
+```bash
+function wait_for_data() {
+    # Block until data appears in the folder specified by $1
+    watchman-wait $1
+}
+```
+
+We define a function that blocks until the appropriate data is returned.
+[`watchman`](https://facebook.github.io/watchman/docs/watchman-wait.html) is a
+cross-platform command-line utility that provides this functionality out of the
+box. We may also choose to use `inotifywait` or a custom polling method.
 
 
-# Process incoming shares for Server A
+The first stage decodes server specific data.
+
+```bash
+wait_for_data ${workdir}/server_a/raw/
+
 prio verify1 \
     ${config_server_a} \
     --input-internal    ${workdir}/server_a/raw/* \
@@ -138,18 +149,13 @@ prio verify1 \
 cp \
     ${workdir}/server_a/intermediate/internal/verify1/* \
     ${workdir}/server_b/intermediate/external/verify1/
+```
 
-# Process incoming shares for Server B
-prio verify1 \
-    ${config_server_b} \
-    --input-internal    ${workdir}/server_b/raw/* \
-    --output            ${workdir}/server_b/intermediate/internal/verify1/
+The second stage processes the SNIPs.
 
-cp \
-    ${workdir}/server_b/intermediate/internal/verify1/* \
-    ${workdir}/server_a/intermediate/external/verify1/
+```bash
+wait_for_data ${workdir}/server_a/intermediate/external/verify1/
 
-# Process SNIPs for Server A
 prio verify2 \
     ${config_server_a} \
     --input-internal    ${workdir}/server_a/intermediate/internal/verify1/* \
@@ -159,20 +165,13 @@ prio verify2 \
 cp \
     ${workdir}/server_a/intermediate/internal/verify2/* \
     ${workdir}/server_b/intermediate/external/verify2/
+```
 
-# Process SNIPs for Server B
-prio verify2 \
-    ${config_server_b} \
-    --input-internal    ${workdir}/server_b/intermediate/internal/verify1/* \
-    --input-external    ${workdir}/server_b/intermediate/external/verify1/* \
-    --output            ${workdir}/server_b/intermediate/internal/verify2/
+The third step aggregates the verified shares.
 
-cp \
-    ${workdir}/server_b/intermediate/internal/verify2/* \
-    ${workdir}/server_a/intermediate/external/verify2/
+```bash
+wait_for_data ${workdir}/server_a/intermediate/external/verify2/
 
-
-# Aggregate shares for Server A
 prio aggregate \
     ${config_server_a} \
     --input-internal    ${workdir}/server_a/intermediate/internal/verify2/* \
@@ -182,31 +181,16 @@ prio aggregate \
 cp \
     ${workdir}/server_a/intermediate/internal/aggregate/* \
     ${workdir}/server_b/intermediate/external/aggregate/
+```
 
+The final share publishes a total generated from the sum of the aggregates shares.
 
-# Aggregate shares for Server B
-prio aggregate \
-    ${config_server_b} \
-    --input-internal    ${workdir}/server_b/intermediate/internal/verify2/* \
-    --input-external    ${workdir}/server_b/intermediate/external/verify2/* \
-    --output            ${workdir}/server_b/intermediate/aggregate/
+```bash
+wait_for_data ${workdir}/server_a/intermediate/external/aggregate/
 
-cp \
-    ${workdir}/server_b/intermediate/internal/aggregate/* \
-    ${workdir}/server_a/intermediate/external/aggregate/
-
-
-# Publish shares for Server A
 prio publish \
     ${config_server_a} \
     --input-internal    ${workdir}/server_a/intermediate/internal/aggregate/* \
     --input-external    ${workdir}/server_a/intermediate/external/aggregate/* \
     --output            ${workdir}/server_a/processed/
-
-# Publish shares for Server B
-prio publish \
-    ${config_server_b} \
-    --input-internal    ${workdir}/server_b/intermediate/internal/aggregate/* \
-    --input-external    ${workdir}/server_b/intermediate/external/aggregate/* \
-    --output            ${workdir}/server_b/processed/
 ```
