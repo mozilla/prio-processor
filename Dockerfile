@@ -18,9 +18,8 @@ RUN dnf install -y \
 RUN ln -s /usr/include/nspr4 /usr/include/nspr
 RUN ln -s /usr/include/nss3 /usr/include/nss
 
-# install pipenv for dependency management
-RUN pip install pipenv
 ENV PATH="$PATH:~/.local/bin"
+RUN pip3 install tox
 
 # install wait-for for docker-compose services
 RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
@@ -31,5 +30,4 @@ WORKDIR /app
 ADD . /app
 
 RUN make
-RUN pipenv sync --dev
 CMD make test
