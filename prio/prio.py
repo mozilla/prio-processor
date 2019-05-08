@@ -14,6 +14,7 @@ class PRGSeed:
     def __init__(self):
         self.instance = libprio.PrioPRGSeed_randomize()
 
+
 # Serializable
 class Config:
     """An object that stores system parameters.
@@ -27,12 +28,11 @@ class Config:
     :param server_b: PublicKey of server B
     :param batch_id: Which batch of aggregate statistics we are computing.
     """
+
     def __init__(self, n_fields, server_a, server_b, batch_id):
         self.instance = libprio.PrioConfig_new(
-            n_fields,
-            server_a.instance,
-            server_b.instance,
-            batch_id)
+            n_fields, server_a.instance, server_b.instance, batch_id
+        )
 
     def num_data_fields(self):
         return libprio.PrioConfig_numDataFields(self.instance)
@@ -131,10 +131,8 @@ class Server:
         self.config = config
         self.server_id = server_id
         self.instance = libprio.PrioServer_new(
-            config.instance,
-            server_id,
-            private_key.instance,
-            secret.instance)
+            config.instance, server_id, private_key.instance, secret.instance
+        )
 
     def create_verifier(self, data):
         return Verifier(self, data)
@@ -150,6 +148,7 @@ class Verifier:
     """The verifier is not serializable because of the reference to the
     server. The verification packets are.
     """
+
     def __init__(self, server, data):
         self.server = server
         self.instance = libprio.PrioVerifier_new(server.instance)
@@ -173,7 +172,9 @@ class Verifier:
 
         # TODO: replace try except block by wrapping function in swig typemap
         try:
-            libprio.PrioVerifier_isValid(self.instance, verify2A.instance, verify2B.instance)
+            libprio.PrioVerifier_isValid(
+                self.instance, verify2A.instance, verify2B.instance
+            )
             return True
         except RuntimeError:
             return False
@@ -188,7 +189,9 @@ class PacketVerify1:
 
     def deserialize(self, config):
         if self._serial_data:
-            libprio.PrioPacketVerify1_read(self.instance, self._serial_data, config.instance)
+            libprio.PrioPacketVerify1_read(
+                self.instance, self._serial_data, config.instance
+            )
         self._serial_data = None
 
     def __getstate__(self):
@@ -203,12 +206,16 @@ class PacketVerify1:
 class PacketVerify2:
     def __init__(self, verifier, A, B):
         self.instance = libprio.PrioPacketVerify2_new()
-        libprio.PrioPacketVerify2_set_data(self.instance, verifier.instance, A.instance, B.instance)
+        libprio.PrioPacketVerify2_set_data(
+            self.instance, verifier.instance, A.instance, B.instance
+        )
         self._serial_data = None
 
     def deserialize(self, config):
         if self._serial_data:
-            libprio.PrioPacketVerify2_read(self.instance, self._serial_data, config.instance)
+            libprio.PrioPacketVerify2_read(
+                self.instance, self._serial_data, config.instance
+            )
         self._serial_data = None
 
     def __getstate__(self):
@@ -228,7 +235,9 @@ class TotalShare:
 
     def deserialize(self, config):
         if self._serial_data:
-            libprio.PrioTotalShare_read(self.instance, self._serial_data, config.instance)
+            libprio.PrioTotalShare_read(
+                self.instance, self._serial_data, config.instance
+            )
         self._serial_data = None
 
     def __getstate__(self):
@@ -248,4 +257,4 @@ def total_share_final(config, tA, tB):
     tA.deserialize(config)
     tB.deserialize(config)
     final = libprio.PrioTotalShare_final(config.instance, tA.instance, tB.instance)
-    return array('L', final)
+    return array("L", final)
