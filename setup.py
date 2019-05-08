@@ -17,9 +17,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 # Add platform specific settings for building the extension module
 if platform == "darwin":
     # macOS
-    library_dirs = [
-        "/usr/local/opt/nss/lib",
-    ]
+    library_dirs = ["/usr/local/opt/nss/lib"]
     include_dirs = [
         "/usr/local/opt/nss/include/nss",
         "/usr/local/opt/nspr/include/nspr",
@@ -47,6 +45,8 @@ setup(
     author="Anthony Miyaguchi",
     author_email="amiyaguchi@mozilla.com",
     url="https://github.com/mozilla/python-libprio",
+    entry_points={"console_scripts": ["prio=prio.cli:main"]},
+    install_requires=["click"],
     packages=["prio"],
     ext_modules=[extension_mod],
 )
