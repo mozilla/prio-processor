@@ -1,5 +1,10 @@
+import json
 import sys
+from base64 import b64decode, b64encode
+
 import click
+
+from . import libprio
 
 
 def common_options(func):
@@ -59,6 +64,23 @@ def input_external_option(func):
 
 
 @click.command()
+def shared_seed():
+    """Generate a shared server secret in base64."""
+    seed = libprio.PrioPRGSeed_randomize()
+    click.echo(b64encode(seed))
+
+
+@click.command()
+def keygen():
+    """Generate a curve25519 key pair as json."""
+    private, public = libprio.Keypair_new()
+    private_hex = libprio.PrivateKey_export_hex(private).decode("utf-8")[:-1]
+    public_hex = libprio.PublicKey_export_hex(public).decode("utf-8")[:-1]
+    data = json.dumps({"private_key": private_hex, "public_key": public_hex})
+    click.echo(data)
+
+
+@click.command()
 @common_options
 @input_internal_option
 def verify1():
@@ -98,6 +120,9 @@ def main(args=None):
     """Command line utility for prio."""
     pass
 
+
+main.add_command(shared_seed)
+main.add_command(keygen)
 
 main.add_command(verify1)
 main.add_command(verify2)
