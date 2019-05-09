@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Generate a markdown page to serve as markdown documentation and a diffing
+# mechanism between revisions of the CLI.
+#
+# Usage:
+#   pip install .
+#   ./scripts/print-cli-help > docs/cli-help.md
+# 
+
+set -euo pipefail
+
+function md_fence() {
+    echo '````bash'
+    echo "${1}"
+    echo '````'
+}
+
+echo "# Prio CLI Help"
+echo ""
+md_fence "$(prio --help)"
+
+commands=$(prio --help | sed "1,/Commands:/d" | awk '{print $1}')
+for command in ${commands}; do
+    echo ""
+    echo "## prio ${command}"
+    echo ""
+    md_fence "$(prio "${command}" --help)"
+done
