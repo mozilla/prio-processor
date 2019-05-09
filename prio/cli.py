@@ -31,7 +31,7 @@ def public_key(func):
     return apply_options(func, options)
 
 
-def private_key(func):
+def server_config(func):
     options = [
         click.option(
             "--server-id",
@@ -44,6 +44,12 @@ def private_key(func):
             required=True,
             type=bytes,
             help="The private key of the processing server.",
+        ),
+        click.option(
+            "--shared-secret",
+            required=True,
+            type=bytes,
+            help="The shared server secret encoded in base64.",
         ),
     ]
     return apply_options(func, options)
@@ -109,6 +115,24 @@ def input_2(func):
     return apply_options(func, options)
 
 
+def data_config(func):
+    options = [
+        click.option(
+            "--batch-id",
+            required=True,
+            type=str,
+            help="A shared batch identifier used as a validity check.",
+        ),
+        click.option(
+            "--n-data",
+            required=True,
+            type=int,
+            help="The size of the input bit-vector.",
+        ),
+    ]
+    return apply_options(func, options)
+
+
 @click.command()
 def shared_seed():
     """Generate a shared server secret in base64."""
@@ -127,13 +151,18 @@ def keygen():
 
 
 @click.command()
+@data_config
+@public_key
+@input_1
+@output_2
 def encode_shares():
     pass
 
 
 @click.command()
+@data_config
+@server_config
 @public_key
-@private_key
 @input_1
 @output_2
 def verify1():
@@ -142,8 +171,9 @@ def verify1():
 
 
 @click.command()
+@data_config
+@server_config
 @public_key
-@private_key
 @input_2
 @output_1
 def verify2():
@@ -152,8 +182,9 @@ def verify2():
 
 
 @click.command()
+@data_config
+@server_config
 @public_key
-@private_key
 @input_2
 @output_1
 def aggregate():
@@ -162,8 +193,9 @@ def aggregate():
 
 
 @click.command()
+@data_config
+@server_config
 @public_key
-@private_key
 @input_2
 @output_1
 def publish():
