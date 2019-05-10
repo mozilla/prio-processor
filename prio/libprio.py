@@ -115,73 +115,131 @@ except __builtin__.Exception:
 
 
 def PublicKey_export(key):
+    """
+    PublicKey_export(const_PublicKey key) -> PyObject *
+
+    Parameters
+    ----------
+    key: const_PublicKey
+
+    """
     return _libprio.PublicKey_export(key)
 
 
-PublicKey_export = _libprio.PublicKey_export
-
-
 def PublicKey_export_hex(key):
+    """
+    PublicKey_export_hex(const_PublicKey key) -> PyObject *
+
+    Parameters
+    ----------
+    key: const_PublicKey
+
+    """
     return _libprio.PublicKey_export_hex(key)
 
 
-PublicKey_export_hex = _libprio.PublicKey_export_hex
-
-
 def PrivateKey_export(key):
+    """
+    PrivateKey_export(PrivateKey key) -> PyObject *
+
+    Parameters
+    ----------
+    key: PrivateKey
+
+    """
     return _libprio.PrivateKey_export(key)
 
 
-PrivateKey_export = _libprio.PrivateKey_export
-
-
 def PrivateKey_export_hex(key):
+    """
+    PrivateKey_export_hex(PrivateKey key) -> PyObject *
+
+    Parameters
+    ----------
+    key: PrivateKey
+
+    """
     return _libprio.PrivateKey_export_hex(key)
 
 
-PrivateKey_export_hex = _libprio.PrivateKey_export_hex
-
-
 def PrioPacketVerify1_write(p):
+    """
+    PrioPacketVerify1_write(const_PrioPacketVerify1 p) -> PyObject *
+
+    Parameters
+    ----------
+    p: const_PrioPacketVerify1
+
+    """
     return _libprio.PrioPacketVerify1_write(p)
 
 
-PrioPacketVerify1_write = _libprio.PrioPacketVerify1_write
-
-
 def PrioPacketVerify2_write(p):
+    """
+    PrioPacketVerify2_write(const_PrioPacketVerify2 p) -> PyObject *
+
+    Parameters
+    ----------
+    p: const_PrioPacketVerify2
+
+    """
     return _libprio.PrioPacketVerify2_write(p)
 
 
-PrioPacketVerify2_write = _libprio.PrioPacketVerify2_write
-
-
 def PrioTotalShare_write(p):
+    """
+    PrioTotalShare_write(const_PrioTotalShare p) -> PyObject *
+
+    Parameters
+    ----------
+    p: const_PrioTotalShare
+
+    """
     return _libprio.PrioTotalShare_write(p)
 
 
-PrioTotalShare_write = _libprio.PrioTotalShare_write
-
-
 def PrioPacketVerify1_read(p, data, cfg):
+    """
+    PrioPacketVerify1_read(PrioPacketVerify1 p, unsigned char const * data, const_PrioConfig cfg) -> SECStatus
+
+    Parameters
+    ----------
+    p: PrioPacketVerify1
+    data: unsigned char const *
+    cfg: const_PrioConfig
+
+    """
     return _libprio.PrioPacketVerify1_read(p, data, cfg)
 
 
-PrioPacketVerify1_read = _libprio.PrioPacketVerify1_read
-
-
 def PrioPacketVerify2_read(p, data, cfg):
+    """
+    PrioPacketVerify2_read(PrioPacketVerify2 p, unsigned char const * data, const_PrioConfig cfg) -> SECStatus
+
+    Parameters
+    ----------
+    p: PrioPacketVerify2
+    data: unsigned char const *
+    cfg: const_PrioConfig
+
+    """
     return _libprio.PrioPacketVerify2_read(p, data, cfg)
 
 
-PrioPacketVerify2_read = _libprio.PrioPacketVerify2_read
-
-
 def PrioTotalShare_read(p, data, cfg):
+    """
+    PrioTotalShare_read(PrioTotalShare p, unsigned char const * data, const_PrioConfig cfg) -> SECStatus
+
+    Parameters
+    ----------
+    p: PrioTotalShare
+    data: unsigned char const *
+    cfg: const_PrioConfig
+
+    """
     return _libprio.PrioTotalShare_read(p, data, cfg)
 
 
-PrioTotalShare_read = _libprio.PrioTotalShare_read
 CURVE25519_KEY_LEN = _libprio.CURVE25519_KEY_LEN
 CURVE25519_KEY_LEN_HEX = _libprio.CURVE25519_KEY_LEN_HEX
 PRIO_SERVER_A = _libprio.PRIO_SERVER_A
@@ -189,176 +247,267 @@ PRIO_SERVER_B = _libprio.PRIO_SERVER_B
 
 
 def Prio_init():
+    """Prio_init() -> SECStatus"""
     return _libprio.Prio_init()
 
 
-Prio_init = _libprio.Prio_init
-
-
 def Prio_clear():
+    """Prio_clear()"""
     return _libprio.Prio_clear()
 
 
-Prio_clear = _libprio.Prio_clear
-
-
 def PrioConfig_new(nFields, serverA, serverB, batchId):
+    """
+    PrioConfig_new(int nFields, PublicKey serverA, PublicKey serverB, unsigned char const * batchId) -> PrioConfig
+
+    Parameters
+    ----------
+    nFields: int
+    serverA: PublicKey
+    serverB: PublicKey
+    batchId: unsigned char const *
+
+    """
     return _libprio.PrioConfig_new(nFields, serverA, serverB, batchId)
 
 
-PrioConfig_new = _libprio.PrioConfig_new
-
-
 def PrioConfig_numDataFields(cfg):
+    """
+    PrioConfig_numDataFields(const_PrioConfig cfg) -> int
+
+    Parameters
+    ----------
+    cfg: const_PrioConfig
+
+    """
     return _libprio.PrioConfig_numDataFields(cfg)
 
 
-PrioConfig_numDataFields = _libprio.PrioConfig_numDataFields
-
-
 def PrioConfig_maxDataFields():
+    """PrioConfig_maxDataFields() -> int"""
     return _libprio.PrioConfig_maxDataFields()
 
 
-PrioConfig_maxDataFields = _libprio.PrioConfig_maxDataFields
-
-
 def PrioConfig_newTest(nFields):
+    """
+    PrioConfig_newTest(int nFields) -> PrioConfig
+
+    Parameters
+    ----------
+    nFields: int
+
+    """
     return _libprio.PrioConfig_newTest(nFields)
 
 
-PrioConfig_newTest = _libprio.PrioConfig_newTest
-
-
 def Keypair_new():
+    """Keypair_new() -> SECStatus"""
     return _libprio.Keypair_new()
 
 
-Keypair_new = _libprio.Keypair_new
-
-
 def PublicKey_import(data):
+    """
+    PublicKey_import(unsigned char const * data) -> SECStatus
+
+    Parameters
+    ----------
+    data: unsigned char const *
+
+    """
     return _libprio.PublicKey_import(data)
 
 
-PublicKey_import = _libprio.PublicKey_import
-
-
 def PrivateKey_import(privData, pubData):
+    """
+    PrivateKey_import(unsigned char const * privData, unsigned char const * pubData) -> SECStatus
+
+    Parameters
+    ----------
+    privData: unsigned char const *
+    pubData: unsigned char const *
+
+    """
     return _libprio.PrivateKey_import(privData, pubData)
 
 
-PrivateKey_import = _libprio.PrivateKey_import
-
-
 def PublicKey_import_hex(hexData):
+    """
+    PublicKey_import_hex(unsigned char const * hexData) -> SECStatus
+
+    Parameters
+    ----------
+    hexData: unsigned char const *
+
+    """
     return _libprio.PublicKey_import_hex(hexData)
 
 
-PublicKey_import_hex = _libprio.PublicKey_import_hex
-
-
 def PrivateKey_import_hex(privHexData, pubHexData):
+    """
+    PrivateKey_import_hex(unsigned char const * privHexData, unsigned char const * pubHexData) -> SECStatus
+
+    Parameters
+    ----------
+    privHexData: unsigned char const *
+    pubHexData: unsigned char const *
+
+    """
     return _libprio.PrivateKey_import_hex(privHexData, pubHexData)
 
 
-PrivateKey_import_hex = _libprio.PrivateKey_import_hex
-
-
 def PrioClient_encode(cfg, data_in):
+    """
+    PrioClient_encode(const_PrioConfig cfg, bool const * data_in) -> SECStatus
+
+    Parameters
+    ----------
+    cfg: const_PrioConfig
+    data_in: bool const *
+
+    """
     return _libprio.PrioClient_encode(cfg, data_in)
 
 
-PrioClient_encode = _libprio.PrioClient_encode
-
-
 def PrioPRGSeed_randomize():
+    """PrioPRGSeed_randomize() -> SECStatus"""
     return _libprio.PrioPRGSeed_randomize()
 
 
-PrioPRGSeed_randomize = _libprio.PrioPRGSeed_randomize
-
-
 def PrioServer_new(cfg, serverIdx, serverPriv, serverSharedSecret):
+    """
+    PrioServer_new(const_PrioConfig cfg, PrioServerId serverIdx, PrivateKey serverPriv, PrioPRGSeed const serverSharedSecret) -> PrioServer
+
+    Parameters
+    ----------
+    cfg: const_PrioConfig
+    serverIdx: enum PrioServerId
+    serverPriv: PrivateKey
+    serverSharedSecret: unsigned char const [AES_128_KEY_LENGTH]
+
+    """
     return _libprio.PrioServer_new(cfg, serverIdx, serverPriv, serverSharedSecret)
 
 
-PrioServer_new = _libprio.PrioServer_new
-
-
 def PrioVerifier_new(s):
+    """
+    PrioVerifier_new(PrioServer s) -> PrioVerifier
+
+    Parameters
+    ----------
+    s: PrioServer
+
+    """
     return _libprio.PrioVerifier_new(s)
 
 
-PrioVerifier_new = _libprio.PrioVerifier_new
-
-
 def PrioVerifier_set_data(v, data):
+    """
+    PrioVerifier_set_data(PrioVerifier v, unsigned char * data) -> SECStatus
+
+    Parameters
+    ----------
+    v: PrioVerifier
+    data: unsigned char *
+
+    """
     return _libprio.PrioVerifier_set_data(v, data)
 
 
-PrioVerifier_set_data = _libprio.PrioVerifier_set_data
-
-
 def PrioPacketVerify1_new():
+    """PrioPacketVerify1_new() -> PrioPacketVerify1"""
     return _libprio.PrioPacketVerify1_new()
 
 
-PrioPacketVerify1_new = _libprio.PrioPacketVerify1_new
-
-
 def PrioPacketVerify1_set_data(p1, v):
+    """
+    PrioPacketVerify1_set_data(PrioPacketVerify1 p1, const_PrioVerifier v) -> SECStatus
+
+    Parameters
+    ----------
+    p1: PrioPacketVerify1
+    v: const_PrioVerifier
+
+    """
     return _libprio.PrioPacketVerify1_set_data(p1, v)
 
 
-PrioPacketVerify1_set_data = _libprio.PrioPacketVerify1_set_data
-
-
 def PrioPacketVerify2_new():
+    """PrioPacketVerify2_new() -> PrioPacketVerify2"""
     return _libprio.PrioPacketVerify2_new()
 
 
-PrioPacketVerify2_new = _libprio.PrioPacketVerify2_new
-
-
 def PrioPacketVerify2_set_data(p2, v, p1A, p1B):
+    """
+    PrioPacketVerify2_set_data(PrioPacketVerify2 p2, const_PrioVerifier v, const_PrioPacketVerify1 p1A, const_PrioPacketVerify1 p1B) -> SECStatus
+
+    Parameters
+    ----------
+    p2: PrioPacketVerify2
+    v: const_PrioVerifier
+    p1A: const_PrioPacketVerify1
+    p1B: const_PrioPacketVerify1
+
+    """
     return _libprio.PrioPacketVerify2_set_data(p2, v, p1A, p1B)
 
 
-PrioPacketVerify2_set_data = _libprio.PrioPacketVerify2_set_data
-
-
 def PrioVerifier_isValid(v, pA, pB):
+    """
+    PrioVerifier_isValid(const_PrioVerifier v, const_PrioPacketVerify2 pA, const_PrioPacketVerify2 pB) -> SECStatus
+
+    Parameters
+    ----------
+    v: const_PrioVerifier
+    pA: const_PrioPacketVerify2
+    pB: const_PrioPacketVerify2
+
+    """
     return _libprio.PrioVerifier_isValid(v, pA, pB)
 
 
-PrioVerifier_isValid = _libprio.PrioVerifier_isValid
-
-
 def PrioServer_aggregate(s, v):
+    """
+    PrioServer_aggregate(PrioServer s, PrioVerifier v) -> SECStatus
+
+    Parameters
+    ----------
+    s: PrioServer
+    v: PrioVerifier
+
+    """
     return _libprio.PrioServer_aggregate(s, v)
 
 
-PrioServer_aggregate = _libprio.PrioServer_aggregate
-
-
 def PrioTotalShare_new():
+    """PrioTotalShare_new() -> PrioTotalShare"""
     return _libprio.PrioTotalShare_new()
 
 
-PrioTotalShare_new = _libprio.PrioTotalShare_new
-
-
 def PrioTotalShare_set_data(t, s):
+    """
+    PrioTotalShare_set_data(PrioTotalShare t, const_PrioServer s) -> SECStatus
+
+    Parameters
+    ----------
+    t: PrioTotalShare
+    s: const_PrioServer
+
+    """
     return _libprio.PrioTotalShare_set_data(t, s)
 
 
-PrioTotalShare_set_data = _libprio.PrioTotalShare_set_data
-
-
 def PrioTotalShare_final(cfg, tA, tB):
+    """
+    PrioTotalShare_final(const_PrioConfig cfg, const_PrioTotalShare tA, const_PrioTotalShare tB) -> SECStatus
+
+    Parameters
+    ----------
+    cfg: const_PrioConfig
+    tA: const_PrioTotalShare
+    tB: const_PrioTotalShare
+
+    """
     return _libprio.PrioTotalShare_final(cfg, tA, tB)
 
 
-PrioTotalShare_final = _libprio.PrioTotalShare_final
 # This file is compatible with both classic and new-style classes.

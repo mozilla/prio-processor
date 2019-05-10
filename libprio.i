@@ -7,6 +7,8 @@
 #include "libprio/include/mprio.h"
 %}
 
+%feature("autodoc", "3");
+
 %init %{
 Prio_init();
 atexit(Prio_clear);
