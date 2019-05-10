@@ -114,7 +114,7 @@ def verify1(
         for datum in data:
             print(datum)
             share = b64decode(datum["payload"])
-            libprio.PrioPacketVerify1_set_data(verifier, share)
+            libprio.PrioVerifier_set_data(verifier, share)
             libprio.PrioPacketVerify1_set_data(packet, verifier)
             packet_data = libprio.PrioPacketVerify1_write(packet)
             datum["payload"] = b64encode(packet_data).decode()
