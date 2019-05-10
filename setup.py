@@ -38,15 +38,15 @@ extension_mod = Extension(
 
 setup(
     name="prio",
-    version="0.3",
+    version="0.4",
     description="An interface to libprio",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Anthony Miyaguchi",
     author_email="amiyaguchi@mozilla.com",
     url="https://github.com/mozilla/python-libprio",
-    entry_points={"console_scripts": ["prio=prio.cli:main"]},
+    entry_points={"console_scripts": ["prio=prio.__main__:main"]},
     install_requires=["click"],
-    packages=["prio"],
+    packages=["prio", "prio.cli"],
     ext_modules=[extension_mod],
 )
