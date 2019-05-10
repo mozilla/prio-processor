@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -eou pipefail
+
+cd "$(dirname "$0")/.."
+
+key_a=$(prio keygen)
+key_b=$(prio keygen)
+shared=$(prio shared-seed)
+
+mkdir -p working/client
+
+cat << EOF > working/client/data.ndjson
+[1, 0, 0]
+[1, 1, 0]
+[1, 1, 1]
+EOF
+
+python -m prio encode-shares \
+    --n-data 3 \
+    --batch-id test \
+    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
+    --public-key-external $(jq -r ".public_key" <<< $key_b) \
+    --input working/client/data.ndjson \
+    --output-A working/server_a/raw/ \
+    --output-B working/server_b/raw
