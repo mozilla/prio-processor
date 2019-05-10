@@ -123,6 +123,7 @@ def verify1(
 @data_config
 @server_config
 @public_key
+@input_1
 @input_2
 @output_1
 def verify2(
@@ -133,6 +134,7 @@ def verify2(
     shared_secret,
     public_key_internal,
     public_key_external,
+    input,
     input_internal,
     input_external,
     output,
@@ -156,22 +158,26 @@ def verify2(
     packet1_external = libprio.PrioPacketVerify1_new()
     packet = libprio.PrioPacketVerify2_new()
 
+    with open(input, "r") as f:
+        data = map(json.loads, f.readlines())
     with open(input_internal, "r") as f:
         data_internal = map(json.loads, f.readlines())
     with open(input_external, "r") as f:
         data_external = map(json.loads, f.readlines())
 
-    # Create an index for matching internal payloads to external payloads. This
-    # acts as an in-memory hash join on id.
+    # Create an index for matching shares to corresponding verification packets.
+    internal_index = {d["id"]: d["payload"] for d in data_internal}
     external_index = {d["id"]: d["payload"] for d in data_external}
 
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
     with open(outfile, "w") as f:
-        for datum in data_internal:
-            internal = b64decode(datum["payload"])
+        for datum in data:
+            share = b64decode(datum["payload"])
+            internal = b64decode(internal_index[datum["id"]])
             external = b64decode(external_index[datum["id"]])
 
+            libprio.PrioVerifier_set_data(verifier, share)
             libprio.PrioPacketVerify1_read(packet1_internal, internal, config)
             libprio.PrioPacketVerify1_read(packet1_external, external, config)
 
@@ -183,11 +189,11 @@ def verify2(
             json.dump(datum, f)
             f.write("\n")
 
-
 @click.command()
 @data_config
 @server_config
 @public_key
+@input_1
 @input_2
 @output_1
 def aggregate(
@@ -198,6 +204,7 @@ def aggregate(
     shared_secret,
     public_key_internal,
     public_key_external,
+    input,
     input_internal,
     input_external,
     output,
@@ -220,37 +227,39 @@ def aggregate(
     packet2_internal = libprio.PrioPacketVerify2_new()
     packet2_external = libprio.PrioPacketVerify2_new()
 
+    with open(input, "r") as f:
+        data = map(json.loads, f.readlines())
     with open(input_internal, "r") as f:
         data_internal = map(json.loads, f.readlines())
     with open(input_external, "r") as f:
         data_external = map(json.loads, f.readlines())
 
-    # Create an index for matching internal payloads to external payloads. This
-    # acts as an in-memory hash join on id.
+    # Create an index for matching shares to corresponding verification packets.
+    internal_index = {d["id"]: d["payload"] for d in data_internal}
     external_index = {d["id"]: d["payload"] for d in data_external}
 
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
     for datum in data_internal:
-        internal = b64decode(datum["payload"])
+        share = b64decode(datum["payload"])
+        internal = b64decode(internal_index[datum["id"]])
         external = b64decode(external_index[datum["id"]])
 
+        libprio.PrioVerifier_set_data(verifier, share)
         libprio.PrioPacketVerify2_read(packet2_internal, internal, config)
         libprio.PrioPacketVerify2_read(packet2_external, external, config)
         try:
             libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
         except RuntimeError:
             # the current packet is invalid
-            print("invalid packet")
             continue
-
         libprio.PrioServer_aggregate(server, verifier)
 
     with open(outfile, "w") as f:
         shares = libprio.PrioTotalShare_new()
         libprio.PrioTotalShare_set_data(shares, server)
         data = libprio.PrioTotalShare_write(shares)
-        f.write(b64encode(data).decode())
+        json.dump(b64encode(data).decode(), f)
 
 
 @click.command()
@@ -285,9 +294,9 @@ def publish(
     )
 
     with open(input_internal, "r") as f:
-        data_internal = b64decode(f.read())
+        data_internal = b64decode(json.load(f))
     with open(input_external, "r") as f:
-        data_external = b64decode(f.read())
+        data_external = b64decode(json.load(f))
 
     share_internal = libprio.PrioTotalShare_new()
     share_external = libprio.PrioTotalShare_new()
