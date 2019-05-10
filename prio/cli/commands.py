@@ -1,4 +1,5 @@
 import click
+import array
 import json
 import os
 from base64 import b64decode, b64encode
@@ -157,7 +158,7 @@ def verify2(
 
     with open(input_internal, "r") as f:
         data_internal = map(json.loads, f.readlines())
-    with open(input_internal, "r") as f:
+    with open(input_external, "r") as f:
         data_external = map(json.loads, f.readlines())
 
     # Create an index for matching internal payloads to external payloads. This
@@ -221,7 +222,7 @@ def aggregate(
 
     with open(input_internal, "r") as f:
         data_internal = map(json.loads, f.readlines())
-    with open(input_internal, "r") as f:
+    with open(input_external, "r") as f:
         data_external = map(json.loads, f.readlines())
 
     # Create an index for matching internal payloads to external payloads. This
@@ -240,6 +241,7 @@ def aggregate(
             libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
         except RuntimeError:
             # the current packet is invalid
+            print("invalid packet")
             continue
 
         libprio.PrioServer_aggregate(server, verifier)
@@ -248,7 +250,7 @@ def aggregate(
         shares = libprio.PrioTotalShare_new()
         libprio.PrioTotalShare_set_data(shares, server)
         data = libprio.PrioTotalShare_write(shares)
-        json.dump(b64encode(data).decode(), f)
+        f.write(b64encode(data).decode())
 
 
 @click.command()
@@ -271,3 +273,28 @@ def publish(
 ):
     """Generate a final aggregate and remap data to a content blocklist"""
     click.echo("Running publish")
+
+    private_key = libprio.PrivateKey_import_hex(private_key, public_key_internal)
+    public_key_internal = libprio.PublicKey_import_hex(public_key_internal)
+    public_key_external = libprio.PublicKey_import_hex(public_key_external)
+    server_id = libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
+    shared_secret = b64decode(shared_secret)
+
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+
+    with open(input_internal, "r") as f:
+        data_internal = b64decode(f.read())
+    with open(input_external, "r") as f:
+        data_external = b64decode(f.read())
+
+    share_internal = libprio.PrioTotalShare_new()
+    share_external = libprio.PrioTotalShare_new()
+
+    libprio.PrioTotalShare_read(share_internal, data_internal, config)
+    libprio.PrioTotalShare_read(share_external, data_external, config)
+
+    final = libprio.PrioTotalShare_final(config, share_internal, share_external)
+    final = list(array.array("L", final))
+    click.echo(final)
