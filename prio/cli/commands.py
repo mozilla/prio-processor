@@ -139,6 +139,49 @@ def verify2(
     """Verify a batch of SNIPs"""
     click.echo("Running verify2")
 
+    private_key = libprio.PrivateKey_import_hex(private_key, public_key_internal)
+    public_key_internal = libprio.PublicKey_import_hex(public_key_internal)
+    public_key_external = libprio.PublicKey_import_hex(public_key_external)
+    server_id = libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
+    shared_secret = b64decode(shared_secret)
+
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+    server = libprio.PrioServer_new(config, server_id, private_key, shared_secret)
+    verifier = libprio.PrioVerifier_new(server)
+
+    packet1_internal = libprio.PrioPacketVerify1_new()
+    packet1_external = libprio.PrioPacketVerify1_new()
+    packet = libprio.PrioPacketVerify2_new()
+
+    with open(input_internal, "r") as f:
+        data_internal = map(json.loads, f.readlines())
+    with open(input_internal, "r") as f:
+        data_external = map(json.loads, f.readlines())
+
+    # Create an index for matching internal payloads to external payloads. This
+    # acts as an in-memory hash join on id.
+    external_index = {d["id"]: d["payload"] for d in data_external}
+
+    name = os.path.basename(input_internal)
+    outfile = os.path.join(output, name)
+    with open(outfile, "w") as f:
+        for datum in data_internal:
+            internal = b64decode(datum["payload"])
+            external = b64decode(external_index[datum["id"]])
+
+            libprio.PrioPacketVerify1_read(packet1_internal, internal, config)
+            libprio.PrioPacketVerify1_read(packet1_external, external, config)
+
+            libprio.PrioPacketVerify2_set_data(
+                packet, verifier, packet1_internal, packet1_external
+            )
+            packet_data = libprio.PrioPacketVerify2_write(packet)
+            datum["payload"] = b64encode(packet_data).decode()
+            json.dump(datum, f)
+            f.write("\n")
+
 
 @click.command()
 @data_config

@@ -63,3 +63,39 @@ python -m prio verify1 \
 cp \
     working/server_b/intermediate/internal/verify1/data.ndjson \
     working/server_a/intermediate/external/verify1/
+
+###########################################################
+# verify2
+###########################################################
+
+python -m prio verify2 \
+    --n-data 3 \
+    --batch-id test \
+    --server-id A \
+    --private-key $(jq -r ".private_key" <<< $key_a) \
+    --shared-secret $shared \
+    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
+    --public-key-external $(jq -r ".public_key" <<< $key_b) \
+    --input-internal working/server_a/intermediate/internal/verify1/data.ndjson \
+    --input-external working/server_a/intermediate/external/verify1/data.ndjson \
+    --output working/server_a/intermediate/internal/verify2/ \
+
+cp \
+    working/server_a/intermediate/internal/verify2/data.ndjson \
+    working/server_b/intermediate/external/verify2/
+
+python -m prio verify2 \
+    --n-data 3 \
+    --batch-id test \
+    --server-id B \
+    --private-key $(jq -r ".private_key" <<< $key_b) \
+    --shared-secret $shared \
+    --public-key-internal $(jq -r ".public_key" <<< $key_b) \
+    --public-key-external $(jq -r ".public_key" <<< $key_a) \
+    --input-internal working/server_b/intermediate/internal/verify1/data.ndjson \
+    --input-external working/server_b/intermediate/external/verify1/data.ndjson \
+    --output working/server_b/intermediate/internal/verify2/ \
+
+cp \
+    working/server_b/intermediate/internal/verify2/data.ndjson \
+    working/server_a/intermediate/external/verify2/
