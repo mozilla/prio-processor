@@ -1,4 +1,5 @@
 import click
+from .types import BYTE_STRING
 
 
 def apply_options(func, options):
@@ -12,13 +13,13 @@ def public_key(func):
         click.option(
             "--public-key-internal",
             required=True,
-            type=str,
+            type=BYTE_STRING,
             help="The public key of the processing server.",
         ),
         click.option(
             "--public-key-external",
             required=True,
-            type=str,
+            type=BYTE_STRING,
             help="The public key of the co-processing server.",
         ),
     ]
@@ -36,13 +37,13 @@ def server_config(func):
         click.option(
             "--private-key",
             required=True,
-            type=str,
+            type=BYTE_STRING,
             help="The private key of the processing server.",
         ),
         click.option(
             "--shared-secret",
             required=True,
-            type=str,
+            type=BYTE_STRING,
             help="The shared server secret encoded in base64.",
         ),
     ]
@@ -114,13 +115,13 @@ def data_config(func):
         click.option(
             "--batch-id",
             required=True,
-            type=str,
+            type=BYTE_STRING,
             help="A shared batch identifier used as a validity check.",
         ),
         click.option(
             "--n-data",
             required=True,
-            type=int,
+            type=click.INT,
             help="The size of the input bit-vector.",
         ),
     ]

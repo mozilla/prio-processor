@@ -47,14 +47,8 @@ def encode_shares(
     output_a,
     output_b,
 ):
-    public_key_internal = libprio.PublicKey_import_hex(
-        bytes(public_key_internal, "utf-8")
-    )
-    public_key_external = libprio.PublicKey_import_hex(
-        bytes(public_key_external, "utf-8")
-    )
-    batch_id = bytes(batch_id, "utf-8")
-
+    public_key_internal = libprio.PublicKey_import_hex(public_key_internal)
+    public_key_external = libprio.PublicKey_import_hex(public_key_external)
     config = libprio.PrioConfig_new(
         n_data, public_key_internal, public_key_external, batch_id
     )
