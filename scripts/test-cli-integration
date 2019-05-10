@@ -30,6 +30,9 @@ python -m prio encode-shares \
     --output-A working/server_a/raw/ \
     --output-B working/server_b/raw/
 
+jq -c '.' working/server_a/raw/data.ndjson
+jq -c '.' working/server_b/raw/data.ndjson
+
 ###########################################################
 # verify1
 ###########################################################
@@ -45,6 +48,8 @@ python -m prio verify1 \
     --input working/server_a/raw/data.ndjson \
     --output working/server_a/intermediate/internal/verify1
 
+jq -c '.' working/server_a/intermediate/internal/verify1/data.ndjson
+
 cp \
     working/server_a/intermediate/internal/verify1/data.ndjson \
     working/server_b/intermediate/external/verify1/
@@ -59,6 +64,8 @@ python -m prio verify1 \
     --public-key-external $(jq -r ".public_key" <<< $key_a) \
     --input working/server_b/raw/data.ndjson \
     --output working/server_b/intermediate/internal/verify1
+
+jq -c '.' working/server_b/intermediate/internal/verify1/data.ndjson
 
 cp \
     working/server_b/intermediate/internal/verify1/data.ndjson \
@@ -80,6 +87,8 @@ python -m prio verify2 \
     --input-external working/server_a/intermediate/external/verify1/data.ndjson \
     --output working/server_a/intermediate/internal/verify2/ \
 
+jq -c '.' working/server_a/intermediate/internal/verify2/data.ndjson
+
 cp \
     working/server_a/intermediate/internal/verify2/data.ndjson \
     working/server_b/intermediate/external/verify2/
@@ -95,6 +104,8 @@ python -m prio verify2 \
     --input-internal working/server_b/intermediate/internal/verify1/data.ndjson \
     --input-external working/server_b/intermediate/external/verify1/data.ndjson \
     --output working/server_b/intermediate/internal/verify2/ \
+
+jq -c '.' working/server_b/intermediate/internal/verify2/data.ndjson
 
 cp \
     working/server_b/intermediate/internal/verify2/data.ndjson \
@@ -114,11 +125,11 @@ python -m prio aggregate \
     --public-key-external $(jq -r ".public_key" <<< $key_b) \
     --input-internal working/server_a/intermediate/internal/verify2/data.ndjson \
     --input-external working/server_a/intermediate/external/verify2/data.ndjson \
-    --output working/server_a/intermediate/internal/shares/
+    --output working/server_a/intermediate/internal/aggregate/
 
 cp \
-    working/server_a/intermediate/internal/shares/data.ndjson \
-    working/server_b/intermediate/external/shares/
+    working/server_a/intermediate/internal/aggregate/data.ndjson \
+    working/server_b/intermediate/external/aggregate/
 
 python -m prio aggregate \
     --n-data 3 \
@@ -130,11 +141,11 @@ python -m prio aggregate \
     --public-key-external $(jq -r ".public_key" <<< $key_a) \
     --input-internal working/server_b/intermediate/internal/verify2/data.ndjson \
     --input-external working/server_b/intermediate/external/verify2/data.ndjson \
-    --output working/server_b/intermediate/internal/shares/ \
+    --output working/server_b/intermediate/internal/aggregate/ \
 
 cp \
-    working/server_b/intermediate/internal/shares/data.ndjson \
-    working/server_a/intermediate/external/shares/
+    working/server_b/intermediate/internal/aggregate/data.ndjson \
+    working/server_a/intermediate/external/aggregate/
 
 ###########################################################
 # publish
@@ -148,8 +159,8 @@ python -m prio publish \
     --shared-secret $shared \
     --public-key-internal $(jq -r ".public_key" <<< $key_a) \
     --public-key-external $(jq -r ".public_key" <<< $key_b) \
-    --input-internal working/server_a/intermediate/internal/shares/data.ndjson \
-    --input-external working/server_a/intermediate/external/shares/data.ndjson \
+    --input-internal working/server_a/intermediate/internal/aggregate/data.ndjson \
+    --input-external working/server_a/intermediate/external/aggregate/data.ndjson \
     --output working/server_a/processed/data.ndjson
 
 python -m prio publish \
@@ -160,6 +171,6 @@ python -m prio publish \
     --shared-secret $shared \
     --public-key-internal $(jq -r ".public_key" <<< $key_b) \
     --public-key-external $(jq -r ".public_key" <<< $key_a) \
-    --input-internal working/server_b/intermediate/internal/shares/data.ndjson \
-    --input-external working/server_b/intermediate/external/shares/data.ndjson \
+    --input-internal working/server_b/intermediate/internal/aggregate/data.ndjson \
+    --input-external working/server_b/intermediate/external/aggregate/data.ndjson \
     --output working/server_b/processed/data.ndjson
