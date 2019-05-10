@@ -23,4 +23,15 @@ python -m prio encode-shares \
     --public-key-external $(jq -r ".public_key" <<< $key_b) \
     --input working/client/data.ndjson \
     --output-A working/server_a/raw/ \
-    --output-B working/server_b/raw
+    --output-B working/server_b/raw/
+
+python -m prio verify1 \
+    --n-data 3 \
+    --batch-id test \
+    --server-id A \
+    --private-key $(jq -r ".private_key" <<< $key_a) \
+    --shared-secret $shared \
+    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
+    --public-key-external $(jq -r ".public_key" <<< $key_b) \
+    --input working/server_a/raw/data.ndjson \
+    --output working/server_a/intermediate/internal/verify1
