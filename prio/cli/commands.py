@@ -62,13 +62,10 @@ def encode_shares(
     with open(path_a, "w") as fp_a, open(path_b, "w") as fp_b:
         for datum in data:
             share_a, share_b = libprio.PrioClient_encode(config, bytes(datum))
-            json.dump(
-                {"id": str(uuid4()), "payload": b64encode(share_a).decode()}, fp_a
-            )
-            json.dump(
-                {"id": str(uuid4()), "payload": b64encode(share_b).decode()}, fp_b
-            )
+            uid = str(uuid4())
+            json.dump({"id": uid, "payload": b64encode(share_a).decode()}, fp_a)
             fp_a.write("\n")
+            json.dump({"id": uid, "payload": b64encode(share_b).decode()}, fp_b)
             fp_b.write("\n")
 
 
@@ -112,7 +109,6 @@ def verify1(
     outfile = os.path.join(output, name)
     with open(outfile, "w") as f:
         for datum in data:
-            print(datum)
             share = b64decode(datum["payload"])
             libprio.PrioVerifier_set_data(verifier, share)
             libprio.PrioPacketVerify1_set_data(packet, verifier)

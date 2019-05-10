@@ -1,12 +1,17 @@
 #!/bin/bash
 
 set -eou pipefail
+set -x
 
 cd "$(dirname "$0")/.."
 
 key_a=$(prio keygen)
 key_b=$(prio keygen)
 shared=$(prio shared-seed)
+
+###########################################################
+# encode-shares
+###########################################################
 
 mkdir -p working/client
 
@@ -25,6 +30,10 @@ python -m prio encode-shares \
     --output-A working/server_a/raw/ \
     --output-B working/server_b/raw/
 
+###########################################################
+# verify1
+###########################################################
+
 python -m prio verify1 \
     --n-data 3 \
     --batch-id test \
@@ -35,3 +44,22 @@ python -m prio verify1 \
     --public-key-external $(jq -r ".public_key" <<< $key_b) \
     --input working/server_a/raw/data.ndjson \
     --output working/server_a/intermediate/internal/verify1
+
+cp \
+    working/server_a/intermediate/internal/verify1/data.ndjson \
+    working/server_b/intermediate/external/verify1/
+
+python -m prio verify1 \
+    --n-data 3 \
+    --batch-id test \
+    --server-id B \
+    --private-key $(jq -r ".private_key" <<< $key_b) \
+    --shared-secret $shared \
+    --public-key-internal $(jq -r ".public_key" <<< $key_b) \
+    --public-key-external $(jq -r ".public_key" <<< $key_a) \
+    --input working/server_b/raw/data.ndjson \
+    --output working/server_b/intermediate/internal/verify1
+
+cp \
+    working/server_b/intermediate/internal/verify1/data.ndjson \
+    working/server_a/intermediate/external/verify1/
