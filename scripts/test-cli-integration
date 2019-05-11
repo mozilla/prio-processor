@@ -21,6 +21,8 @@ cat << EOF > working/client/data.ndjson
 [1, 1, 1]
 EOF
 
+jq -c '.' working/client/data.ndjson
+
 python -m prio encode-shares \
     --n-data 3 \
     --batch-id test \
@@ -149,7 +151,7 @@ python -m prio aggregate \
     --input-external working/server_b/intermediate/external/verify2/data.ndjson \
     --output working/server_b/intermediate/internal/aggregate/ \
 
-jq -c '.' working/server_b/intermediate/internal/aggregate/data.ndjson
+jq -c '.' working/server_b/intermediate/internal/verify2/data.ndjson
 
 cp \
     working/server_b/intermediate/internal/aggregate/data.ndjson \
@@ -169,7 +171,9 @@ python -m prio publish \
     --public-key-external $(jq -r ".public_key" <<< $key_b) \
     --input-internal working/server_a/intermediate/internal/aggregate/data.ndjson \
     --input-external working/server_a/intermediate/external/aggregate/data.ndjson \
-    --output working/server_a/processed/data.ndjson
+    --output working/server_a/processed/
+
+jq -c '.' working/server_a/processed/data.ndjson
 
 python -m prio publish \
     --n-data 3 \
@@ -181,4 +185,6 @@ python -m prio publish \
     --public-key-external $(jq -r ".public_key" <<< $key_a) \
     --input-internal working/server_b/intermediate/internal/aggregate/data.ndjson \
     --input-external working/server_b/intermediate/external/aggregate/data.ndjson \
-    --output working/server_b/processed/data.ndjson
+    --output working/server_b/processed/
+
+jq -c '.' working/server_b/processed/data.ndjson

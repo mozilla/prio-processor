@@ -189,6 +189,7 @@ def verify2(
             json.dump(datum, f)
             f.write("\n")
 
+
 @click.command()
 @data_config
 @server_config
@@ -238,9 +239,7 @@ def aggregate(
     internal_index = {d["id"]: d["payload"] for d in data_internal}
     external_index = {d["id"]: d["payload"] for d in data_external}
 
-    name = os.path.basename(input_internal)
-    outfile = os.path.join(output, name)
-    for datum in data_internal:
+    for datum in data:
         share = b64decode(datum["payload"])
         internal = b64decode(internal_index[datum["id"]])
         external = b64decode(external_index[datum["id"]])
@@ -255,6 +254,8 @@ def aggregate(
             continue
         libprio.PrioServer_aggregate(server, verifier)
 
+    name = os.path.basename(input_internal)
+    outfile = os.path.join(output, name)
     with open(outfile, "w") as f:
         shares = libprio.PrioTotalShare_new()
         libprio.PrioTotalShare_set_data(shares, server)
@@ -304,6 +305,14 @@ def publish(
     libprio.PrioTotalShare_read(share_internal, data_internal, config)
     libprio.PrioTotalShare_read(share_external, data_external, config)
 
+    # ordering matters
+    if server_id == libprio.PRIO_SERVER_B:
+        share_internal, share_external = share_external, share_internal
+
     final = libprio.PrioTotalShare_final(config, share_internal, share_external)
     final = list(array.array("L", final))
-    click.echo(final)
+
+    name = os.path.basename(input_internal)
+    outfile = os.path.join(output, name)
+    with open(outfile, "w") as f:
+        json.dump(final, f)
