@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+docker-compose = ">= 1.10.0"
+
+[packages]
+"prio" = {path = "./../..", editable = true}
+aioamqp = "*"
+click = "*"
+aio-pika = "*"
+
+[requires]
+python_version = "3"

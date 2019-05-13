@@ -22,7 +22,11 @@ RUN ln -s /usr/include/nss3 /usr/include/nss
 RUN pip install pipenv
 ENV PATH="$PATH:~/.local/bin"
 
-# inst
+# install wait-for for docker-compose services
+RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+RUN chmod +x /usr/local/bin/wait-for-it
+
+# install the app
 WORKDIR /app
 ADD . /app
 
