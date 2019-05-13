@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  # server_a:
+  #   build: .
+  #   command:
+  minio:
+    # https://docs.min.io/docs/minio-docker-quickstart-guide
+    # https://docs.min.io/docs/minio-multi-user-quickstart-guide.html
+    image: minio/minio:latest
+    command: server /data
+    ports: 
+      - 9000:9000
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
