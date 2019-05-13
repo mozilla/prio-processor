@@ -30,4 +30,5 @@ WORKDIR /app
 ADD . /app
 
 RUN make
+RUN pip3 install .
 CMD make test
