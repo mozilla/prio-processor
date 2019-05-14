@@ -21,4 +21,4 @@ for server in ["server_a", "server_b"]:
         p = os.path.join(workdir, server, path)
         os.makedirs(p, exist_ok=True)
 
-print(f"Done creating folders in {workdir}")
+os.makedirs(os.path.join(workdir, "client"), exist_ok=True)
