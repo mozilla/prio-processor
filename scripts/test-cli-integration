@@ -40,8 +40,8 @@ jq -c '.' ${CLIENT_BUCKET}/data.ndjson
 python -m prio encode-shares \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
-    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
-    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input working/client/data.ndjson \
     --output-A ${SERVER_A_BUCKET}/raw/ \
     --output-B ${SERVER_B_BUCKET}/raw/
@@ -57,10 +57,10 @@ python -m prio verify1 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key ${SERVER_A_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
-    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input ${SERVER_A_BUCKET}/raw/data.ndjson \
     --output ${SERVER_A_BUCKET}/intermediate/internal/verify1
 
@@ -74,10 +74,10 @@ python -m prio verify1 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key ${SERVER_B_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
-    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input ${SERVER_B_BUCKET}/raw/data.ndjson \
     --output ${SERVER_B_BUCKET}/intermediate/internal/verify1
 
@@ -95,10 +95,10 @@ python -m prio verify2 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key ${SERVER_A_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
-    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input ${SERVER_A_BUCKET}/raw/data.ndjson \
     --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify1/data.ndjson \
     --input-external ${SERVER_A_BUCKET}/intermediate/external/verify1/data.ndjson \
@@ -114,10 +114,10 @@ python -m prio verify2 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key ${SERVER_B_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
-    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input ${SERVER_B_BUCKET}/raw/data.ndjson \
     --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify1/data.ndjson \
     --input-external ${SERVER_B_BUCKET}/intermediate/external/verify1/data.ndjson \
@@ -137,10 +137,10 @@ python -m prio aggregate \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key ${SERVER_A_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
-    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input ${SERVER_A_BUCKET}/raw/data.ndjson \
     --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify2/data.ndjson \
     --input-external ${SERVER_A_BUCKET}/intermediate/external/verify2/data.ndjson \
@@ -156,10 +156,10 @@ python -m prio aggregate \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key ${SERVER_B_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
-    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input ${SERVER_B_BUCKET}/raw/data.ndjson \
     --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson \
     --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2/data.ndjson \
@@ -179,10 +179,10 @@ python -m prio publish \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key ${SERVER_A_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
-    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input-internal ${SERVER_A_BUCKET}/intermediate/internal/aggregate/data.ndjson \
     --input-external ${SERVER_A_BUCKET}/intermediate/external/aggregate/data.ndjson \
     --output ${SERVER_A_BUCKET}/processed/
@@ -193,10 +193,10 @@ python -m prio publish \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key ${SERVER_B_PRIVATE_KEY} \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
-    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input-internal ${SERVER_B_BUCKET}/intermediate/internal/aggregate/data.ndjson \
     --input-external ${SERVER_B_BUCKET}/intermediate/external/aggregate/data.ndjson \
     --output ${SERVER_B_BUCKET}/processed/

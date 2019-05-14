@@ -11,16 +11,16 @@ def apply_options(func, options):
 def public_key(func):
     options = [
         click.option(
-            "--public-key-internal",
+            "--public-key-hex-internal",
             required=True,
             type=BYTE_STRING,
-            help="The public key of the processing server.",
+            help="The public key of the processing server as a hex string.",
         ),
         click.option(
-            "--public-key-external",
+            "--public-key-hex-external",
             required=True,
             type=BYTE_STRING,
-            help="The public key of the co-processing server.",
+            help="The public key of the co-processing server as a hex string.",
         ),
     ]
     return apply_options(func, options)
@@ -35,10 +35,10 @@ def server_config(func):
             help="The identifier for match.",
         ),
         click.option(
-            "--private-key",
+            "--private-key-hex",
             required=True,
             type=BYTE_STRING,
-            help="The private key of the processing server.",
+            help="The private key of the processing server as a hex string.",
         ),
         click.option(
             "--shared-secret",
