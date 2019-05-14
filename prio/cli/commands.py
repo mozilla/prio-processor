@@ -54,7 +54,7 @@ def encode_shares(
         n_data, public_key_internal, public_key_external, batch_id
     )
 
-    with open(input, "r") as f:
+    with open(input) as f:
         data = map(json.loads, f.readlines())
 
     name = os.path.basename(input)
@@ -103,7 +103,7 @@ def verify1(
     verifier = libprio.PrioVerifier_new(server)
     packet = libprio.PrioPacketVerify1_new()
 
-    with open(input, "r") as f:
+    with open(input) as f:
         data = map(json.loads, f.readlines())
 
     name = os.path.basename(input)
@@ -158,11 +158,11 @@ def verify2(
     packet1_external = libprio.PrioPacketVerify1_new()
     packet = libprio.PrioPacketVerify2_new()
 
-    with open(input, "r") as f:
+    with open(input) as f:
         data = map(json.loads, f.readlines())
-    with open(input_internal, "r") as f:
+    with open(input_internal) as f:
         data_internal = map(json.loads, f.readlines())
-    with open(input_external, "r") as f:
+    with open(input_external) as f:
         data_external = map(json.loads, f.readlines())
 
     # Create an index for matching shares to corresponding verification packets.
@@ -228,11 +228,11 @@ def aggregate(
     packet2_internal = libprio.PrioPacketVerify2_new()
     packet2_external = libprio.PrioPacketVerify2_new()
 
-    with open(input, "r") as f:
+    with open(input) as f:
         data = map(json.loads, f.readlines())
-    with open(input_internal, "r") as f:
+    with open(input_internal) as f:
         data_internal = map(json.loads, f.readlines())
-    with open(input_external, "r") as f:
+    with open(input_external) as f:
         data_external = map(json.loads, f.readlines())
 
     # Create an index for matching shares to corresponding verification packets.
@@ -294,9 +294,9 @@ def publish(
         n_data, public_key_internal, public_key_external, batch_id
     )
 
-    with open(input_internal, "r") as f:
+    with open(input_internal) as f:
         data_internal = b64decode(json.load(f))
-    with open(input_external, "r") as f:
+    with open(input_external) as f:
         data_external = b64decode(json.load(f))
 
     share_internal = libprio.PrioTotalShare_new()
