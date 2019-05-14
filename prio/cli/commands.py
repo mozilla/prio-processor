@@ -17,6 +17,24 @@ from .options import (
 )
 
 
+def import_public_keys(public_key_hex_internal, public_key_hex_external):
+    return (
+        libprio.PublicKey_import_hex(public_key_hex_internal),
+        libprio.PublicKey_import_hex(public_key_hex_external),
+    )
+
+
+def import_keys(private_key_hex, public_key_hex_internal, public_key_hex_external):
+    return (
+        libprio.PrivateKey_import_hex(private_key_hex, public_key_hex_internal),
+        *import_public_keys(public_key_hex_internal, public_key_hex_external),
+    )
+
+
+def match_server(server_id):
+    return libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
+
+
 @click.command()
 def shared_seed():
     """Generate a shared server secret in base64."""
@@ -48,8 +66,9 @@ def encode_shares(
     output_a,
     output_b,
 ):
-    public_key_internal = libprio.PublicKey_import_hex(public_key_hex_internal)
-    public_key_external = libprio.PublicKey_import_hex(public_key_hex_external)
+    public_key_internal, public_key_external = import_public_keys(
+        public_key_hex_internal, public_key_hex_external
+    )
     config = libprio.PrioConfig_new(
         n_data, public_key_internal, public_key_external, batch_id
     )
@@ -90,16 +109,16 @@ def verify1(
     """Decode a batch of shares"""
     click.echo("Running verify1")
 
-    private_key = libprio.PrivateKey_import_hex(private_key_hex, private_key_hex)
-    public_key_internal = libprio.PublicKey_import_hex(public_key_hex_internal)
-    public_key_external = libprio.PublicKey_import_hex(public_key_hex_external)
-    server_id = libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
-    shared_secret = b64decode(shared_secret)
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
+    )
 
     config = libprio.PrioConfig_new(
         n_data, public_key_internal, public_key_external, batch_id
     )
-    server = libprio.PrioServer_new(config, server_id, private_key, shared_secret)
+    server = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, b64decode(shared_secret)
+    )
     verifier = libprio.PrioVerifier_new(server)
     packet = libprio.PrioPacketVerify1_new()
 
@@ -142,18 +161,16 @@ def verify2(
     """Verify a batch of SNIPs"""
     click.echo("Running verify2")
 
-    private_key = libprio.PrivateKey_import_hex(
-        private_key_hex, public_key_hex_internal
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
     )
-    public_key_internal = libprio.PublicKey_import_hex(public_key_hex_internal)
-    public_key_external = libprio.PublicKey_import_hex(public_key_hex_external)
-    server_id = libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
-    shared_secret = b64decode(shared_secret)
 
     config = libprio.PrioConfig_new(
         n_data, public_key_internal, public_key_external, batch_id
     )
-    server = libprio.PrioServer_new(config, server_id, private_key, shared_secret)
+    server = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, b64decode(shared_secret)
+    )
     verifier = libprio.PrioVerifier_new(server)
 
     packet1_internal = libprio.PrioPacketVerify1_new()
@@ -215,18 +232,16 @@ def aggregate(
     """Generate an aggregate share from a batch of verified SNIPs"""
     click.echo("Running aggregate")
 
-    private_key = libprio.PrivateKey_import_hex(
-        private_key_hex, public_key_hex_internal
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
     )
-    public_key_internal = libprio.PublicKey_import_hex(public_key_hex_internal)
-    public_key_external = libprio.PublicKey_import_hex(public_key_hex_external)
-    server_id = libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
-    shared_secret = b64decode(shared_secret)
 
     config = libprio.PrioConfig_new(
         n_data, public_key_internal, public_key_external, batch_id
     )
-    server = libprio.PrioServer_new(config, server_id, private_key, shared_secret)
+    server = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, b64decode(shared_secret)
+    )
     verifier = libprio.PrioVerifier_new(server)
 
     packet2_internal = libprio.PrioPacketVerify2_new()
@@ -288,13 +303,9 @@ def publish(
     """Generate a final aggregate and remap data to a content blocklist"""
     click.echo("Running publish")
 
-    private_key = libprio.PrivateKey_import_hex(
-        private_key_hex, public_key_hex_internal
+    _, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
     )
-    public_key_internal = libprio.PublicKey_import_hex(public_key_hex_internal)
-    public_key_external = libprio.PublicKey_import_hex(public_key_hex_external)
-    server_id = libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
-    shared_secret = b64decode(shared_secret)
 
     config = libprio.PrioConfig_new(
         n_data, public_key_internal, public_key_external, batch_id
@@ -312,7 +323,7 @@ def publish(
     libprio.PrioTotalShare_read(share_external, data_external, config)
 
     # ordering matters
-    if server_id == libprio.PRIO_SERVER_B:
+    if match_server(server_id) == libprio.PRIO_SERVER_B:
         share_internal, share_external = share_external, share_internal
 
     final = libprio.PrioTotalShare_final(config, share_internal, share_external)
