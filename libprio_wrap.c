@@ -4477,41 +4477,256 @@ fail:
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
-	 { (char *)"PublicKey_export", _wrap_PublicKey_export, METH_VARARGS, NULL},
-	 { (char *)"PublicKey_export_hex", _wrap_PublicKey_export_hex, METH_VARARGS, NULL},
-	 { (char *)"PrivateKey_export", _wrap_PrivateKey_export, METH_VARARGS, NULL},
-	 { (char *)"PrivateKey_export_hex", _wrap_PrivateKey_export_hex, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_write", _wrap_PrioPacketVerify1_write, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_write", _wrap_PrioPacketVerify2_write, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_write", _wrap_PrioTotalShare_write, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_read", _wrap_PrioPacketVerify1_read, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_read", _wrap_PrioPacketVerify2_read, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_read", _wrap_PrioTotalShare_read, METH_VARARGS, NULL},
-	 { (char *)"Prio_init", _wrap_Prio_init, METH_VARARGS, NULL},
-	 { (char *)"Prio_clear", _wrap_Prio_clear, METH_VARARGS, NULL},
-	 { (char *)"PrioConfig_new", _wrap_PrioConfig_new, METH_VARARGS, NULL},
-	 { (char *)"PrioConfig_numDataFields", _wrap_PrioConfig_numDataFields, METH_VARARGS, NULL},
-	 { (char *)"PrioConfig_maxDataFields", _wrap_PrioConfig_maxDataFields, METH_VARARGS, NULL},
-	 { (char *)"PrioConfig_newTest", _wrap_PrioConfig_newTest, METH_VARARGS, NULL},
-	 { (char *)"Keypair_new", _wrap_Keypair_new, METH_VARARGS, NULL},
-	 { (char *)"PublicKey_import", _wrap_PublicKey_import, METH_VARARGS, NULL},
-	 { (char *)"PrivateKey_import", _wrap_PrivateKey_import, METH_VARARGS, NULL},
-	 { (char *)"PublicKey_import_hex", _wrap_PublicKey_import_hex, METH_VARARGS, NULL},
-	 { (char *)"PrivateKey_import_hex", _wrap_PrivateKey_import_hex, METH_VARARGS, NULL},
-	 { (char *)"PrioClient_encode", _wrap_PrioClient_encode, METH_VARARGS, NULL},
-	 { (char *)"PrioPRGSeed_randomize", _wrap_PrioPRGSeed_randomize, METH_VARARGS, NULL},
-	 { (char *)"PrioServer_new", _wrap_PrioServer_new, METH_VARARGS, NULL},
-	 { (char *)"PrioVerifier_new", _wrap_PrioVerifier_new, METH_VARARGS, NULL},
-	 { (char *)"PrioVerifier_set_data", _wrap_PrioVerifier_set_data, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_new", _wrap_PrioPacketVerify1_new, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify1_set_data", _wrap_PrioPacketVerify1_set_data, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_new", _wrap_PrioPacketVerify2_new, METH_VARARGS, NULL},
-	 { (char *)"PrioPacketVerify2_set_data", _wrap_PrioPacketVerify2_set_data, METH_VARARGS, NULL},
-	 { (char *)"PrioVerifier_isValid", _wrap_PrioVerifier_isValid, METH_VARARGS, NULL},
-	 { (char *)"PrioServer_aggregate", _wrap_PrioServer_aggregate, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_new", _wrap_PrioTotalShare_new, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_set_data", _wrap_PrioTotalShare_set_data, METH_VARARGS, NULL},
-	 { (char *)"PrioTotalShare_final", _wrap_PrioTotalShare_final, METH_VARARGS, NULL},
+	 { (char *)"PublicKey_export", _wrap_PublicKey_export, METH_VARARGS, (char *)"\n"
+		"PublicKey_export(const_PublicKey key) -> PyObject *\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"key: const_PublicKey\n"
+		"\n"
+		""},
+	 { (char *)"PublicKey_export_hex", _wrap_PublicKey_export_hex, METH_VARARGS, (char *)"\n"
+		"PublicKey_export_hex(const_PublicKey key) -> PyObject *\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"key: const_PublicKey\n"
+		"\n"
+		""},
+	 { (char *)"PrivateKey_export", _wrap_PrivateKey_export, METH_VARARGS, (char *)"\n"
+		"PrivateKey_export(PrivateKey key) -> PyObject *\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"key: PrivateKey\n"
+		"\n"
+		""},
+	 { (char *)"PrivateKey_export_hex", _wrap_PrivateKey_export_hex, METH_VARARGS, (char *)"\n"
+		"PrivateKey_export_hex(PrivateKey key) -> PyObject *\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"key: PrivateKey\n"
+		"\n"
+		""},
+	 { (char *)"PrioPacketVerify1_write", _wrap_PrioPacketVerify1_write, METH_VARARGS, (char *)"\n"
+		"PrioPacketVerify1_write(const_PrioPacketVerify1 p) -> PyObject *\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p: const_PrioPacketVerify1\n"
+		"\n"
+		""},
+	 { (char *)"PrioPacketVerify2_write", _wrap_PrioPacketVerify2_write, METH_VARARGS, (char *)"\n"
+		"PrioPacketVerify2_write(const_PrioPacketVerify2 p) -> PyObject *\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p: const_PrioPacketVerify2\n"
+		"\n"
+		""},
+	 { (char *)"PrioTotalShare_write", _wrap_PrioTotalShare_write, METH_VARARGS, (char *)"\n"
+		"PrioTotalShare_write(const_PrioTotalShare p) -> PyObject *\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p: const_PrioTotalShare\n"
+		"\n"
+		""},
+	 { (char *)"PrioPacketVerify1_read", _wrap_PrioPacketVerify1_read, METH_VARARGS, (char *)"\n"
+		"PrioPacketVerify1_read(PrioPacketVerify1 p, unsigned char const * data, const_PrioConfig cfg) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p: PrioPacketVerify1\n"
+		"data: unsigned char const *\n"
+		"cfg: const_PrioConfig\n"
+		"\n"
+		""},
+	 { (char *)"PrioPacketVerify2_read", _wrap_PrioPacketVerify2_read, METH_VARARGS, (char *)"\n"
+		"PrioPacketVerify2_read(PrioPacketVerify2 p, unsigned char const * data, const_PrioConfig cfg) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p: PrioPacketVerify2\n"
+		"data: unsigned char const *\n"
+		"cfg: const_PrioConfig\n"
+		"\n"
+		""},
+	 { (char *)"PrioTotalShare_read", _wrap_PrioTotalShare_read, METH_VARARGS, (char *)"\n"
+		"PrioTotalShare_read(PrioTotalShare p, unsigned char const * data, const_PrioConfig cfg) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p: PrioTotalShare\n"
+		"data: unsigned char const *\n"
+		"cfg: const_PrioConfig\n"
+		"\n"
+		""},
+	 { (char *)"Prio_init", _wrap_Prio_init, METH_VARARGS, (char *)"Prio_init() -> SECStatus"},
+	 { (char *)"Prio_clear", _wrap_Prio_clear, METH_VARARGS, (char *)"Prio_clear()"},
+	 { (char *)"PrioConfig_new", _wrap_PrioConfig_new, METH_VARARGS, (char *)"\n"
+		"PrioConfig_new(int nFields, PublicKey serverA, PublicKey serverB, unsigned char const * batchId) -> PrioConfig\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"nFields: int\n"
+		"serverA: PublicKey\n"
+		"serverB: PublicKey\n"
+		"batchId: unsigned char const *\n"
+		"\n"
+		""},
+	 { (char *)"PrioConfig_numDataFields", _wrap_PrioConfig_numDataFields, METH_VARARGS, (char *)"\n"
+		"PrioConfig_numDataFields(const_PrioConfig cfg) -> int\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"cfg: const_PrioConfig\n"
+		"\n"
+		""},
+	 { (char *)"PrioConfig_maxDataFields", _wrap_PrioConfig_maxDataFields, METH_VARARGS, (char *)"PrioConfig_maxDataFields() -> int"},
+	 { (char *)"PrioConfig_newTest", _wrap_PrioConfig_newTest, METH_VARARGS, (char *)"\n"
+		"PrioConfig_newTest(int nFields) -> PrioConfig\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"nFields: int\n"
+		"\n"
+		""},
+	 { (char *)"Keypair_new", _wrap_Keypair_new, METH_VARARGS, (char *)"Keypair_new() -> SECStatus"},
+	 { (char *)"PublicKey_import", _wrap_PublicKey_import, METH_VARARGS, (char *)"\n"
+		"PublicKey_import(unsigned char const * data) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"data: unsigned char const *\n"
+		"\n"
+		""},
+	 { (char *)"PrivateKey_import", _wrap_PrivateKey_import, METH_VARARGS, (char *)"\n"
+		"PrivateKey_import(unsigned char const * privData, unsigned char const * pubData) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"privData: unsigned char const *\n"
+		"pubData: unsigned char const *\n"
+		"\n"
+		""},
+	 { (char *)"PublicKey_import_hex", _wrap_PublicKey_import_hex, METH_VARARGS, (char *)"\n"
+		"PublicKey_import_hex(unsigned char const * hexData) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"hexData: unsigned char const *\n"
+		"\n"
+		""},
+	 { (char *)"PrivateKey_import_hex", _wrap_PrivateKey_import_hex, METH_VARARGS, (char *)"\n"
+		"PrivateKey_import_hex(unsigned char const * privHexData, unsigned char const * pubHexData) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"privHexData: unsigned char const *\n"
+		"pubHexData: unsigned char const *\n"
+		"\n"
+		""},
+	 { (char *)"PrioClient_encode", _wrap_PrioClient_encode, METH_VARARGS, (char *)"\n"
+		"PrioClient_encode(const_PrioConfig cfg, bool const * data_in) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"cfg: const_PrioConfig\n"
+		"data_in: bool const *\n"
+		"\n"
+		""},
+	 { (char *)"PrioPRGSeed_randomize", _wrap_PrioPRGSeed_randomize, METH_VARARGS, (char *)"PrioPRGSeed_randomize() -> SECStatus"},
+	 { (char *)"PrioServer_new", _wrap_PrioServer_new, METH_VARARGS, (char *)"\n"
+		"PrioServer_new(const_PrioConfig cfg, PrioServerId serverIdx, PrivateKey serverPriv, PrioPRGSeed const serverSharedSecret) -> PrioServer\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"cfg: const_PrioConfig\n"
+		"serverIdx: enum PrioServerId\n"
+		"serverPriv: PrivateKey\n"
+		"serverSharedSecret: unsigned char const [AES_128_KEY_LENGTH]\n"
+		"\n"
+		""},
+	 { (char *)"PrioVerifier_new", _wrap_PrioVerifier_new, METH_VARARGS, (char *)"\n"
+		"PrioVerifier_new(PrioServer s) -> PrioVerifier\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"s: PrioServer\n"
+		"\n"
+		""},
+	 { (char *)"PrioVerifier_set_data", _wrap_PrioVerifier_set_data, METH_VARARGS, (char *)"\n"
+		"PrioVerifier_set_data(PrioVerifier v, unsigned char * data) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"v: PrioVerifier\n"
+		"data: unsigned char *\n"
+		"\n"
+		""},
+	 { (char *)"PrioPacketVerify1_new", _wrap_PrioPacketVerify1_new, METH_VARARGS, (char *)"PrioPacketVerify1_new() -> PrioPacketVerify1"},
+	 { (char *)"PrioPacketVerify1_set_data", _wrap_PrioPacketVerify1_set_data, METH_VARARGS, (char *)"\n"
+		"PrioPacketVerify1_set_data(PrioPacketVerify1 p1, const_PrioVerifier v) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p1: PrioPacketVerify1\n"
+		"v: const_PrioVerifier\n"
+		"\n"
+		""},
+	 { (char *)"PrioPacketVerify2_new", _wrap_PrioPacketVerify2_new, METH_VARARGS, (char *)"PrioPacketVerify2_new() -> PrioPacketVerify2"},
+	 { (char *)"PrioPacketVerify2_set_data", _wrap_PrioPacketVerify2_set_data, METH_VARARGS, (char *)"\n"
+		"PrioPacketVerify2_set_data(PrioPacketVerify2 p2, const_PrioVerifier v, const_PrioPacketVerify1 p1A, const_PrioPacketVerify1 p1B) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"p2: PrioPacketVerify2\n"
+		"v: const_PrioVerifier\n"
+		"p1A: const_PrioPacketVerify1\n"
+		"p1B: const_PrioPacketVerify1\n"
+		"\n"
+		""},
+	 { (char *)"PrioVerifier_isValid", _wrap_PrioVerifier_isValid, METH_VARARGS, (char *)"\n"
+		"PrioVerifier_isValid(const_PrioVerifier v, const_PrioPacketVerify2 pA, const_PrioPacketVerify2 pB) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"v: const_PrioVerifier\n"
+		"pA: const_PrioPacketVerify2\n"
+		"pB: const_PrioPacketVerify2\n"
+		"\n"
+		""},
+	 { (char *)"PrioServer_aggregate", _wrap_PrioServer_aggregate, METH_VARARGS, (char *)"\n"
+		"PrioServer_aggregate(PrioServer s, PrioVerifier v) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"s: PrioServer\n"
+		"v: PrioVerifier\n"
+		"\n"
+		""},
+	 { (char *)"PrioTotalShare_new", _wrap_PrioTotalShare_new, METH_VARARGS, (char *)"PrioTotalShare_new() -> PrioTotalShare"},
+	 { (char *)"PrioTotalShare_set_data", _wrap_PrioTotalShare_set_data, METH_VARARGS, (char *)"\n"
+		"PrioTotalShare_set_data(PrioTotalShare t, const_PrioServer s) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"t: PrioTotalShare\n"
+		"s: const_PrioServer\n"
+		"\n"
+		""},
+	 { (char *)"PrioTotalShare_final", _wrap_PrioTotalShare_final, METH_VARARGS, (char *)"\n"
+		"PrioTotalShare_final(const_PrioConfig cfg, const_PrioTotalShare tA, const_PrioTotalShare tB) -> SECStatus\n"
+		"\n"
+		"Parameters\n"
+		"----------\n"
+		"cfg: const_PrioConfig\n"
+		"tA: const_PrioTotalShare\n"
+		"tB: const_PrioTotalShare\n"
+		"\n"
+		""},
 	 { NULL, NULL, 0, NULL }
 };
 

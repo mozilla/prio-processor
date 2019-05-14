@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+import os
+
+dirname = os.path.dirname(os.path.dirname(__file__))
+workdir = os.path.join(dirname, "working")
+
+paths = [
+    "raw/",
+    "intermediate/internal/verify1",
+    "intermediate/external/verify1",
+    "intermediate/internal/verify2",
+    "intermediate/external/verify2",
+    "intermediate/internal/aggregate",
+    "intermediate/external/aggregate",
+    "processed/",
+]
+
+for server in ["server_a", "server_b"]:
+    for path in paths:
+        p = os.path.join(workdir, server, path)
+        os.makedirs(p, exist_ok=True)
+
+os.makedirs(os.path.join(workdir, "client"), exist_ok=True)
