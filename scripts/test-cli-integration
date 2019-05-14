@@ -9,182 +9,196 @@ key_a=$(prio keygen)
 key_b=$(prio keygen)
 shared=$(prio shared-seed)
 
+N_DATA=3
+BATCH_ID="test"
+SHARED_SECRET=$shared
+
+SERVER_A_PUBLIC_KEY=$(jq -r ".public_key" <<< $key_a)
+SERVER_B_PUBLIC_KEY=$(jq -r ".public_key" <<< $key_b)
+
+SERVER_A_PRIVATE_KEY=$(jq -r ".private_key" <<< $key_a)
+SERVER_B_PRIVATE_KEY=$(jq -r ".private_key" <<< $key_b)
+
+CLIENT_BUCKET="working/client"
+SERVER_A_BUCKET="working/server_a"
+SERVER_B_BUCKET="working/server_b"
+
 ###########################################################
 # encode-shares
 ###########################################################
 
-mkdir -p working/client
+mkdir -p ${CLIENT_BUCKET}
 
-cat << EOF > working/client/data.ndjson
+cat << EOF > ${CLIENT_BUCKET}/data.ndjson
 [1, 0, 0]
 [1, 1, 0]
 [1, 1, 1]
 EOF
 
-jq -c '.' working/client/data.ndjson
+jq -c '.' ${CLIENT_BUCKET}/data.ndjson
 
 python -m prio encode-shares \
-    --n-data 3 \
-    --batch-id test \
-    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
-    --public-key-external $(jq -r ".public_key" <<< $key_b) \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-external ${SERVER_B_PUBLIC_KEY} \
     --input working/client/data.ndjson \
-    --output-A working/server_a/raw/ \
-    --output-B working/server_b/raw/
+    --output-A ${SERVER_A_BUCKET}/raw/ \
+    --output-B ${SERVER_B_BUCKET}/raw/
 
-jq -c '.' working/server_a/raw/data.ndjson
-jq -c '.' working/server_b/raw/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/raw/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/raw/data.ndjson
 
 ###########################################################
 # verify1
 ###########################################################
 
 python -m prio verify1 \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key $(jq -r ".private_key" <<< $key_a) \
+    --private-key ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
-    --public-key-external $(jq -r ".public_key" <<< $key_b) \
-    --input working/server_a/raw/data.ndjson \
-    --output working/server_a/intermediate/internal/verify1
+    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --input ${SERVER_A_BUCKET}/raw/data.ndjson \
+    --output ${SERVER_A_BUCKET}/intermediate/internal/verify1
 
-jq -c '.' working/server_a/intermediate/internal/verify1/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify1/data.ndjson
 
 cp \
-    working/server_a/intermediate/internal/verify1/data.ndjson \
-    working/server_b/intermediate/external/verify1/
+    ${SERVER_A_BUCKET}/intermediate/internal/verify1/data.ndjson \
+    ${SERVER_B_BUCKET}/intermediate/external/verify1/
 
 python -m prio verify1 \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key $(jq -r ".private_key" <<< $key_b) \
+    --private-key ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_b) \
-    --public-key-external $(jq -r ".public_key" <<< $key_a) \
-    --input working/server_b/raw/data.ndjson \
-    --output working/server_b/intermediate/internal/verify1
+    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --input ${SERVER_B_BUCKET}/raw/data.ndjson \
+    --output ${SERVER_B_BUCKET}/intermediate/internal/verify1
 
-jq -c '.' working/server_b/intermediate/internal/verify1/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify1/data.ndjson
 
 cp \
-    working/server_b/intermediate/internal/verify1/data.ndjson \
-    working/server_a/intermediate/external/verify1/
+    ${SERVER_B_BUCKET}/intermediate/internal/verify1/data.ndjson \
+    ${SERVER_A_BUCKET}/intermediate/external/verify1/
 
 ###########################################################
 # verify2
 ###########################################################
 
 python -m prio verify2 \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key $(jq -r ".private_key" <<< $key_a) \
+    --private-key ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
-    --public-key-external $(jq -r ".public_key" <<< $key_b) \
-    --input working/server_a/raw/data.ndjson \
-    --input-internal working/server_a/intermediate/internal/verify1/data.ndjson \
-    --input-external working/server_a/intermediate/external/verify1/data.ndjson \
-    --output working/server_a/intermediate/internal/verify2/ \
+    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --input ${SERVER_A_BUCKET}/raw/data.ndjson \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify1/data.ndjson \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify1/data.ndjson \
+    --output ${SERVER_A_BUCKET}/intermediate/internal/verify2/ \
 
-jq -c '.' working/server_a/intermediate/internal/verify2/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify2/data.ndjson
 
 cp \
-    working/server_a/intermediate/internal/verify2/data.ndjson \
-    working/server_b/intermediate/external/verify2/
+    ${SERVER_A_BUCKET}/intermediate/internal/verify2/data.ndjson \
+    ${SERVER_B_BUCKET}/intermediate/external/verify2/
 
 python -m prio verify2 \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key $(jq -r ".private_key" <<< $key_b) \
+    --private-key ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_b) \
-    --public-key-external $(jq -r ".public_key" <<< $key_a) \
-    --input working/server_b/raw/data.ndjson \
-    --input-internal working/server_b/intermediate/internal/verify1/data.ndjson \
-    --input-external working/server_b/intermediate/external/verify1/data.ndjson \
-    --output working/server_b/intermediate/internal/verify2/ \
+    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --input ${SERVER_B_BUCKET}/raw/data.ndjson \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify1/data.ndjson \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify1/data.ndjson \
+    --output ${SERVER_B_BUCKET}/intermediate/internal/verify2/ \
 
-jq -c '.' working/server_b/intermediate/internal/verify2/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson
 
 cp \
-    working/server_b/intermediate/internal/verify2/data.ndjson \
-    working/server_a/intermediate/external/verify2/
+    ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson \
+    ${SERVER_A_BUCKET}/intermediate/external/verify2/
 
 ###########################################################
 # aggregate
 ###########################################################
 
 python -m prio aggregate \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key $(jq -r ".private_key" <<< $key_a) \
+    --private-key ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
-    --public-key-external $(jq -r ".public_key" <<< $key_b) \
-    --input working/server_a/raw/data.ndjson \
-    --input-internal working/server_a/intermediate/internal/verify2/data.ndjson \
-    --input-external working/server_a/intermediate/external/verify2/data.ndjson \
-    --output working/server_a/intermediate/internal/aggregate/
+    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --input ${SERVER_A_BUCKET}/raw/data.ndjson \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify2/data.ndjson \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify2/data.ndjson \
+    --output ${SERVER_A_BUCKET}/intermediate/internal/aggregate/
 
-jq -c '.' working/server_a/intermediate/internal/aggregate/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/aggregate/data.ndjson
 
 cp \
-    working/server_a/intermediate/internal/aggregate/data.ndjson \
-    working/server_b/intermediate/external/aggregate/
+    ${SERVER_A_BUCKET}/intermediate/internal/aggregate/data.ndjson \
+    ${SERVER_B_BUCKET}/intermediate/external/aggregate/
 
 python -m prio aggregate \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key $(jq -r ".private_key" <<< $key_b) \
+    --private-key ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_b) \
-    --public-key-external $(jq -r ".public_key" <<< $key_a) \
-    --input working/server_b/raw/data.ndjson \
-    --input-internal working/server_b/intermediate/internal/verify2/data.ndjson \
-    --input-external working/server_b/intermediate/external/verify2/data.ndjson \
-    --output working/server_b/intermediate/internal/aggregate/ \
+    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --input ${SERVER_B_BUCKET}/raw/data.ndjson \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2/data.ndjson \
+    --output ${SERVER_B_BUCKET}/intermediate/internal/aggregate/ \
 
-jq -c '.' working/server_b/intermediate/internal/verify2/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson
 
 cp \
-    working/server_b/intermediate/internal/aggregate/data.ndjson \
-    working/server_a/intermediate/external/aggregate/
+    ${SERVER_B_BUCKET}/intermediate/internal/aggregate/data.ndjson \
+    ${SERVER_A_BUCKET}/intermediate/external/aggregate/
 
 ###########################################################
 # publish
 ###########################################################
 
 python -m prio publish \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id A \
-    --private-key $(jq -r ".private_key" <<< $key_a) \
+    --private-key ${SERVER_A_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_a) \
-    --public-key-external $(jq -r ".public_key" <<< $key_b) \
-    --input-internal working/server_a/intermediate/internal/aggregate/data.ndjson \
-    --input-external working/server_a/intermediate/external/aggregate/data.ndjson \
-    --output working/server_a/processed/
+    --public-key-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-external ${SERVER_B_PUBLIC_KEY} \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/aggregate/data.ndjson \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/aggregate/data.ndjson \
+    --output ${SERVER_A_BUCKET}/processed/
 
-jq -c '.' working/server_a/processed/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/processed/data.ndjson
 
 python -m prio publish \
-    --n-data 3 \
-    --batch-id test \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
     --server-id B \
-    --private-key $(jq -r ".private_key" <<< $key_b) \
+    --private-key ${SERVER_B_PRIVATE_KEY} \
     --shared-secret $shared \
-    --public-key-internal $(jq -r ".public_key" <<< $key_b) \
-    --public-key-external $(jq -r ".public_key" <<< $key_a) \
-    --input-internal working/server_b/intermediate/internal/aggregate/data.ndjson \
-    --input-external working/server_b/intermediate/external/aggregate/data.ndjson \
-    --output working/server_b/processed/
+    --public-key-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-external ${SERVER_A_PUBLIC_KEY} \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/aggregate/data.ndjson \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/aggregate/data.ndjson \
+    --output ${SERVER_B_BUCKET}/processed/
 
-jq -c '.' working/server_b/processed/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/processed/data.ndjson
