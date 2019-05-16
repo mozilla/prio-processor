@@ -1,19 +1,16 @@
 {
-    "Version":"2012-10-17",
-    "Statement":[
-       {
-          "Effect":"Allow",
-          "Action":[
-             "s3:PutObject",
-             "s3:GetObject",
-             "s3:GetObjectVersion",
-             "s3:DeleteObject",
-             "s3:DeleteObjectVersion"
-          ],
-          "Resource":"arn:aws:s3:::server-b/intermediate/external/*"
-       },
-       {
-           
-       }
-    ]
+   "Version": "2012-10-17",
+   "Statement": [
+     {
+       "Action": [
+         "s3:*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+         "arn:aws:s3:::server-a/*",
+         "arn:aws:s3:::server-b/intermediate/external/*"
+       ],
+       "Sid": ""
+     }
+   ]
  }
