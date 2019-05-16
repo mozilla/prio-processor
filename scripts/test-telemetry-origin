@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+
+import json
+import sys
+
+from pathlib import Path
+from os import environ
+from subprocess import run
+from typing import Generator, Union
+
+
+def iter_data(path: Union[Path, str]) -> Generator[str, str, int]:
+    p = Path(path)
+    for item in p.iterdir():
+        # {batch_id: str}-{shard_id: int}.ndjson
+        if not item.name.startswith("content.blocking"):
+            continue
+        filename = item.name
+        batch_id = filename[: filename.rfind(".")]
+        n_data = 2046 if int(batch_id[-1]) == 0 else 440
+        yield filename, batch_id, n_data
+
+
+def process_raw(path: Union[Path, str]):
+    for filename, batch_id, n_data in iter_data(path):
+        batch_config = {
+            "FILENAME": filename,
+            "BATCH_ID": batch_id,
+            "N_DATA": str(n_data),
+        }
+        env = {**environ, **batch_config}
+        run("scripts/test-cli-integration", shell=True, env=env)
+
+
+def map_processed(path: Union[Path, str]) -> dict:
+    origins = json.loads(run("scripts/download-mapping", capture_output=True).stdout)
+    p = Path(path)
+    results = {}
+    for filename, batch_id, n_data in iter_data(p):
+        with open(p.joinpath(filename)) as f:
+            data = json.load(f)
+
+        # find the index into the origins mapping
+        i = int(batch_id[-1])
+        mapping = origins[i * 2046 : (i + 1) * 2046]
+        results[batch_id] = {k: v for k, v in zip(mapping, data) if v}
+    return results
+
+
+def test_input_counts(expected: Path, result: dict):
+    expected_data = {}
+    with expected.open() as f:
+        for line in f.readlines():
+            k, v = line.split()
+            expected_data[k] = int(v)
+
+    left = set(expected_data.items())
+    right = set(result.items())
+    diff = left ^ right
+    if diff:
+        print(f"Unexpected difference: {diff}")
+    else:
+        print("No differences found. Success!")
+
+
+def check_environment():
+    keys = {
+        "SERVER_A_PUBLIC_KEY",
+        "SERVER_B_PUBLIC_KEY",
+        "SERVER_A_PRIVATE_KEY",
+        "SERVER_B_PRIVATE_KEY",
+    }
+    unset_keys = keys - set(environ.keys())
+    if unset_keys:
+        print("The following environment variables must be set:")
+        for key in unset_keys:
+            print(key)
+        sys.exit()
+
+
+def main():
+    check_environment()
+    process_raw("working/server_a/raw")
+    data = map_processed("working/server_a/processed")
+    result = {
+        **data["content.blocking_blocked_TESTONLY-0"],
+        **data["content.blocking_blocked_TESTONLY-1"],
+    }
+    test_input_counts(Path("data/2019-05-15_test_ping_input_counts.txt"), result)
+    print(json.dumps(data))
+
+
+if __name__ == "__main__":
+    main()

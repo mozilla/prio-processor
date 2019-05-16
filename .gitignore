@@ -11,3 +11,4 @@ examples/*/Pipfile.lock
 .pytest_cache
 
 .vscode
+.env
