@@ -1,0 +1,10 @@
+.git
+.tox
+build
+dist
+*.egg
+*.egg-info
+
+**/*.pyc
+**/*.pyo
+**/__pycache__

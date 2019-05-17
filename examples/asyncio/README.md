@@ -6,7 +6,7 @@ This example demonstrates usage of the python wrapper using asyncio.
 
 ```
 $ pipenv sync
-$ pipenv run main.py
+$ pipenv run python main.py
 ```
 
 ## Dataflow diagram

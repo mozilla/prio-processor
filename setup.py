@@ -22,12 +22,10 @@ if platform == "darwin":
         "/usr/local/opt/nss/include/nss",
         "/usr/local/opt/nspr/include/nspr",
     ]
-    libraries = ["nss", "nspr4"]
 else:
     # Fedora
     library_dirs = []
     include_dirs = ["/usr/include/nspr", "/usr/include/nss"]
-    libraries = ["nss3", "nspr4"]
 
 
 extension_mod = Extension(
@@ -35,18 +33,20 @@ extension_mod = Extension(
     ["libprio_wrap.c"],
     library_dirs=["libprio/build/prio", "libprio/build/mpi"] + library_dirs,
     include_dirs=include_dirs,
-    libraries=["mprio", "mpi", "msgpackc"] + libraries,
+    libraries=["mprio", "mpi", "msgpackc", "nss3", "nspr4"],
 )
 
 setup(
     name="prio",
-    version="0.3",
+    version="0.4",
     description="An interface to libprio",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Anthony Miyaguchi",
     author_email="amiyaguchi@mozilla.com",
     url="https://github.com/mozilla/python-libprio",
-    packages=["prio"],
+    entry_points={"console_scripts": ["prio=prio.__main__:main"]},
+    install_requires=["click"],
+    packages=["prio", "prio.cli"],
     ext_modules=[extension_mod],
 )

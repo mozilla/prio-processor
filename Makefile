@@ -4,6 +4,9 @@ all:
 	swig -python -outdir prio -o libprio_wrap.c libprio.i
 	python3 setup.py build_ext
 
+test:
+	tox
+
 clean:
 	cd libprio && scons -c && cd ..
 	find . \( \
@@ -17,9 +20,3 @@ clean:
 		\) -exec rm -r {} +
 	rm -rf build
 
-test:
-	pipenv sync --dev
-	pipenv run pytest
-
-coverage:
-	pipenv run coverage report
