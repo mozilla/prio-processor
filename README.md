@@ -1,13 +1,15 @@
 # python-libprio
+
 [![CircleCI](https://circleci.com/gh/mozilla/python-libprio.svg?style=svg)](https://circleci.com/gh/mozilla/python-libprio)
 
-A set of tools for aggregating data in a privacy preserving way. This repository
-includes a Python wrapper around mozilla/libprio and is designed for
-implementing server-side components.
+Prio is an system for aggregating data in a privacy-preserving way. This
+repository includes a Python wrapper around the [libprio
+library](https://github.com/mozilla/libprio) and a command-line tool that can be
+used to batch process large amounts of input data using Prio's multi-server
+architecture.
 
-The library provides low-level bindings to the reference C implementation of the
-[Prio system](https://github.com/mozilla/libprio), a Python wrapper, and a
-command-line interface.
+For more information about Prio, see [this blog
+post](https://hacks.mozilla.org/2018/10/testing-privacy-preserving-telemetry-with-prio/).
 
 ## Build and Development
 
@@ -27,7 +29,7 @@ running on macOS, the packages can be installed via homebrew.
 brew install nss nspr scons msgpack swig
 ```
 
-First, the static libraries for prio and big numbers are generated in the git
+First, the static libraries for Prio and big numbers are generated in the git
 submodule. Then, SWIG generates C files from the SWIG interface file. This
 contains the code for sharing data between the static library and Python
 objects. Finally, the library is made available to the Python package as an
@@ -47,6 +49,7 @@ docker.
 docker build -t prio .
 docker run -it prio
 ```
+
 This will build the package and run the tests. You can mount your working
 directory and shell into the container for development work.
 
@@ -64,11 +67,14 @@ This is required for the python foreign-function interface.
 ## Running examples
 
 There are various examples included in the repository that demonstrate small
-applications that can be built from the library.
+applications that can be built using this set of tools.
 
-* `swig-wrapper` - A simple application demonstrating the full prio pipeline.
-* `python-wrapper` - A usage of the object-oriented based Python wrapper.
-* `benchmarks` - Various benchmarks in a jupyter notebook.
-* `browser-validation` - The validation code used to verify existing Firefox measurements for this [blog post](https://hacks.mozilla.org/2018/10/testing-privacy-preserving-telemetry-with-prio/).
+* `swig-wrapper` - A simple application demonstrating the full Prio pipeline.
+* `python-wrapper` - A usage of the object-oriented Python wrapper.
+* `benchmarks` - Various benchmarks in a Jupyter notebook.
+* `browser-validation` - The validation code used to verify existing Firefox
+  measurements for this [blog
+  post](https://hacks.mozilla.org/2018/10/testing-privacy-preserving-telemetry-with-prio/).
 * `asyncio` - An asynchronous pipeline.
-* `docker-asyncio` - An asynchronous pipeline using a publish-subscribe architecture.
+* `docker-asyncio` - An asynchronous pipeline using a publish-subscribe
+  architecture.
