@@ -72,14 +72,14 @@ def output_2(func):
     options = [
         click.option(
             "--output-A",
-            envvar="OUTPUT_A",
+            envvar="OUTPUT_INTERNAL",
             required=True,
             type=click.Path(file_okay=False),
             help="The path to the input directory of server A.",
         ),
         click.option(
             "--output-B",
-            envvar="OUTPUT_B",
+            envvar="OUTPUT_EXTERNAL",
             required=True,
             type=click.Path(file_okay=False),
             help="The path to the input directory of server B.",
