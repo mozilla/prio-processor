@@ -29,4 +29,4 @@ set -a
 set +a
 ### end variable export
 
-python -m prio.spark.transform prio-spark
+python -m prio.spark.commands prio-spark
