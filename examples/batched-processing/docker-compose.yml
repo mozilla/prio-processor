@@ -1,10 +1,6 @@
 version: '3'
 
 services:
-  # server_a:
-  #   build: .
-  #   command:
-
   minio:
     # https://docs.min.io/docs/minio-docker-quickstart-guide
     # https://docs.min.io/docs/minio-multi-user-quickstart-guide.html
@@ -39,7 +35,7 @@ services:
       - N_DATA=3
       - BATCH_ID=test
       - SERVER_ID=A
-      - SHARED_SECRET="m/AqDal/ZSA9597GwMM+VA=="
+      - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
       - PRIVATE_KEY=19DDC146FB8EE4A0B762A7DAE7E96033F87C9528DBBF8CA899CCD1DB8CD74984
       - PUBLIC_KEY_INTERNAL=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78
       - PUBLIC_KEY_EXTERNAL=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
