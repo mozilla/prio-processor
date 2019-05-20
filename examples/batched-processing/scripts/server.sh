@@ -16,13 +16,9 @@ set -x
 : ${BUCKET_INTERNAL?}
 : ${BUCKET_EXTERNAL?}
 
-mc config host add minio http://minio:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY --api s3v4;
+TARGET="minio"
 
-function wait_for_data() {
-    path=$(( mc watch --json $1 & ) | head -n 1 | jq -r '.events.path')
-    # Remove the url portion
-    echo "minio/${path##http://minio:9000/}"
-}
+mc config host add $TARGET http://minio:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY --api s3v4;
 
 cd /tmp
 mkdir -p data/raw
@@ -35,11 +31,29 @@ mkdir -p data/intermediate/external/aggregate
 mkdir -p data/processed
 cd data
 
+
+function trigger_on_event() {
+    path=$(( mc watch --json $1 & ) | head -n 1 | jq -r '.events.path')
+    # Remove the url portion
+    echo "$TARGET/${path##http://minio:9000/}"
+}
+
+function poll_for_data() {
+    retries=0
+    while ! mc stat $1 &>/dev/null; do
+        sleep 2;
+        $((retries++))
+        if $((retries > 5)); then
+            exit 1
+        fi
+    done
+}
+
 ###########################################################
 # verify1
 ###########################################################
 
-path=$(wait_for_data "minio/$BUCKET_INTERNAL/raw/")
+path=$(trigger_on_event "${TARGET}/${BUCKET_INTERNAL}/raw/")
 filename=$(basename $path)
 
 mc cp $path raw/
@@ -57,13 +71,17 @@ prio verify1 \
 
 jq -c '.' intermediate/internal/verify1/$filename
 
-cp \
-    ${BUCKET_INTERNAL}/intermediate/internal/verify1/$filename \
-    ${BUCKET_EXTERNAL}/intermediate/external/verify1/
+mc cp \
+    intermediate/internal/verify1/$filename \
+    ${TARGET}/${BUCKET_EXTERNAL}/intermediate/external/verify1/
 
 ###########################################################
 # verify2
 ###########################################################
+
+path="${TARGET}/${BUCKET_INTERNAL}/intermediate/external/verify1/$filename"
+poll_for_data $path
+mc cp $path intermediate/external/verify1/
 
 prio verify2 \
     --n-data $N_DATA \
@@ -73,43 +91,51 @@ prio verify2 \
     --shared-secret $SHARED_SECRET \
     --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
     --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
-    --input ${BUCKET_INTERNAL}/raw/$filename \
-    --input-internal ${BUCKET_INTERNAL}/intermediate/internal/verify1/$filename \
-    --input-external ${BUCKET_INTERNAL}/intermediate/external/verify1/$filename \
-    --output ${BUCKET_INTERNAL}/intermediate/internal/verify2/ \
+    --input raw/$filename \
+    --input-internal intermediate/internal/verify1/$filename \
+    --input-external intermediate/external/verify1/$filename \
+    --output intermediate/internal/verify2/ \
 
-jq -c '.' ${BUCKET_INTERNAL}/intermediate/internal/verify2/$filename
+jq -c '.' intermediate/internal/verify2/$filename
 
-cp \
-    ${BUCKET_INTERNAL}/intermediate/internal/verify2/$filename \
-    ${BUCKET_EXTERNAL}/intermediate/external/verify2/
+mc cp \
+    intermediate/internal/verify2/$filename \
+    ${TARGET}/${BUCKET_EXTERNAL}/intermediate/external/verify2/
 
 ###########################################################
 # aggregate
 ###########################################################
 
+path="${TARGET}/${BUCKET_INTERNAL}/intermediate/external/verify2/$filename"
+poll_for_data $path
+mc cp $path intermediate/external/verify2/
+
 prio aggregate \
     --n-data $N_DATA \
     --batch-id $BATCH_ID \
     --server-id $SERVER_ID \
-    --private-key $PRIVATE_KEY \
+    --private-key-hex $PRIVATE_KEY \
     --shared-secret $SHARED_SECRET \
     --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
     --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
-    --input ${BUCKET_INTERNAL}/raw/$filename \
-    --input-internal ${BUCKET_INTERNAL}/intermediate/internal/verify2/$filename \
-    --input-external ${BUCKET_INTERNAL}/intermediate/external/verify2/$filename \
-    --output ${BUCKET_INTERNAL}/intermediate/internal/aggregate/
+    --input raw/$filename \
+    --input-internal intermediate/internal/verify2/$filename \
+    --input-external intermediate/external/verify2/$filename \
+    --output intermediate/internal/aggregate/
 
-jq -c '.' ${BUCKET_INTERNAL}/intermediate/internal/aggregate/$filename
+jq -c '.' intermediate/internal/aggregate/$filename
 
-cp \
-    ${BUCKET_INTERNAL}/intermediate/internal/aggregate/$filename \
-    ${BUCKET_EXTERNAL}/intermediate/external/aggregate/
+mc cp \
+    intermediate/internal/aggregate/$filename \
+    ${TARGET}/${BUCKET_EXTERNAL}/intermediate/external/aggregate/
 
 ###########################################################
 # publish
 ###########################################################
+
+path="${TARGET}/${BUCKET_INTERNAL}/intermediate/external/aggregate/$filename"
+poll_for_data $path
+mc cp $path intermediate/external/aggregate/
 
 prio publish \
     --n-data $N_DATA \
@@ -119,8 +145,8 @@ prio publish \
     --shared-secret $SHARED_SECRET \
     --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
     --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
-    --input-internal ${BUCKET_INTERNAL}/intermediate/internal/aggregate/$filename \
-    --input-external ${BUCKET_INTERNAL}/intermediate/external/aggregate/$filename \
-    --output ${BUCKET_INTERNAL}/processed/
+    --input-internal intermediate/internal/aggregate/$filename \
+    --input-external intermediate/external/aggregate/$filename \
+    --output processed/
 
-jq -c '.' ${BUCKET_INTERNAL}/processed/$filename
+jq -c '.' processed/$filename
