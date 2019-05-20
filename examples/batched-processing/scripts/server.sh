@@ -24,7 +24,7 @@ function wait_for_data() {
     echo "minio/${path##http://minio:9000/}"
 }
 
-sleep 3
+cd /tmp
 mkdir -p data/raw
 mkdir -p data/intermediate/internal/verify1
 mkdir -p data/intermediate/internal/verify2
@@ -48,10 +48,10 @@ prio verify1 \
     --n-data $N_DATA \
     --batch-id $BATCH_ID \
     --server-id $SERVER_ID \
-    --private-key $PRIVATE_KEY \
+    --private-key-hex $PRIVATE_KEY \
     --shared-secret $SHARED_SECRET \
-    --public-key-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-external $PUBLIC_KEY_EXTERNAL \
+    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
+    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input raw/$filename \
     --output intermediate/internal/verify1
 
@@ -69,10 +69,10 @@ prio verify2 \
     --n-data $N_DATA \
     --batch-id $BATCH_ID \
     --server-id $SERVER_ID \
-    --private-key $PRIVATE_KEY \
+    --private-key-hex $PRIVATE_KEY \
     --shared-secret $SHARED_SECRET \
-    --public-key-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-external $PUBLIC_KEY_EXTERNAL \
+    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
+    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input ${BUCKET_INTERNAL}/raw/$filename \
     --input-internal ${BUCKET_INTERNAL}/intermediate/internal/verify1/$filename \
     --input-external ${BUCKET_INTERNAL}/intermediate/external/verify1/$filename \
@@ -94,8 +94,8 @@ prio aggregate \
     --server-id $SERVER_ID \
     --private-key $PRIVATE_KEY \
     --shared-secret $SHARED_SECRET \
-    --public-key-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-external $PUBLIC_KEY_EXTERNAL \
+    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
+    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input ${BUCKET_INTERNAL}/raw/$filename \
     --input-internal ${BUCKET_INTERNAL}/intermediate/internal/verify2/$filename \
     --input-external ${BUCKET_INTERNAL}/intermediate/external/verify2/$filename \
@@ -115,10 +115,10 @@ prio publish \
     --n-data $N_DATA \
     --batch-id $BATCH_ID \
     --server-id $SERVER_ID \
-    --private-key $PRIVATE_KEY \
+    --private-key-hex $PRIVATE_KEY \
     --shared-secret $SHARED_SECRET \
-    --public-key-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-external $PUBLIC_KEY_EXTERNAL \
+    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
+    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input-internal ${BUCKET_INTERNAL}/intermediate/internal/aggregate/$filename \
     --input-external ${BUCKET_INTERNAL}/intermediate/external/aggregate/$filename \
     --output ${BUCKET_INTERNAL}/processed/

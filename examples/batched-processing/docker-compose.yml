@@ -6,7 +6,7 @@ services:
     # https://docs.min.io/docs/minio-multi-user-quickstart-guide.html
     image: minio/minio:latest
     command: server /data
-    ports: 
+    ports:
       - 9000:9000
     environment:
       - MINIO_ACCESS_KEY=admin
@@ -22,10 +22,28 @@ services:
     volumes:
       - .:/root/
 
+  client:
+    build: .
+    working_dir: /app/examples/batched-processing
+    command: bash -c "sleep 3 && scripts/client.sh"
+    volumes:
+      - .:/app/examples/batched-processing
+    depends_on:
+      - server_a
+    environment:
+      - N_DATA=3
+      - BATCH_ID=test
+      - PUBLIC_KEY_SERVER_A=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78
+      - PUBLIC_KEY_SERVER_B=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+      - BUCKET_SERVER_A=server-a
+      - BUCKET_SERVER_B=server-b
+
   server_a:
     build: .
     working_dir: /app/examples/batched-processing
-    command: scripts/main.sh
+    command: bash -c "sleep 2 && scripts/server.sh"
     volumes:
       - .:/app/examples/batched-processing
     depends_on:
