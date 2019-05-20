@@ -81,6 +81,7 @@ def prio_spark(
         )
     )
 
+    # NOTE: jump into a session with spark started for testing
     import code
 
     code.interact(local=locals())

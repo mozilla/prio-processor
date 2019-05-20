@@ -10,17 +10,17 @@ def spark():
     spark.stop()
 
 
-def test_transform_verify1():
+def test_function_verify1():
     raise NotImplementedError
 
 
-def test_transform_verify2():
+def test_function_verify2():
     raise NotImplementedError
 
 
-def test_transform_aggregate():
+def test_function_aggregate():
     raise NotImplementedError
 
 
-def test_transform_publish():
+def test_function_publish():
     raise NotImplementedError
