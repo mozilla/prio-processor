@@ -12,7 +12,8 @@ RUN dnf install -y \
     swig \
     python3-devel \
     nss-devel \
-    msgpack-devel
+    msgpack-devel \
+    jq
 
 # symbolically link to name without version suffix to accomodate libprio includes
 RUN ln -s /usr/include/nspr4 /usr/include/nspr
