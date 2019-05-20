@@ -42,7 +42,7 @@ function poll_for_data() {
     retries=0
     while ! mc stat $1 &>/dev/null; do
         sleep 2;
-        $((retries++))
+        : $((retries++))
         if $((retries > 5)); then
             exit 1
         fi
