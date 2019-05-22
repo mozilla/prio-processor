@@ -15,7 +15,7 @@ set -x
 : ${BUCKET_SERVER_B?}
 
 TARGET="minio"
-mc config host add $TARGET http://minio:9000 admin password
+mc config host add $TARGET http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}
 
 # The bucket name is used for the local file directory and for the remote minio
 # bucket.
@@ -41,3 +41,7 @@ jq -c '.' ${BUCKET_SERVER_B}/raw/data.ndjson
 
 mc cp --recursive $BUCKET_SERVER_A $TARGET
 mc cp --recursive $BUCKET_SERVER_B $TARGET
+
+touch _SUCCESS
+mc cp _SUCCESS $TARGET/$BUCKET_SERVER_A/raw
+mc cp _SUCCESS $TARGET/$BUCKET_SERVER_B/raw

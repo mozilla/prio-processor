@@ -31,95 +31,125 @@ mkdir -p data/intermediate/external/verify2
 mkdir -p data/intermediate/external/aggregate
 mkdir -p data/processed
 cd data
+touch _SUCCESS
 
-
-function trigger_on_event() {
-    path=$(( mc watch --json $1 & ) | head -n 1 | jq -r '.events.path')
-    # Remove the url portion
-    echo "$TARGET/${path##http://minio:9000/}"
-}
 
 function poll_for_data() {
+    max_retries=5
     retries=0
+    backoff=2
     while ! mc stat $1 &>/dev/null; do
-        sleep 2;
-        : $((retries++))
-        if $((retries > 5)); then
+        sleep $backoff;
+        backoff=$((backoff * 2))
+        retries=$((retries + 1))
+        if $((retries > max_retries)); then
+            echo "Reached the maximum number of retries."
             exit 1
         fi
     done
 }
 
+
 ###########################################################
 # verify1
 ###########################################################
 
-path=$(trigger_on_event "${TARGET}/${BUCKET_INTERNAL}/raw/")
-filename=$(basename $path)
+input="raw"
+output_internal="intermediate/internal/verify1"
+output_external="intermediate/external/verify1"
 
-mc cp $path raw/
+path=${TARGET}/${BUCKET_INTERNAL}/$input
+poll_for_data $path/_SUCCESS
+mc cp --recursive $path/ $input
 
-prio verify1 \
-    --input raw/$filename \
-    --output intermediate/internal/verify1
+filenames=$(find $input -type f -not -name "_SUCCESS" | xargs basename)
+for filename in $filenames; do
+    prio verify1 \
+        --input $input/$filename \
+        --output $output_internal
 
-jq -c '.' intermediate/internal/verify1/$filename
+    jq -c '.' $output_internal/$filename
+done
 
-mc cp \
-    intermediate/internal/verify1/$filename \
-    ${TARGET}/${BUCKET_EXTERNAL}/intermediate/external/verify1/
+mc cp --recursive $output_internal/* ${TARGET}/${BUCKET_EXTERNAL}/$output_external
+mc cp _SUCCESS ${TARGET}/${BUCKET_EXTERNAL}/$output_external/
 
 ###########################################################
 # verify2
 ###########################################################
 
-path="${TARGET}/${BUCKET_INTERNAL}/intermediate/external/verify1/$filename"
-poll_for_data $path
-mc cp $path intermediate/external/verify1/
+input_internal="intermediate/internal/verify1"
+input_external="intermediate/external/verify1"
+output_internal="intermediate/internal/verify2"
+output_external="intermediate/external/verify2"
 
-prio verify2 \
-    --input raw/$filename \
-    --input-internal intermediate/internal/verify1/$filename \
-    --input-external intermediate/external/verify1/$filename \
-    --output intermediate/internal/verify2/ \
+path="${TARGET}/${BUCKET_INTERNAL}/$input_external"
+poll_for_data $path/_SUCCESS
+mc cp --recursive $path/ $input_external
 
-jq -c '.' intermediate/internal/verify2/$filename
+filenames=$(find $input_internal -type f -not -name "_SUCCESS" | xargs basename)
+for filename in $filenames; do
+    prio verify2 \
+        --input $input/$filename \
+        --input-internal $input_internal/$filename \
+        --input-external $input_external/$filename \
+        --output $output_internal
 
-mc cp \
-    intermediate/internal/verify2/$filename \
-    ${TARGET}/${BUCKET_EXTERNAL}/intermediate/external/verify2/
+    jq -c '.' $output_internal/$filename
+done
+
+mc cp --recursive $output_internal/* ${TARGET}/${BUCKET_EXTERNAL}/$output_external
+mc cp _SUCCESS ${TARGET}/${BUCKET_EXTERNAL}/$output_external/
+
 
 ###########################################################
 # aggregate
 ###########################################################
 
-path="${TARGET}/${BUCKET_INTERNAL}/intermediate/external/verify2/$filename"
-poll_for_data $path
-mc cp $path intermediate/external/verify2/
+input_internal="intermediate/internal/verify2"
+input_external="intermediate/external/verify2"
+output_internal="intermediate/internal/aggregate"
+output_external="intermediate/external/aggregate"
 
-prio aggregate \
-    --input raw/$filename \
-    --input-internal intermediate/internal/verify2/$filename \
-    --input-external intermediate/external/verify2/$filename \
-    --output intermediate/internal/aggregate/
+path="${TARGET}/${BUCKET_INTERNAL}/$input_external"
+poll_for_data $path/_SUCCESS
+mc cp --recursive $path/ $input_external
 
-jq -c '.' intermediate/internal/aggregate/$filename
+filenames=$(find $input_internal -type f -not -name "_SUCCESS" | xargs basename)
+for filename in $filenames; do
+    prio aggregate \
+        --input $input/$filename \
+        --input-internal $input_internal/$filename \
+        --input-external $input_external/$filename \
+        --output $output_internal
 
-mc cp \
-    intermediate/internal/aggregate/$filename \
-    ${TARGET}/${BUCKET_EXTERNAL}/intermediate/external/aggregate/
+    jq -c '.' $output_internal/$filename
+done
+
+mc cp --recursive $output_internal/* ${TARGET}/${BUCKET_EXTERNAL}/$output_external
+mc cp _SUCCESS ${TARGET}/${BUCKET_EXTERNAL}/$output_external/
 
 ###########################################################
 # publish
 ###########################################################
 
-path="${TARGET}/${BUCKET_INTERNAL}/intermediate/external/aggregate/$filename"
-poll_for_data $path
-mc cp $path intermediate/external/aggregate/
+input_internal="intermediate/internal/aggregate"
+input_external="intermediate/external/aggregate"
+output="processed"
 
-prio publish \
-    --input-internal intermediate/internal/aggregate/$filename \
-    --input-external intermediate/external/aggregate/$filename \
-    --output processed/
+path="${TARGET}/${BUCKET_INTERNAL}/$input_external"
+poll_for_data $path/_SUCCESS
+mc cp --recursive $path/ $input_external
 
-jq -c '.' processed/$filename
+filenames=$(find $input_internal -type f -not -name "_SUCCESS" | xargs basename)
+for filename in $filenames; do
+    prio publish \
+        --input-internal $input_internal/$filename \
+        --input-external $input_external/$filename \
+        --output $output
+
+    jq -c '.' $output/$filename
+done
+
+mc cp --recursive $output/* ${TARGET}/${BUCKET_INTERNAL}/$output
+mc cp _SUCCESS ${TARGET}/${BUCKET_INTERNAL}/$output/
