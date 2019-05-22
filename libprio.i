@@ -246,7 +246,9 @@ MSGPACK_WRITE(PrioTotalShare)
 SECStatus TYPE ## _read_wrapper(TYPE p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    bool result = msgpack_unpacker_init(&upk, len+1);
+    // Allocate twice as much memory as our input buffer to prevent allocation
+    // errors in Linux.
+    bool result = msgpack_unpacker_init(&upk, len*2);
     if (result) {
         memcpy(msgpack_unpacker_buffer(&upk), data, len);
         msgpack_unpacker_buffer_consumed(&upk, len);
