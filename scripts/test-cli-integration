@@ -4,6 +4,7 @@ set -eou pipefail
 set -x
 
 cd "$(dirname "$0")/.."
+scripts/create-folder
 
 key_a=$(prio keygen)
 key_b=$(prio keygen)
