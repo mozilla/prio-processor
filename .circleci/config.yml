@@ -21,6 +21,9 @@ jobs:
       - run:
           name: Test Code
           command: docker run prio
+      - run:
+          name: Integration Code
+          command: docker run prio scripts/test-cli-integration
 
 workflows:
     version: 2
