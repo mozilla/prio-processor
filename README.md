@@ -2,11 +2,9 @@
 
 [![CircleCI](https://circleci.com/gh/mozilla/python-libprio.svg?style=svg)](https://circleci.com/gh/mozilla/python-libprio)
 
-Prio is an system for aggregating data in a privacy-preserving way. This
-repository includes a Python wrapper around the [libprio
-library](https://github.com/mozilla/libprio) and a command-line tool that can be
-used to batch process large amounts of input data using Prio's multi-server
-architecture.
+Prio is a system for aggregating data in a privacy-preserving way. This
+repository includes a Python wrapper around [libprio](https://github.com/mozilla/libprio) 
+and a command-line tool for batch processing in Prio's multi-server architecture.
 
 For more information about Prio, see [this blog
 post](https://hacks.mozilla.org/2018/10/testing-privacy-preserving-telemetry-with-prio/).
@@ -32,7 +30,7 @@ brew install nss nspr scons msgpack swig
 First, the static libraries for Prio and big numbers are generated in the git
 submodule. Then, SWIG generates C files from the SWIG interface file. This
 contains the code for sharing data between the static library and Python
-objects. Finally, the library is made available to the Python package as an
+objects. Finally, the library is made available to the Python package in an
 extension module.
 
 ```bash
