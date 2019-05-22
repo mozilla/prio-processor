@@ -20,28 +20,47 @@ mc config host add $TARGET http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_
 # The bucket name is used for the local file directory and for the remote minio
 # bucket.
 cd /tmp
-mkdir -p $BUCKET_SERVER_A/raw
-mkdir -p $BUCKET_SERVER_B/raw
+output_a=$BUCKET_SERVER_A/raw
+output_b=$BUCKET_SERVER_B/raw
+mkdir -p $output_a
+mkdir -p $output_b
 
-cat << EOF > data.ndjson
+cat << EOF > part-0.ndjson
 [1, 0, 0]
 [1, 1, 0]
 [1, 1, 1]
 EOF
 
-jq -c '.' data.ndjson
+cat << EOF > part-1.ndjson
+[1, 0, 1]
+[1, 1, 1]
+[1, 0, 1]
+[1, 1, 1]
+EOF
 
-prio encode-shares \
-    --input data.ndjson \
-    --output-A ${BUCKET_SERVER_A}/raw/ \
-    --output-B ${BUCKET_SERVER_B}/raw/
+cat << EOF > part-2.ndjson
+[1, 0, 0]
+[1, 0, 0]
+[1, 0, 0]
+[1, 0, 0]
+[1, 1, 0]
+[1, 1, 0]
+[1, 1, 1]
+EOF
 
-jq -c '.' ${BUCKET_SERVER_A}/raw/data.ndjson
-jq -c '.' ${BUCKET_SERVER_B}/raw/data.ndjson
+for filename in $(find . -name "*.ndjson"); do
+    prio encode-shares \
+        --input $filename \
+        --output-A $output_a \
+        --output-B $output_b
 
-mc cp --recursive $BUCKET_SERVER_A $TARGET
-mc cp --recursive $BUCKET_SERVER_B $TARGET
+    jq -c '.' $output_a/$filename
+    jq -c '.' $output_b/$filename
+done
+
+mc cp --recursive $output_a/ $TARGET/$output_a/
+mc cp --recursive $output_b/ $TARGET/$output_b/
 
 touch _SUCCESS
-mc cp _SUCCESS $TARGET/$BUCKET_SERVER_A/raw
-mc cp _SUCCESS $TARGET/$BUCKET_SERVER_B/raw
+mc cp _SUCCESS $TARGET/$output_a/
+mc cp _SUCCESS $TARGET/$output_b/
