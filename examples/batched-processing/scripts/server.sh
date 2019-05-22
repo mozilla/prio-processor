@@ -3,13 +3,14 @@
 set -eou pipefail
 set -x
 
+# Parameters that are read through the environment
 : ${N_DATA?}
 : ${BATCH_ID?}
 : ${SERVER_ID}
 : ${SHARED_SECRET?}
-: ${PRIVATE_KEY?}
-: ${PUBLIC_KEY_INTERNAL?}
-: ${PUBLIC_KEY_EXTERNAL?}
+: ${PRIVATE_KEY_HEX?}
+: ${PUBLIC_KEY_HEX_INTERNAL?}
+: ${PUBLIC_KEY_HEX_EXTERNAL?}
 
 : ${MINIO_ACCESS_KEY?}
 : ${MINIO_SECRET_KEY?}
@@ -59,13 +60,6 @@ filename=$(basename $path)
 mc cp $path raw/
 
 prio verify1 \
-    --n-data $N_DATA \
-    --batch-id $BATCH_ID \
-    --server-id $SERVER_ID \
-    --private-key-hex $PRIVATE_KEY \
-    --shared-secret $SHARED_SECRET \
-    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input raw/$filename \
     --output intermediate/internal/verify1
 
@@ -84,13 +78,6 @@ poll_for_data $path
 mc cp $path intermediate/external/verify1/
 
 prio verify2 \
-    --n-data $N_DATA \
-    --batch-id $BATCH_ID \
-    --server-id $SERVER_ID \
-    --private-key-hex $PRIVATE_KEY \
-    --shared-secret $SHARED_SECRET \
-    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input raw/$filename \
     --input-internal intermediate/internal/verify1/$filename \
     --input-external intermediate/external/verify1/$filename \
@@ -111,13 +98,6 @@ poll_for_data $path
 mc cp $path intermediate/external/verify2/
 
 prio aggregate \
-    --n-data $N_DATA \
-    --batch-id $BATCH_ID \
-    --server-id $SERVER_ID \
-    --private-key-hex $PRIVATE_KEY \
-    --shared-secret $SHARED_SECRET \
-    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input raw/$filename \
     --input-internal intermediate/internal/verify2/$filename \
     --input-external intermediate/external/verify2/$filename \
@@ -138,13 +118,6 @@ poll_for_data $path
 mc cp $path intermediate/external/aggregate/
 
 prio publish \
-    --n-data $N_DATA \
-    --batch-id $BATCH_ID \
-    --server-id $SERVER_ID \
-    --private-key-hex $PRIVATE_KEY \
-    --shared-secret $SHARED_SECRET \
-    --public-key-hex-internal $PUBLIC_KEY_INTERNAL \
-    --public-key-hex-external $PUBLIC_KEY_EXTERNAL \
     --input-internal intermediate/internal/aggregate/$filename \
     --input-external intermediate/external/aggregate/$filename \
     --output processed/

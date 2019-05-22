@@ -3,10 +3,11 @@
 set -eou pipefail
 set -x
 
+# Parameters that are read through the environment
 : ${N_DATA?}
 : ${BATCH_ID?}
-: ${PUBLIC_KEY_SERVER_A?}
-: ${PUBLIC_KEY_SERVER_B?}
+: ${PUBLIC_KEY_HEX_INTERNAL?}
+: ${PUBLIC_KEY_HEX_EXTERNAL?}
 
 : ${MINIO_ACCESS_KEY?}
 : ${MINIO_SECRET_KEY?}
@@ -31,10 +32,6 @@ EOF
 jq -c '.' data.ndjson
 
 prio encode-shares \
-    --n-data ${N_DATA} \
-    --batch-id ${BATCH_ID} \
-    --public-key-hex-internal ${PUBLIC_KEY_SERVER_A} \
-    --public-key-hex-external ${PUBLIC_KEY_SERVER_B} \
     --input data.ndjson \
     --output-A ${BUCKET_SERVER_A}/raw/ \
     --output-B ${BUCKET_SERVER_B}/raw/
