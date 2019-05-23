@@ -20,7 +20,7 @@ RUN ln -s /usr/include/nspr4 /usr/include/nspr
 RUN ln -s /usr/include/nss3 /usr/include/nss
 
 ENV PATH="$PATH:~/.local/bin"
-RUN pip3 install tox
+RUN pip3 install --user tox
 
 # install the app
 WORKDIR /app

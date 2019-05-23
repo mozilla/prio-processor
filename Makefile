@@ -1,3 +1,5 @@
+.PHONY: all test clean build shell
+
 all:
 	cd libprio && CCFLAGS='-fPIC' scons && cd ..
 	mkdir -p build
@@ -20,3 +22,8 @@ clean:
 		\) -exec rm -r {} +
 	rm -rf build
 
+build:
+	docker build -t prio .
+
+shell:
+	docker run -it prio bash
