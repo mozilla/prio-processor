@@ -40,7 +40,7 @@ jobs:
           command: |
             mkdir -p /cache
             docker save -o /cache/dev.tar "prio:dev"
-            docker save -p /cache/prod.tar "prio:prod"
+            docker save -o /cache/prod.tar "prio:prod"
       - save_cache:
           key: v1-{{ .Branch }}-{{ epoch }}
           paths:
