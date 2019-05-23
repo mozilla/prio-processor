@@ -23,7 +23,8 @@ clean:
 	rm -rf build
 
 build:
-	docker build -t prio .
+	docker build --target development -t prio:dev .
+	docker build --target production -t prio:latest .
 
 shell:
-	docker run -it prio bash
+	docker run -it prio:dev bash -c "make && bash"
