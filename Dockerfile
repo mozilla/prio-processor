@@ -51,10 +51,15 @@ RUN yum install -y epel-release \
     && yum clean all \
     && rm -rf /var/cache/yum
 
+RUN groupadd --gid 10001 app && \
+    useradd -g app --uid 10001 --shell /usr/sbin/nologin --create-home \
+        --home-dir /app app
+
 WORKDIR /app
 COPY --from=development /app .
 RUN python3 -m ensurepip && pip3 install dist/prio-*.whl
 
+USER app
 CMD scripts/test-cli-integration
 
 
