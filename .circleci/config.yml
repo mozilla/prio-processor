@@ -51,6 +51,7 @@ jobs:
     docker:
       - image: docker:stable-git
     steps:
+      - setup_remote_docker
       - restore_cache:
           key: v1-{{ .Branch }}
       - run:
@@ -69,6 +70,7 @@ jobs:
     docker:
       - image: docker:stable-git
     steps:
+      - setup_remote_docker
       - restore_cache:
           key: v1-{{ .Branch }}
       - run:

@@ -14,7 +14,8 @@ RUN dnf install -y \
     python36 \
     nss-devel \
     msgpack-devel \
-    jq
+    jq \
+    && dnf clean all
 
 # symbolically link to name without version suffix to accomodate libprio includes
 RUN ln -s /usr/include/nspr4 /usr/include/nspr \
