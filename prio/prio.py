@@ -33,6 +33,7 @@ class Config:
         self.instance = libprio.PrioConfig_new(
             n_fields, server_a.instance, server_b.instance, batch_id
         )
+        self.batch_id = batch_id
 
     def num_data_fields(self):
         return libprio.PrioConfig_numDataFields(self.instance)
@@ -108,10 +109,15 @@ class PrivateKey:
         """Export a curve25519 public key as a NULL-terminated hex bytestring."""
         if not self.instance:
             return None
-        return libprio.PrivateKey_export_hex(self.instance)
+        return libprio.PrivateKey_export_hex(self.instance)[:-1]
 
 
 class Client:
+    """Encodes measurements into two shares.
+
+    :param config: An instance of the config
+    """
+
     def __init__(self, config):
         self.config = config
 
