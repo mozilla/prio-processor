@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+from base64 import b64encode
+from collections import namedtuple
+from datetime import datetime
+from os import environ
+from textwrap import dedent
+from typing import Generator, List, Sequence
+from uuid import uuid4
+import itertools
+import math
+
+import click
+import numpy as np
+import rapidjson as json
+
+from prio import prio
+from prio.cli.options import public_key
+from tqdm import tqdm
+import sys
+
+data_schema = {
+    "$schema": "http://json-schema.org/schema#4",
+    "type": "object",
+    "description": "a single partition containing an image of submissions",
+    "properties": {
+        "id": {
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+            "type": "string",
+            "format": "uuid4",
+        },
+        "payload": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "encoding": {
+                        "type": "string",
+                        "description": "The batch-id for the shares",
+                    },
+                    "prio": {
+                        "type": "object",
+                        "properties": {
+                            "a": {
+                                "type": "string",
+                                "description": "Shares for server A in base64",
+                                "format": "base64",
+                            },
+                            "b": {
+                                "type": "string",
+                                "description": "Shares for server B in base64",
+                                "format": "base64",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+}
+
+PopulationParam = namedtuple("PopulationParam", ["num_bits"])
+
+
+class PopulationModel:
+    def __init__(self, param):
+        self.param = param
+
+    def draw(self, n_samples=1) -> np.ndarray:
+        return np.random.randint(0, 2, (n_samples, self.param.num_bits))
+
+
+def encode_batch(encoder, batch: np.ndarray) -> Generator[List[bytes], None, None]:
+    for row in batch:
+        data = np.packbits(row).tobytes()
+        shares = encoder.encode(data)
+        yield [b64encode(share) for share in shares]
+
+
+def to_data(batch_id: bytes, share: List[str], indent=None) -> str:
+    return json.dumps(
+        {
+            "id": str(uuid4()),
+            "payload": [
+                {"encoding": batch_id.decode(), "prio": {"a": share[0], "b": share[1]}}
+            ],
+        },
+        indent=indent,
+    )
+
+
+def write(path: Path, data: Sequence[str]):
+    print(f"writing to {path}")
+    with open(path, "w") as f:
+        for datum in tqdm(data):
+            f.write(datum)
+            f.write("\n")
+
+
+@click.command()
+@click.option("--output", type=click.Path(), default=None)
+@click.option("--size", type=int, default=8)
+@click.option("--num-bits", type=int, default=8)
+@click.option("--public-key-hex-internal", type=str, envvar="PUBLIC_KEY_HEX_INTERNAL")
+@click.option("--public-key-hex-external", type=str, envvar="PUBLIC_KEY_HEX_EXTERNAL")
+def main(output, size, num_bits, public_key_hex_internal, public_key_hex_external):
+    print("reading the keys")
+    # TODO: generate keys and dump them into an extra output
+    # NOTE: retain this functionality to reuse existing keys
+    public_key_internal = prio.PublicKey().import_hex(public_key_hex_internal.encode())
+    public_key_external = prio.PublicKey().import_hex(public_key_hex_external.encode())
+    print(f"public key a: {public_key_internal.export_hex()}")
+    print(f"public key a: {public_key_external.export_hex()}")
+
+    def test_generate_sample():
+        print("creating the population")
+        n_samples = 8
+        param = PopulationParam(num_bits=num_bits)
+        pm = PopulationModel(param)
+        batch = pm.draw(n_samples)
+        print(batch)
+
+        print("encoding data using prio")
+        config = prio.Config(
+            param.num_bits,
+            public_key_internal,
+            public_key_external,
+            datetime.utcnow().isoformat().encode(),
+        )
+
+        encoder = prio.Client(config)
+        encoded_shares = list(encode_batch(encoder, batch))
+
+        print("printing a sample data point")
+        data = encoded_shares[0]
+        print(
+            dedent(
+                f"""
+                size:
+                    server a: {len(data[0])} bytes
+                    server b: {len(data[1])} bytes
+                head:
+                    server a: {data[0][:60].decode()}...
+                    server b: {data[1][:60].decode()}...
+                """
+            )
+        )
+
+        print(to_data(config.batch_id, encoded_shares[0], indent=2))
+
+    def generate_data(output):
+        print("now generating requested data")
+        path = Path(output)
+
+        param = PopulationParam(num_bits=num_bits)
+        pm = PopulationModel(param)
+
+        config = prio.Config(
+            param.num_bits,
+            public_key_internal,
+            public_key_external,
+            datetime.utcnow().isoformat().encode(),
+        )
+
+        encoder = prio.Client(config)
+
+        # 200 mb partitions
+        datum = to_data(config.batch_id, next(encode_batch(encoder, pm.draw(1))))
+        # TODO: validate datum against schema
+        datum_size = len(datum)
+        estimate_total = (datum_size + 1) * size
+        n_partitions = math.ceil(estimate_total / (200 * 1024 ** 2))
+        n_rows = math.floor(size / n_partitions)
+        print(
+            dedent(
+                f"""
+                size: {datum_size}
+                n_partitions: {n_partitions}
+                n_rows per partition: {n_rows}
+                leftover: {datum_size - n_rows * n_partitions}
+                """
+            )
+        )
+
+        if path.exists() and path.is_file() and n_partitions > 1:
+            print("Cannot write to a single file.")
+            sys.exit(-1)
+
+        # default to a file
+        if not path.exists():
+            path.touch()
+
+        if path.is_file():
+            batch = pm.draw(size)
+            encoded_shares = encode_batch(encoder, batch)
+            with_metadata = (to_data(config.batch_id, s) for s in encoded_shares)
+            write(path, with_metadata)
+        else:
+            batch = pm.draw(size)
+            encoded_shares = encode_batch(encoder, batch)
+            for part_num in tqdm(range(n_partitions)):
+                part = itertools.islice(
+                    (to_data(config.batch_id, s) for s in encoded_shares), n_rows
+                )
+                write(path / f"part-{part_num:03d}.njdson", part)
+
+    if output is None:
+        test_generate_sample()
+
+    if output:
+        generate_data(output)
+
+
+if __name__ == "__main__":
+    main()
