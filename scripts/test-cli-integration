@@ -9,46 +9,48 @@ scripts/create-folder
 key_a=$(prio keygen)
 key_b=$(prio keygen)
 shared=$(prio shared-seed)
-
-N_DATA=3
-BATCH_ID="test"
 SHARED_SECRET=$shared
 
-SERVER_A_PUBLIC_KEY=$(jq -r ".public_key" <<< $key_a)
-SERVER_B_PUBLIC_KEY=$(jq -r ".public_key" <<< $key_b)
+FILENAME=${FILENAME:-"data.ndjson"}
+N_DATA=${N_DATA:-3}
+BATCH_ID=${BATCH_ID:-"test"}
 
-SERVER_A_PRIVATE_KEY=$(jq -r ".private_key" <<< $key_a)
-SERVER_B_PRIVATE_KEY=$(jq -r ".private_key" <<< $key_b)
+SERVER_A_PUBLIC_KEY=${SERVER_A_PUBLIC_KEY:-$(jq -r ".public_key" <<< $key_a)}
+SERVER_B_PUBLIC_KEY=${SERVER_B_PUBLIC_KEY:-$(jq -r ".public_key" <<< $key_b)}
 
-CLIENT_BUCKET="working/client"
-SERVER_A_BUCKET="working/server_a"
-SERVER_B_BUCKET="working/server_b"
+SERVER_A_PRIVATE_KEY=${SERVER_A_PRIVATE_KEY:-$(jq -r ".private_key" <<< $key_a)}
+SERVER_B_PRIVATE_KEY=${SERVER_B_PRIVATE_KEY:-$(jq -r ".private_key" <<< $key_b)}
+
+CLIENT_BUCKET=${CLIENT_BUCKET:-"working/client"}
+SERVER_A_BUCKET=${SERVER_A_BUCKET:-"working/server_a"}
+SERVER_B_BUCKET=${SERVER_B_BUCKET:-"working/server_b"}
 
 ###########################################################
 # encode-shares
 ###########################################################
 
-mkdir -p ${CLIENT_BUCKET}
+if [[ "$FILENAME" == "data.ndjson" ]]; then
 
-cat << EOF > ${CLIENT_BUCKET}/data.ndjson
+    cat << EOF > ${CLIENT_BUCKET}/data.ndjson
 [1, 0, 0]
 [1, 1, 0]
 [1, 1, 1]
 EOF
 
-jq -c '.' ${CLIENT_BUCKET}/data.ndjson
+    jq -c '.' ${CLIENT_BUCKET}/${FILENAME}
 
-python3 -m prio encode-shares \
-    --n-data ${N_DATA} \
-    --batch-id ${BATCH_ID} \
-    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
-    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
-    --input working/client/data.ndjson \
-    --output-A ${SERVER_A_BUCKET}/raw/ \
-    --output-B ${SERVER_B_BUCKET}/raw/
+    python3 -m prio encode-shares \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+        --input working/client/${FILENAME} \
+        --output-A ${SERVER_A_BUCKET}/raw/ \
+        --output-B ${SERVER_B_BUCKET}/raw/
 
-jq -c '.' ${SERVER_A_BUCKET}/raw/data.ndjson
-jq -c '.' ${SERVER_B_BUCKET}/raw/data.ndjson
+    jq -c '.' ${SERVER_A_BUCKET}/raw/${FILENAME}
+    jq -c '.' ${SERVER_B_BUCKET}/raw/${FILENAME}
+fi
 
 ###########################################################
 # verify1
@@ -62,13 +64,13 @@ python3 -m prio verify1 \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
-    --input ${SERVER_A_BUCKET}/raw/data.ndjson \
+    --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
     --output ${SERVER_A_BUCKET}/intermediate/internal/verify1
 
-jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify1/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify1/${FILENAME}
 
 cp \
-    ${SERVER_A_BUCKET}/intermediate/internal/verify1/data.ndjson \
+    ${SERVER_A_BUCKET}/intermediate/internal/verify1/${FILENAME} \
     ${SERVER_B_BUCKET}/intermediate/external/verify1/
 
 python3 -m prio verify1 \
@@ -79,13 +81,13 @@ python3 -m prio verify1 \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
-    --input ${SERVER_B_BUCKET}/raw/data.ndjson \
+    --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
     --output ${SERVER_B_BUCKET}/intermediate/internal/verify1
 
-jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify1/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify1/${FILENAME}
 
 cp \
-    ${SERVER_B_BUCKET}/intermediate/internal/verify1/data.ndjson \
+    ${SERVER_B_BUCKET}/intermediate/internal/verify1/${FILENAME} \
     ${SERVER_A_BUCKET}/intermediate/external/verify1/
 
 ###########################################################
@@ -100,15 +102,15 @@ python3 -m prio verify2 \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
-    --input ${SERVER_A_BUCKET}/raw/data.ndjson \
-    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify1/data.ndjson \
-    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify1/data.ndjson \
+    --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify1/${FILENAME} \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify1/${FILENAME} \
     --output ${SERVER_A_BUCKET}/intermediate/internal/verify2/ \
 
-jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify2/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify2/${FILENAME}
 
 cp \
-    ${SERVER_A_BUCKET}/intermediate/internal/verify2/data.ndjson \
+    ${SERVER_A_BUCKET}/intermediate/internal/verify2/${FILENAME} \
     ${SERVER_B_BUCKET}/intermediate/external/verify2/
 
 python3 -m prio verify2 \
@@ -119,15 +121,15 @@ python3 -m prio verify2 \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
-    --input ${SERVER_B_BUCKET}/raw/data.ndjson \
-    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify1/data.ndjson \
-    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify1/data.ndjson \
+    --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify1/${FILENAME} \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify1/${FILENAME} \
     --output ${SERVER_B_BUCKET}/intermediate/internal/verify2/ \
 
-jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME}
 
 cp \
-    ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson \
+    ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME} \
     ${SERVER_A_BUCKET}/intermediate/external/verify2/
 
 ###########################################################
@@ -142,15 +144,15 @@ python3 -m prio aggregate \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
-    --input ${SERVER_A_BUCKET}/raw/data.ndjson \
-    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify2/data.ndjson \
-    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify2/data.ndjson \
+    --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify2/${FILENAME} \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify2/${FILENAME} \
     --output ${SERVER_A_BUCKET}/intermediate/internal/aggregate/
 
-jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/aggregate/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME}
 
 cp \
-    ${SERVER_A_BUCKET}/intermediate/internal/aggregate/data.ndjson \
+    ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
     ${SERVER_B_BUCKET}/intermediate/external/aggregate/
 
 python3 -m prio aggregate \
@@ -161,15 +163,15 @@ python3 -m prio aggregate \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
-    --input ${SERVER_B_BUCKET}/raw/data.ndjson \
-    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson \
-    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2/data.ndjson \
+    --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME} \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2/${FILENAME} \
     --output ${SERVER_B_BUCKET}/intermediate/internal/aggregate/ \
 
-jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME}
 
 cp \
-    ${SERVER_B_BUCKET}/intermediate/internal/aggregate/data.ndjson \
+    ${SERVER_B_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
     ${SERVER_A_BUCKET}/intermediate/external/aggregate/
 
 ###########################################################
@@ -184,11 +186,11 @@ python3 -m prio publish \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
-    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/aggregate/data.ndjson \
-    --input-external ${SERVER_A_BUCKET}/intermediate/external/aggregate/data.ndjson \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/aggregate/${FILENAME} \
     --output ${SERVER_A_BUCKET}/processed/
 
-jq -c '.' ${SERVER_A_BUCKET}/processed/data.ndjson
+jq -c '.' ${SERVER_A_BUCKET}/processed/${FILENAME}
 
 python3 -m prio publish \
     --n-data ${N_DATA} \
@@ -198,8 +200,8 @@ python3 -m prio publish \
     --shared-secret $shared \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
-    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/aggregate/data.ndjson \
-    --input-external ${SERVER_B_BUCKET}/intermediate/external/aggregate/data.ndjson \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/aggregate/${FILENAME} \
     --output ${SERVER_B_BUCKET}/processed/
 
-jq -c '.' ${SERVER_B_BUCKET}/processed/data.ndjson
+jq -c '.' ${SERVER_B_BUCKET}/processed/${FILENAME}

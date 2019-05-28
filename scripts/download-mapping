@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+import urllib.request
+from collections import namedtuple
+import json
+
+ORIGIN = namedtuple("Origin", ["name", "hash"])
+
+url = "https://hg.mozilla.org/mozilla-central/raw-file/tip/toolkit/components/telemetry/core/TelemetryOriginData.inc"
+resp = urllib.request.urlopen(url)
+data = map(eval, resp.readlines())
+
+origins = [datum.name for datum in data]
+
+print(json.dumps(origins))
