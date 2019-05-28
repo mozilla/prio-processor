@@ -17,7 +17,7 @@ atexit(Prio_clear);
 // Handle SECStatus.
 %typemap(out) SECStatus {
    if ($1 != SECSuccess) {
-       PyErr_SetString(PyExc_RuntimeError, "$symname was not succesful.");
+       PyErr_SetString(PyExc_RuntimeError, "$symname was not successful.");
        SWIG_fail;
    }
    $result = Py_BuildValue("");
@@ -239,6 +239,11 @@ MSGPACK_WRITE(PrioTotalShare)
     (const unsigned char *data, unsigned int len)
 }
 
+// Add a type-casting rule to prevent swig from adding the define into the scripting interface
+%inline %{
+#define MSGPACK_INIT_BUFFER_SIZE (size_t)128
+%}
+
 %define MSGPACK_READ(TYPE)
 %ignore TYPE ## _read;
 %rename(TYPE ## _read) TYPE ## _read_wrapper;
@@ -246,11 +251,19 @@ MSGPACK_WRITE(PrioTotalShare)
 SECStatus TYPE ## _read_wrapper(TYPE p, const unsigned char *data, unsigned int len, const_PrioConfig cfg) {
     SECStatus rv = SECFailure;
     msgpack_unpacker upk;
-    bool result = msgpack_unpacker_init(&upk, len+1);
+    // Initialize the unpacker with a reasonably sized initial buffer. The
+    // unpacker will eat into the initially reserved space for counting and may
+    // need to be reallocated.
+    bool result = msgpack_unpacker_init(&upk, MSGPACK_INIT_BUFFER_SIZE);
     if (result) {
-        memcpy(msgpack_unpacker_buffer(&upk), data, len);
-        msgpack_unpacker_buffer_consumed(&upk, len);
-        rv = TYPE ## _read(p, &upk, cfg);
+        if (msgpack_unpacker_buffer_capacity(&upk) < len) {
+            result = msgpack_unpacker_reserve_buffer(&upk, len);
+        }
+        if (result) {
+            memcpy(msgpack_unpacker_buffer(&upk), data, len);
+            msgpack_unpacker_buffer_consumed(&upk, len);
+            rv = TYPE ## _read(p, &upk, cfg);
+        }
     }
     msgpack_unpacker_destroy(&upk);
     return rv;
@@ -271,4 +284,4 @@ MSGPACK_READ(PrioTotalShare)
 // * http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_nn2
 // * https://stackoverflow.com/questions/26567457/swig-wrapping-typedef-struct
 // * http://www.swig.org/Doc3.0/SWIGDocumentation.html#Typemaps_multi_argument_typemaps
-// * https://github.com/msgpack/msgpack-c/wiki/v1_1_c_overview
+// * https://github.com/msgpack/msgpack-c/wiki/v2_0_c_overview

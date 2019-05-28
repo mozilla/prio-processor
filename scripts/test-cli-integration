@@ -4,6 +4,7 @@ set -eou pipefail
 set -x
 
 cd "$(dirname "$0")/.."
+scripts/create-folder
 
 key_a=$(prio keygen)
 key_b=$(prio keygen)
@@ -38,7 +39,7 @@ EOF
 
     jq -c '.' ${CLIENT_BUCKET}/${FILENAME}
 
-    python -m prio encode-shares \
+    python3 -m prio encode-shares \
         --n-data ${N_DATA} \
         --batch-id ${BATCH_ID} \
         --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
@@ -46,7 +47,6 @@ EOF
         --input working/client/${FILENAME} \
         --output-A ${SERVER_A_BUCKET}/raw/ \
         --output-B ${SERVER_B_BUCKET}/raw/
-
 
     jq -c '.' ${SERVER_A_BUCKET}/raw/${FILENAME}
     jq -c '.' ${SERVER_B_BUCKET}/raw/${FILENAME}
@@ -56,7 +56,7 @@ fi
 # verify1
 ###########################################################
 
-python -m prio verify1 \
+python3 -m prio verify1 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
@@ -73,7 +73,7 @@ cp \
     ${SERVER_A_BUCKET}/intermediate/internal/verify1/${FILENAME} \
     ${SERVER_B_BUCKET}/intermediate/external/verify1/
 
-python -m prio verify1 \
+python3 -m prio verify1 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
@@ -94,7 +94,7 @@ cp \
 # verify2
 ###########################################################
 
-python -m prio verify2 \
+python3 -m prio verify2 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
@@ -113,7 +113,7 @@ cp \
     ${SERVER_A_BUCKET}/intermediate/internal/verify2/${FILENAME} \
     ${SERVER_B_BUCKET}/intermediate/external/verify2/
 
-python -m prio verify2 \
+python3 -m prio verify2 \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
@@ -136,7 +136,7 @@ cp \
 # aggregate
 ###########################################################
 
-python -m prio aggregate \
+python3 -m prio aggregate \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
@@ -155,7 +155,7 @@ cp \
     ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
     ${SERVER_B_BUCKET}/intermediate/external/aggregate/
 
-python -m prio aggregate \
+python3 -m prio aggregate \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
@@ -178,7 +178,7 @@ cp \
 # publish
 ###########################################################
 
-python -m prio publish \
+python3 -m prio publish \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id A \
@@ -192,7 +192,7 @@ python -m prio publish \
 
 jq -c '.' ${SERVER_A_BUCKET}/processed/${FILENAME}
 
-python -m prio publish \
+python3 -m prio publish \
     --n-data ${N_DATA} \
     --batch-id ${BATCH_ID} \
     --server-id B \
