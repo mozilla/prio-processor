@@ -44,15 +44,21 @@ This project contains a pre-configured build and test environment through
 docker.
 
 ```bash
-docker build -t prio .
-docker run -it prio
+make build
+
+# or using docker directly by building the development stage
+docker build --target development -t prio:dev .
 ```
 
-This will build the package and run the tests. You can mount your working
-directory and shell into the container for development work.
+`make build` will generate two containers in a multi-stage build. The `prio:dev`
+image is suitable for development. The `prio:latest` image is the production
+image that is suitable for server deployments.
+
+You can mount your working directory and shell into the container for
+development work.
 
 ```bash
-docker run -v `pwd`:/app -it prio bash
+docker run -v `pwd`:/app -it prio:dev bash
 make
 make test
 ```
