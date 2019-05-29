@@ -3,13 +3,22 @@
 This example is an example of a minimal two-server aggregation scheme that
 fulfils the privacy guarantees of the Prio system.
 
-## Building
+## Quickstart
 
-docker build -t prio-dev ../..
+```bash
+# Build the containers
+make build
 
+# Start the server
+make test &
 
-# Resources
+# Clean up resources like minio
+make clean
+```
 
+## Resources
+
+### Generated Keys
 ```json
 # Server A
 {
@@ -24,11 +33,7 @@ docker build -t prio-dev ../..
 }
 ```
 
-The last example:
-https://docs.aws.amazon.com/AmazonS3/latest/dev/example-policies-s3.html
+## Misc
 
-
-# TODO
-
-* Update triggering logic to work based on `_SUCCESS` files for Hadoop compatibility
-* Add a million document test set
+* Generating an [s3 policy file](https://docs.aws.amazon.com/AmazonS3/latest/dev/example-policies-s3.html)
+* [MinIO multi-user quickstart guide](https://docs.min.io/docs/minio-multi-user-quickstart-guide.html)

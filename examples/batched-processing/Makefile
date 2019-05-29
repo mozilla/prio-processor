@@ -1,8 +1,8 @@
 build:
-	docker build -t prio-dev ../..
+	docker build --target development -t prio:dev ../..
 	docker-compose build
 
-up:
+test:
 	docker-compose up
 
 clean:
