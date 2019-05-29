@@ -31,7 +31,11 @@ mkdir -p processed
 # create the file that is used to notify that processing for a step is done
 touch _SUCCESS
 
-
+# Wait for a completed batch of data, signaled by the appearance of a _SUCCESS
+# file.
+#
+# Arguments:
+#   $1 - Absolute path to a file
 function poll_for_data() {
     set +e
     max_retries=5
@@ -50,6 +54,21 @@ function poll_for_data() {
 }
 
 
+# Poll for a success file and then copy the appropriate files locally
+#
+# Arguments:
+#   $1 - Path relative to TARGET/BUCKET_INTERNAL
+#
+# Environment:
+#   TARGET - The minio host
+#   BUCKET_INTERNAL - The bucket pointing to this server's data
+function fetch_input_blocked() {
+    local input=$1
+    local path=${TARGET}/${BUCKET_INTERNAL}/$input
+    poll_for_data $path/_SUCCESS
+    mc cp --recursive $path/ $input/
+}
+
 ###########################################################
 # verify1
 ###########################################################
@@ -58,9 +77,7 @@ input="raw"
 output_internal="intermediate/internal/verify1"
 output_external="intermediate/external/verify1"
 
-path=${TARGET}/${BUCKET_INTERNAL}/$input
-poll_for_data $path/_SUCCESS
-mc cp --recursive $path/ $input/
+fetch_input_blocked $input
 
 filenames=$(find $input -type f -not -name "_SUCCESS" -printf "%f\n")
 for filename in $filenames; do
@@ -83,9 +100,7 @@ input_external="intermediate/external/verify1"
 output_internal="intermediate/internal/verify2"
 output_external="intermediate/external/verify2"
 
-path="${TARGET}/${BUCKET_INTERNAL}/$input_external"
-poll_for_data $path/_SUCCESS
-mc cp --recursive $path/ $input_external/
+fetch_input_blocked $input_external
 
 filenames=$(find $input_internal -type f -not -name "_SUCCESS" -printf "%f\n")
 for filename in $filenames; do
@@ -111,9 +126,7 @@ input_external="intermediate/external/verify2"
 output_internal="intermediate/internal/aggregate"
 output_external="intermediate/external/aggregate"
 
-path="${TARGET}/${BUCKET_INTERNAL}/$input_external"
-poll_for_data $path/_SUCCESS
-mc cp --recursive $path/ $input_external/
+fetch_input_blocked $input_external
 
 filenames=$(find $input_internal -type f -not -name "_SUCCESS" -printf "%f\n")
 for filename in $filenames; do
@@ -137,9 +150,7 @@ input_internal="intermediate/internal/aggregate"
 input_external="intermediate/external/aggregate"
 output="processed"
 
-path="${TARGET}/${BUCKET_INTERNAL}/$input_external"
-poll_for_data $path/_SUCCESS
-mc cp --recursive $path/ $input_external/
+fetch_input_blocked $input_external
 
 filenames=$(find $input_internal -type f -not -name "_SUCCESS" -printf "%f\n")
 for filename in $filenames; do
