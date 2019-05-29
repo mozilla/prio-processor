@@ -8,8 +8,8 @@ accomodate workflows in different infrastructure.
 
 1. Localhost: Batched file processing via object-store
 2. Cloud: Sandboxing GCP-backed processors
-3. Firefox: Telemetry Origin
-4. Scheduling and ETL: telemetry-airflow
+3. Preprocessing: Firefox Telemetry Origin
+4. Scheduling: telemetry-airflow
 5. Cost and Performance
 6. Future Improvements
 
@@ -41,8 +41,10 @@ MINIO_ACCESS_KEY
 MINIO_SECRET_KEY
 ```
 
-The servers interop using two buckets that have been configured with the
-following structure:
+The servers interact using an s3-compatible file-store as a hand-off mechanism.
+Minio implements an open-source store that can be configured to run within a
+local cluster. Permissions are set appropriately so each server has access to an
+`external` folder in the other store.
 
 ```
 minio
@@ -89,7 +91,7 @@ Here is one scheme for processing data.
 * Pass appropriate credentials to the `prio:latest` container at runtime
 * Wait for processing and shutdown the instance once done
 
-## ETL: Firefox Telemetry Origin
+## Preprocessing: Firefox Telemetry Origin
 
 Telemetry Origin provides the API for the content blocking study. The prio
 shares are contained in the following format:
@@ -135,7 +137,7 @@ cluster may be long running or provisioned by Airflow.
 ## Cost and Performance
 
 The initial study is planned to run around 1-5 million pings per week with 2500
-bits of information. A 1 million ping data-set at 2000 pings is estimated to be
+bits of information. A 1 million ping data-set at 2000 bits is estimated to be
 around 50GB in size.
 
 The main server is dealing with the main chunk of processing. If the initial
