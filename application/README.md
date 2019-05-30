@@ -13,6 +13,12 @@ different deployment configurations.
 
 export GOOGLE_APPLICATION_CREDENTIALS=<CREDENTIALS_FILE>
 
+# TODO
+
+* Configure GCE to run a docker container with the cli script
+* Create a GCS resource
+* Trigger the GCE instance to terminate
+
 # Resources
 
 https://cloud.google.com/community/tutorials/managing-gcp-projects-with-terraform
