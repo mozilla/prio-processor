@@ -19,7 +19,7 @@ def iter_data(path: Union[Path, str]) -> Generator[str, str, int]:
             continue
         filename = item.name
         batch_id = filename[: filename.rfind(".")]
-        n_data = 2046 if int(batch_id[-1]) == 0 else 440
+        n_data = 2046 if int(batch_id[-1]) == 0 else 441
         yield filename, batch_id, n_data
 
 
@@ -86,17 +86,21 @@ def check_environment():
 def main():
     root = Path(__file__).parent.parent
     working = root / "working"
-    test_input = root / "data" / "2019-05-15_test_ping_input_counts.txt"
 
     os.chdir(root)
     check_environment()
     process_raw(working / "server_a" / "raw")
     data = map_processed(working / "server_a" / "processed")
-    result = {
-        **data["content.blocking_blocked_TESTONLY-0"],
-        **data["content.blocking_blocked_TESTONLY-1"],
-    }
-    test_input_counts(test_input, result)
+
+    test_expected = False
+    if test_expected:
+        test_input = root / "data" / "2019-05-15_test_ping_input_counts.txt"
+        result = {
+            **data["content.blocking_blocked_TESTONLY-0"],
+            **data["content.blocking_blocked_TESTONLY-1"],
+        }
+        test_input_counts(test_input, result)
+
     print(json.dumps(data))
 
 
