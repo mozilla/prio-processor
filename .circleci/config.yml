@@ -76,7 +76,7 @@ jobs:
           key: v1-{{.Branch}}
       - run:
           name: Restore Docker image cache
-          command: docker load -i /tmp/dev.tar
+          command: docker load -i /cache/dev.tar
       - run:
           name: Build the compose container
           command: docker-compose build
