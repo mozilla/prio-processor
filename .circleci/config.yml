@@ -66,6 +66,24 @@ jobs:
           name: Integration Code
           command: docker run prio:prod scripts/test-cli-integration
   
+  test-batch-example:
+    machine: true
+    working_directory: ~/python-libprio/examples/batched-processing
+    steps:
+      - checkout:
+          path: ~/python-libprio
+      - restore_cache:
+          key: v1-{{.Branch}}
+      - run:
+          name: Restore Docker image cache
+          command: docker load -i /tmp/dev.tar
+      - run:
+          name: Build the compose container
+          command: docker-compose build
+      - run:
+          name: Run the batched-processing integration test
+          command: scripts/integration.sh
+
   deploy:
     docker:
       - image: docker:stable-git
@@ -101,6 +119,12 @@ workflows:
             tags:
               only: /.*/
       - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+      - test-batch-example:
           requires:
             - build
           filters:
