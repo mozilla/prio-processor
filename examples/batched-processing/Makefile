@@ -3,7 +3,4 @@ build:
 	docker-compose build
 
 test:
-	docker-compose up
-
-clean:
-	docker-compose down
+	scripts/integration.sh

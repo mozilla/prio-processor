@@ -36,7 +36,7 @@ mkdir -p processed
 #   $1 - Absolute path to a file
 function poll_for_data() {
     set +e
-    max_retries=5
+    max_retries=4
     retries=0
     backoff=2
     while ! mc stat $1 &>/dev/null; do

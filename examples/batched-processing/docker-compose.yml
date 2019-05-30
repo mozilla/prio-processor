@@ -25,7 +25,7 @@ services:
   server_a:
     build: .
     working_dir: /app/examples/batched-processing
-    command: bash -c "sleep 2 && scripts/server.sh"
+    command: "true"
     volumes:
       - .:/app/examples/batched-processing
     depends_on:
@@ -47,7 +47,7 @@ services:
   server_b:
     build: .
     working_dir: /app/examples/batched-processing
-    command: bash -c "sleep 2 && scripts/server.sh"
+    command: "true"
     volumes:
       - .:/app/examples/batched-processing
     depends_on:
@@ -69,7 +69,7 @@ services:
   client:
     build: .
     working_dir: /app/examples/batched-processing
-    command: bash -c "sleep 3 && scripts/client.sh"
+    command: "true"
     volumes:
       - .:/app/examples/batched-processing
     depends_on:
