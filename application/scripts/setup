@@ -2,8 +2,11 @@
 
 set -eou pipefail
 
-input () {
-  echo ; set +x ; echo "${1}... (RET to continue)" && read ; set -x
+input() {
+  echo
+  set +x
+  echo "${1}... (RET to continue)" && read -r
+  set -x
 }
 export -f input
 
@@ -17,7 +20,7 @@ echo "Project ID is ${PROJECT}"
 [[ $(gcloud config get-value project 2>/dev/null) == "$PROJECT" ]] || gcloud config set project $PROJECT
 
 SCRIPT="$(dirname ${0})/${1}"
-if [[ -z "$1" ]] || ! [[ -f "$SCRIPT" ]] ; then
+if [[ -z "$1" ]] || ! [[ -f "$SCRIPT" ]]; then
   echo "usage: ${0} ACTION"
   echo "See README.md for details"
   exit 1

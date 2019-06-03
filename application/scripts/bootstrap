@@ -13,7 +13,7 @@ if ! gcloud projects describe $PROJECT &>/dev/null; then
   echo "Enabling billing on project"
   gcloud beta billing projects link $PROJECT --billing-account $BILLING_ACCOUNT
   echo "Enabling APIs in project"
-  gcloud --project=$PROJECT services enable {compute,}.googleapis.com
+  gcloud --project=$PROJECT services enable compute.googleapis.com
 fi
 echo "https://console.cloud.google.com/home/dashboard?project=${PROJECT}&folder=&organizationId="
 
