@@ -18,3 +18,5 @@ data/
 dist/
 working/
 venv/
+.mc
+.ash_history

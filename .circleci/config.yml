@@ -38,14 +38,13 @@ jobs:
       - run:
           name: Save image into cache
           command: |
-            mkdir -p /cache
-            docker save -o /cache/dev.tar "prio:dev"
-            docker save -o /cache/prod.tar "prio:prod"
+            docker save -o /tmp/dev.tar "prio:dev"
+            docker save -o /tmp/prod.tar "prio:prod"
       - save_cache:
           key: v1-{{ .Branch }}-{{ epoch }}
           paths:
-            - /cache/dev.tar
-            - /cache/prod.tar
+            - /tmp/dev.tar
+            - /tmp/prod.tar
 
   test:
     docker:
@@ -57,8 +56,8 @@ jobs:
       - run:
           name: Restore cache
           command: |
-            docker load -i /cache/dev.tar
-            docker load -i /cache/prod.tar
+            docker load -i /tmp/dev.tar
+            docker load -i /tmp/prod.tar
       - run:
           name: Test Code
           command: docker run prio:dev
@@ -66,6 +65,24 @@ jobs:
           name: Integration Code
           command: docker run prio:prod scripts/test-cli-integration
   
+  test-batch-example:
+    machine: true
+    working_directory: ~/python-libprio/examples/batched-processing
+    steps:
+      - checkout:
+          path: ~/python-libprio
+      - restore_cache:
+          key: v1-{{.Branch}}
+      - run:
+          name: Restore Docker image cache
+          command: docker load -i /tmp/dev.tar
+      - run:
+          name: Build the compose container
+          command: docker-compose build
+      - run:
+          name: Run the batched-processing integration test
+          command: make test
+
   deploy:
     docker:
       - image: docker:stable-git
@@ -75,7 +92,7 @@ jobs:
           key: v1-{{ .Branch }}
       - run:
           name: Restore cache
-          command: docker load -i /cache/prod.tar
+          command: docker load -i /tmp/prod.tar
       - run:
           name: Deploy to Dockerhub
           command: |
@@ -101,6 +118,12 @@ workflows:
             tags:
               only: /.*/
       - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+      - test-batch-example:
           requires:
             - build
           filters:
