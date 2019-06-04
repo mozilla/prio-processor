@@ -9,11 +9,8 @@ fulfils the privacy guarantees of the Prio system.
 # Build the containers
 make build
 
-# Start the server
-make test &
-
-# Clean up resources like minio
-make clean
+# Run the test
+make test
 ```
 
 ## Resources
