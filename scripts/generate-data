@@ -82,9 +82,11 @@ def to_data(batch_id: bytes, share: List[str], indent=None) -> str:
     return json.dumps(
         {
             "id": str(uuid4()),
-            "payload": [
-                {"encoding": batch_id.decode(), "prio": {"a": share[0], "b": share[1]}}
-            ],
+            "payload": {
+                "prioData": [
+                    {"encoding": batch_id.decode(), "prio": {"a": share[0], "b": share[1]}}
+                ],
+            }
         },
         indent=indent,
     )
@@ -99,7 +101,7 @@ def write(path: Path, data: Sequence[str]):
 
 
 @click.command()
-@click.option("--output", type=click.Path(), default=None)
+@click.option("--output", type=click.Path(), required=True)
 @click.option("--size", type=int, default=8)
 @click.option("--num-bits", type=int, default=8)
 @click.option("--public-key-hex-internal", type=str, envvar="PUBLIC_KEY_HEX_INTERNAL")
@@ -203,7 +205,7 @@ def main(output, size, num_bits, public_key_hex_internal, public_key_hex_externa
                 part = itertools.islice(
                     (to_data(config.batch_id, s) for s in encoded_shares), n_rows
                 )
-                write(path / f"part-{part_num:03d}.njdson", part)
+                write(path / f"part-{part_num:03d}.ndjson", part)
 
     if output is None:
         test_generate_sample()
