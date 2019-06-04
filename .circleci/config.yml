@@ -81,7 +81,7 @@ jobs:
           command: docker-compose build
       - run:
           name: Run the batched-processing integration test
-          command: scripts/integration.sh
+          command: make test
 
   deploy:
     docker:
