@@ -16,6 +16,7 @@ RUN yum install -y epel-release \
                 nss-devel \
                 msgpack-devel \
                 jq \
+                gdb \
         && yum clean all \
         && rm -rf /var/cache/yum
 
