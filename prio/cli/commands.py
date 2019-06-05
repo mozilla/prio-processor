@@ -4,8 +4,16 @@ import json
 import os
 from base64 import b64decode, b64encode
 from uuid import uuid4
+from functools import partial
+
+import dask.dataframe as dd
+import dask.bag as db
+import dask
+import numpy as np
 
 from .. import libprio
+from .. import prio
+
 from .options import (
     data_config,
     server_config,
@@ -35,6 +43,32 @@ def match_server(server_id):
     return libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
 
 
+def create_config(public_key_hex_internal, public_key_hex_external, n_data, batch_id):
+    public_key_internal = prio.PublicKey().import_hex(public_key_hex_internal)
+    public_key_external = prio.PublicKey().import_hex(public_key_hex_external)
+    return prio.Config(n_data, public_key_internal, public_key_external, batch_id)
+
+
+def create_server(
+    private_key_hex,
+    public_key_hex_internal,
+    public_key_hex_external,
+    n_data,
+    batch_id,
+    server_id,
+    shared_secret,
+):
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
+    )
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+    return libprio.PrioServer_new(
+        config, match_server(server_id), private_key, b64decode(shared_secret)
+    )
+
+
 @click.command()
 def shared_seed():
     """Generate a shared server secret in base64."""
@@ -50,6 +84,43 @@ def keygen():
     public_hex = libprio.PublicKey_export_hex(public).decode("utf-8")[:-1]
     data = json.dumps({"private_key": private_hex, "public_key": public_hex})
     click.echo(data)
+
+
+@click.command()
+@data_config
+@public_key
+@output_2
+def random_shares(
+    batch_id,
+    n_data,
+    public_key_hex_internal,
+    public_key_hex_external,
+    output_a,
+    output_b,
+):
+    """Generate random shares drawn from a bernoulli distribution."""
+    config_cb = dask.delayed(
+        partial(
+            create_config,
+            public_key_hex_external,
+            public_key_hex_internal,
+            n_data,
+            batch_id,
+        )
+    )
+
+    @dask.delayed
+    def random_share(n_data, config_cb):
+        data = np.packbits(np.random.binomial(1, 0.5, n_data)).tobytes()
+        shares = prio.Client(config_cb()).encode(data)
+        b64shares = [b64encode(share).decode() for share in shares]
+        return {"id": str(uuid4()), "a": b64shares[0], "b": b64shares[1]}
+
+    results = [random_share(n_data, config_cb) for _ in range(100)]
+    bag = db.from_delayed(results[0])
+    bag.compute()
+    # import code
+    # code.interact(local={**globals(), **locals()})
 
 
 @click.command()

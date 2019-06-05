@@ -30,6 +30,8 @@ class Config:
     """
 
     def __init__(self, n_fields, server_a, server_b, batch_id):
+        self.server_a = server_a
+        self.server_b = server_b
         self.instance = libprio.PrioConfig_new(
             n_fields, server_a.instance, server_b.instance, batch_id
         )
