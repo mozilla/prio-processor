@@ -90,6 +90,7 @@ def keygen():
 @data_config
 @public_key
 @output_2
+@click.option("--size", type=int, help="Number of elements in the dataset.")
 def random_shares(
     batch_id,
     n_data,
@@ -97,30 +98,27 @@ def random_shares(
     public_key_hex_external,
     output_a,
     output_b,
+    size,
 ):
     """Generate random shares drawn from a bernoulli distribution."""
-    config_cb = dask.delayed(
-        partial(
-            create_config,
-            public_key_hex_external,
-            public_key_hex_internal,
-            n_data,
-            batch_id,
-        )
-    )
 
-    @dask.delayed
-    def random_share(n_data, config_cb):
+    @dask.delayed(pure=False)
+    def random_share():
         data = np.packbits(np.random.binomial(1, 0.5, n_data)).tobytes()
-        shares = prio.Client(config_cb()).encode(data)
+        libprio.Prio_init()
+        config = create_config(
+            public_key_hex_external, public_key_hex_internal, n_data, batch_id
+        )
+        shares = prio.Client(config).encode(data)
+        libprio.Prio_clear()
         b64shares = [b64encode(share).decode() for share in shares]
-        return {"id": str(uuid4()), "a": b64shares[0], "b": b64shares[1]}
+        return str(uuid4()), b64shares[0], b64shares[1]
 
-    results = [random_share(n_data, config_cb) for _ in range(100)]
-    bag = db.from_delayed(results[0])
-    bag.compute()
-    # import code
-    # code.interact(local={**globals(), **locals()})
+    results = dask.delayed(random_share() for _ in range(size))
+    bag = db.from_delayed(results)
+    df = bag.to_dataframe(meta=[("id", str), ("a", str), ("b", str)])
+    df[["id", "a"]].rename(columns={"a": "payload"}).to_json(output_a)
+    df[["id", "a"]].rename(columns={"a": "payload"}).to_json(output_b)
 
 
 @click.command()
