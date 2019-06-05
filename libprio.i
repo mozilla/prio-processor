@@ -9,11 +9,6 @@
 
 %feature("autodoc", "3");
 
-%init %{
-Prio_init();
-atexit(Prio_clear);
-%}
-
 // Handle SECStatus.
 %typemap(out) SECStatus {
    if ($1 != SECSuccess) {

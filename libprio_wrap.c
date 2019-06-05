@@ -5528,10 +5528,6 @@ SWIG_init(void) {
   
   SWIG_InstallConstants(d,swig_const_table);
   
-  
-  Prio_init();
-  atexit(Prio_clear);
-  
   SWIG_Python_SetConstant(d, "CURVE25519_KEY_LEN",SWIG_From_int((int)(32)));
   SWIG_Python_SetConstant(d, "CURVE25519_KEY_LEN_HEX",SWIG_From_int((int)(64)));
   SWIG_Python_SetConstant(d, "PRIO_SERVER_A",SWIG_From_int((int)(PRIO_SERVER_A)));
