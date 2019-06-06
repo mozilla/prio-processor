@@ -5,6 +5,7 @@ import os
 from base64 import b64decode, b64encode
 from uuid import uuid4
 from functools import partial
+import math
 
 import dask.dataframe as dd
 import dask.bag as db
@@ -23,6 +24,9 @@ from .options import (
     output_2,
     public_key,
 )
+
+dask.config.set(scheduler="processes")
+dask.config.set(num_workers=4)
 
 
 def import_public_keys(public_key_hex_internal, public_key_hex_external):
@@ -72,16 +76,18 @@ def create_server(
 @click.command()
 def shared_seed():
     """Generate a shared server secret in base64."""
-    seed = libprio.PrioPRGSeed_randomize()
+    with prio.Prio():
+        seed = libprio.PrioPRGSeed_randomize()
     click.echo(b64encode(seed))
 
 
 @click.command()
 def keygen():
     """Generate a curve25519 key pair as json."""
-    private, public = libprio.Keypair_new()
-    private_hex = libprio.PrivateKey_export_hex(private).decode("utf-8")[:-1]
-    public_hex = libprio.PublicKey_export_hex(public).decode("utf-8")[:-1]
+    with prio.Prio():
+        private, public = libprio.Keypair_new()
+        private_hex = libprio.PrivateKey_export_hex(private).decode("utf-8")[:-1]
+        public_hex = libprio.PublicKey_export_hex(public).decode("utf-8")[:-1]
     data = json.dumps({"private_key": private_hex, "public_key": public_hex})
     click.echo(data)
 
@@ -90,7 +96,9 @@ def keygen():
 @data_config
 @public_key
 @output_2
-@click.option("--size", type=int, help="Number of elements in the dataset.")
+@click.option(
+    "--size", type=int, required=True, help="Number of elements in the dataset."
+)
 def random_shares(
     batch_id,
     n_data,
@@ -105,18 +113,25 @@ def random_shares(
     @dask.delayed(pure=False)
     def random_share():
         data = np.packbits(np.random.binomial(1, 0.5, n_data)).tobytes()
-        libprio.Prio_init()
-        config = create_config(
-            public_key_hex_external, public_key_hex_internal, n_data, batch_id
-        )
-        shares = prio.Client(config).encode(data)
-        libprio.Prio_clear()
+        with prio.Prio():
+            config = create_config(
+                public_key_hex_external, public_key_hex_internal, n_data, batch_id
+            )
+            shares = prio.Client(config).encode(data)
         b64shares = [b64encode(share).decode() for share in shares]
         return str(uuid4()), b64shares[0], b64shares[1]
+
+    sample = random_share().compute()
+    partition_size_bytes = 200 * 10 ** 6
+    row_bytes = sum(map(len, sample))
+    npartitions = math.ceil(row_bytes * size / partition_size_bytes)
+    print(f"npartitions: {npartitions}")
 
     results = dask.delayed(random_share() for _ in range(size))
     bag = db.from_delayed(results)
     df = bag.to_dataframe(meta=[("id", str), ("a", str), ("b", str)])
+    df = df.repartition(npartitions=npartitions)
+
     df[["id", "a"]].rename(columns={"a": "payload"}).to_json(output_a)
     df[["id", "a"]].rename(columns={"a": "payload"}).to_json(output_b)
 

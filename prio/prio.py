@@ -9,6 +9,15 @@ from array import array
 PRIO_SERVER_A = libprio.PRIO_SERVER_A
 PRIO_SERVER_B = libprio.PRIO_SERVER_B
 
+
+class Prio:
+    def __enter__(self):
+        libprio.Prio_init()
+
+    def __exit__(self, *exc):
+        libprio.Prio_clear()
+
+
 # Serializable
 class PRGSeed:
     def __init__(self):
