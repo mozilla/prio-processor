@@ -63,6 +63,16 @@ make
 make test
 ```
 
+If you need access to gdb or valgrind, the following command is useful:
+
+```bash
+docker run \
+    --cap-add=SYS_PTRACE \
+    --security-opt seccomp=unconfined \
+    -v `pwd`:/app \
+    -it prio:dev bash
+```
+
 ### Notes
 
 `libprio` is compiled with position-independent code (`fPIC`).
