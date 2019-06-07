@@ -1,0 +1,18 @@
+kind: Deployment
+apiVersion: v1
+metadata:
+  name: prio-processor
+spec:
+  replicas: 0
+  strategy: Recreate
+  selector:
+    matchLabels:
+      deploy: prio
+  template:
+    metadata:
+      labels:
+        deploy: prio
+    spec:
+      containers:
+        - name: prio-processor 
+          image: mozilla/python-libprio:latest
