@@ -9,18 +9,18 @@ set -eou pipefail
 set -x
 
 # Parameters that are read through the environment
-: ${N_DATA?}
-: ${BATCH_ID?}
+: "${N_DATA?}"
+: "${BATCH_ID?}"
 
-: ${SERVER_ID}
-: ${SHARED_SECRET?}
-: ${PRIVATE_KEY_HEX?}
-: ${PUBLIC_KEY_HEX_INTERNAL?}
-: ${PUBLIC_KEY_HEX_EXTERNAL?}
+: "${SERVER_ID?}"
+: "${SHARED_SECRET?}"
+: "${PRIVATE_KEY_HEX?}"
+: "${PUBLIC_KEY_HEX_INTERNAL?}"
+: "${PUBLIC_KEY_HEX_EXTERNAL?}"
 
-: ${BUCKET_INTERNAL_PRIVATE}
-: ${BUCKET_INTERNAL_SHARED?}
-: ${BUCKET_EXTERNAL_SHARED?}
+: "${BUCKET_INTERNAL_PRIVATE?}"
+: "${BUCKET_INTERNAL_SHARED?}"
+: "${BUCKET_EXTERNAL_SHARED?}"
 
 
 function create_folders() {
@@ -38,15 +38,16 @@ function create_folders() {
 # Arguments:
 #   $1 - Absolute path to a file
 function poll_for_data() {
+    local path=$1
     set +e
     max_retries=5
     retries=0
     backoff=2
-    while ! gsutil -q stat $1 &>/dev/null; do
-        sleep $backoff;
+    while ! gsutil -q stat "${path}" &>/dev/null; do
+        sleep ${backoff};
         ((backoff *= 2))
         ((retries++))
-        if [[ "$retries" -gt "$max_retries" ]]; then
+        if [[ "${retries}" -gt "${max_retries}" ]]; then
             echo "Reached the maximum number of retries."
             exit 1
         fi
@@ -63,9 +64,9 @@ function poll_for_data() {
 function fetch_input_blocked() {
     local bucket=$1
     local input=$2
-    local path="gs://$bucket/$input"
-    poll_for_data $path/_SUCCESS
-    gsutil cp --recursive $path/ $input/
+    local path="gs://${bucket}/${input}"
+    poll_for_data "${path}/_SUCCESS"
+    gsutil cp --recursive "${path}/" "${input}/"
 }
 
 
@@ -78,7 +79,7 @@ function fetch_input_blocked() {
 #   BUCKET_INTERNAL_PRIVATE
 function fetch_input_private() {
     local input=$1
-    fetch_input_blocked ${BUCKET_INTERNAL_PRIVATE} $input
+    fetch_input_blocked "${BUCKET_INTERNAL_PRIVATE}" "${input}"
 }
 
 
@@ -91,7 +92,7 @@ function fetch_input_private() {
 #   BUCKET_INTERNAL_SHARED
 function fetch_input_shared() {
     local input=$1
-    fetch_input_blocked ${BUCKET_INTERNAL_SHARED} $input
+    fetch_input_blocked "${BUCKET_INTERNAL_SHARED}" "${input}"
 }
 
 
@@ -107,10 +108,10 @@ function fetch_input_shared() {
 function send_output_external() {
     local output_internal=$1
     local output_external=$2
-    local path="gs://${BUCKET_EXTERNAL_SHARED}/$output_external"
-    gsutil cp --recursive $output_internal/ $path/
+    local path="gs://${BUCKET_EXTERNAL_SHARED}/${output_external}"
+    gsutil cp --recursive "${output_internal}/" "${path}/"
     touch _SUCCESS
-    gsutil cp _SUCCESS $path/
+    gsutil cp _SUCCESS "${path}/"
 }
 
 
@@ -125,9 +126,9 @@ function send_output_external() {
 function send_output_internal() {
     local output=$1
     local path="gs://${BUCKET_INTERNAL_PRIVATE}/$output"
-    gsutil cp --recursive $output/ $path/
+    gsutil cp --recursive "${output}/" "${path}/"
     touch _SUCCESS
-    gsutil cp _SUCCESS $path/
+    gsutil cp _SUCCESS "${path}/"
 }
 
 
@@ -137,7 +138,7 @@ function send_output_internal() {
 #   $1 - relative path to a folder containing data
 function list_partitions() {
     local input=$1
-    find $input -type f -not -name "_SUCCESS" -printf "%f\n"
+    find "${input}" -type f -not -name "_SUCCESS" -printf "%f\n"
 }
 
 
@@ -146,15 +147,15 @@ function verify1() {
     local output_internal="intermediate/internal/verify1"
     local output_external="intermediate/external/verify1"
 
-    fetch_input_private $input
+    fetch_input_private ${input}
 
-    for filename in $(list_partitions $input); do
+    for filename in $(list_partitions ${input}); do
         prio verify1 \
-            --input $input/$filename \
-            --output $output_internal
+            --input "${input}/${filename}" \
+            --output ${output_internal}
     done
 
-    send_output_external $output_internal $output_external
+    send_output_external ${output_internal} ${output_external}
 }
 
 
@@ -164,17 +165,17 @@ function verify2() {
     local output_internal="intermediate/internal/verify2"
     local output_external="intermediate/external/verify2"
 
-    fetch_input_shared $input_external
+    fetch_input_shared ${input_external}
 
-    for filename in $(list_partitions $input_internal); do
+    for filename in $(list_partitions ${input_internal}); do
         prio verify2 \
-            --input $input/$filename \
-            --input-internal $input_internal/$filename \
-            --input-external $input_external/$filename \
-            --output $output_internal
+            --input "${input}/${filename}" \
+            --input-internal "${input_internal}/${filename}" \
+            --input-external "${input_external}/${filename}" \
+            --output ${output_internal}
     done
 
-    send_output_external $output_internal $output_external
+    send_output_external ${output_internal} ${output_external}
 }
 
 
@@ -184,17 +185,17 @@ function aggregate() {
     local output_internal="intermediate/internal/aggregate"
     local output_external="intermediate/external/aggregate"
 
-    fetch_input_shared $input_external
+    fetch_input_shared ${input_external}
 
-    for filename in $(list_partitions $input_internal); do
+    for filename in $(list_partitions ${input_internal}); do
         prio aggregate \
-            --input $input/$filename \
-            --input-internal $input_internal/$filename \
-            --input-external $input_external/$filename \
-            --output $output_internal
+            --input "${input}/${filename}" \
+            --input-internal "${input_internal}/${filename}" \
+            --input-external "${input_external}/${filename}" \
+            --output ${output_internal}
     done
 
-    send_output_external $output_internal $output_external
+    send_output_external ${output_internal} ${output_external}
 }
 
 
@@ -203,18 +204,18 @@ function publish() {
     local input_external="intermediate/external/aggregate"
     local output="processed"
 
-    fetch_input_shared $input_external
+    fetch_input_shared ${input_external}
 
-    for filename in $(list_partitions $input_internal); do
+    for filename in $(list_partitions ${input_internal}); do
         prio publish \
-            --input-internal $input_internal/$filename \
-            --input-external $input_external/$filename \
-            --output $output
+            --input-internal "${input_internal}/${filename}" \
+            --input-external "${input_external}/${filename}" \
+            --output ${output}
     done
 
-    jq -c '.' $output/*.ndjson
+    jq -c '.' ${output}/*.ndjson
 
-    send_output_internal $output
+    send_output_internal ${output}
 }
 
 
