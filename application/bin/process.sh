@@ -142,6 +142,8 @@ function list_partitions() {
 }
 
 
+# Read the shares for this server and start verification with the external
+# server.
 function verify1() {
     local input="raw"
     local output_internal="intermediate/internal/verify1"
@@ -159,6 +161,8 @@ function verify1() {
 }
 
 
+# Verify that the shares are well-formed by proving a secret-shared
+# non-interactive proof.
 function verify2() {
     local input_internal="intermediate/internal/verify1"
     local input_external="intermediate/external/verify1"
@@ -179,6 +183,7 @@ function verify2() {
 }
 
 
+# Accumulate well-formed shares.
 function aggregate() {
     local input_internal="intermediate/internal/verify2"
     local input_external="intermediate/external/verify2"
@@ -199,6 +204,7 @@ function aggregate() {
 }
 
 
+# Publish the aggregated shares.
 function publish() {
     local input_internal="intermediate/internal/aggregate"
     local input_external="intermediate/external/aggregate"
