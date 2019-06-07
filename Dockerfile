@@ -27,6 +27,10 @@ RUN ln -s /usr/include/nspr4 /usr/include/nspr \
 ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && pip3 install tox setuptools wheel
 
+RUN curl https://sdk.cloud.google.com | bash
+ENV PATH $PATH:~/google-cloud-sdk/bin
+RUN gcloud config set disable_usage_reporting true
+
 # install the app
 WORKDIR /app
 ADD . /app
