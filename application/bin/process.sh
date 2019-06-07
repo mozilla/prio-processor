@@ -1,4 +1,9 @@
 #!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# This scripts defines the batched processing pipeline for use on GCP.
 
 set -eou pipefail
 set -x
@@ -6,27 +11,25 @@ set -x
 # Parameters that are read through the environment
 : ${N_DATA?}
 : ${BATCH_ID?}
+
 : ${SERVER_ID}
 : ${SHARED_SECRET?}
 : ${PRIVATE_KEY_HEX?}
 : ${PUBLIC_KEY_HEX_INTERNAL?}
 : ${PUBLIC_KEY_HEX_EXTERNAL?}
 
-: ${MINIO_ACCESS_KEY?}
-: ${MINIO_SECRET_KEY?}
-: ${BUCKET_INTERNAL?}
-: ${BUCKET_EXTERNAL?}
+: ${BUCKET_INTERNAL_PRIVATE}
+: ${BUCKET_INTERNAL_SHARED?}
+: ${BUCKET_EXTERNAL_SHARED?}
 
-TARGET="minio"
 
-mc config host add $TARGET http://minio:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY --api s3v4;
-
-cd /tmp
-mkdir -p raw
-mkdir -p intermediate/internal/verify1
-mkdir -p intermediate/internal/verify2
-mkdir -p intermediate/internal/aggregate
-mkdir -p processed
+function create_folders() {
+    mkdir -p raw
+    mkdir -p intermediate/internal/verify1
+    mkdir -p intermediate/internal/verify2
+    mkdir -p intermediate/internal/aggregate
+    mkdir -p processed
+}
 
 
 # Wait for a completed batch of data, signaled by the appearance of a _SUCCESS
@@ -39,7 +42,7 @@ function poll_for_data() {
     max_retries=5
     retries=0
     backoff=2
-    while ! mc stat $1 &>/dev/null; do
+    while ! gsutil -q stat $1 &>/dev/null; do
         sleep $backoff;
         ((backoff *= 2))
         ((retries++))
@@ -55,16 +58,40 @@ function poll_for_data() {
 # Poll for a success file and then copy the appropriate files locally
 #
 # Arguments:
-#   $1 - Path relative to TARGET/BUCKET_INTERNAL
+#   $1 - Input bucket
+#   $2 - Path relative to the input bucket
+function fetch_input_blocked() {
+    local bucket=$1
+    local input=$2
+    local path="gs://$bucket/$input"
+    poll_for_data $path/_SUCCESS
+    gsutil cp --recursive $path/ $input/
+}
+
+
+# Wait for data to be written to the internal private bucket before copying.
+#
+# Arguments:
+#   $1 - The path relative to the internal private bucket
 #
 # Environment:
-#   TARGET - The minio host
-#   BUCKET_INTERNAL - The bucket pointing to this server's data
-function fetch_input_blocked() {
+#   BUCKET_INTERNAL_PRIVATE
+function fetch_input_private() {
     local input=$1
-    local path=${TARGET}/${BUCKET_INTERNAL}/$input
-    poll_for_data $path/_SUCCESS
-    mc cp --recursive $path/ $input/
+    fetch_input_blocked ${BUCKET_INTERNAL_PRIVATE} $input
+}
+
+
+# Wait for data to be written to the internal shared bucket before copying.
+#
+# Arguments:
+#   $1 - The path relative to the internal shared bucket
+#
+# Environment:
+#   BUCKET_INTERNAL_SHARED
+function fetch_input_shared() {
+    local input=$1
+    fetch_input_blocked ${BUCKET_INTERNAL_SHARED} $input
 }
 
 
@@ -76,14 +103,14 @@ function fetch_input_blocked() {
 #   $2 - relative path to the external bucket of the external server
 #
 # Environment:
-#   TARGET - The minio host
-#   BUCKET_EXTERNAL - The bucket of the external server
+#   BUCKET_EXTERNAL_SHARED - The bucket of the external server
 function send_output_external() {
     local output_internal=$1
     local output_external=$2
-    mc cp --recursive $output_internal/ ${TARGET}/${BUCKET_EXTERNAL}/$output_external/
+    local path="gs://${BUCKET_EXTERNAL_SHARED}/$output_external"
+    gsutil cp --recursive $output_internal/ $path/
     touch _SUCCESS
-    mc cp _SUCCESS ${TARGET}/${BUCKET_EXTERNAL}/$output_external/
+    gsutil cp _SUCCESS $path/
 }
 
 
@@ -94,12 +121,13 @@ function send_output_external() {
 #
 # Environment:
 #   TARGET - The minio host
-#   BUCKET_INTERNAL - The bucket pointing to this server's data
+#   BUCKET_INTERNAL_PRIVATE - The bucket pointing to this server's data
 function send_output_internal() {
     local output=$1
-    mc cp --recursive $output/ ${TARGET}/${BUCKET_INTERNAL}/$output/
+    local path="gs://${BUCKET_INTERNAL_PRIVATE}/$output"
+    gsutil cp --recursive $output/ $path/
     touch _SUCCESS
-    mc cp _SUCCESS ${TARGET}/${BUCKET_INTERNAL}/$output/
+    gsutil cp _SUCCESS $path/
 }
 
 
@@ -113,90 +141,90 @@ function list_partitions() {
 }
 
 
-###########################################################
-# verify1
-###########################################################
+function verify1() {
+    local input="raw"
+    local output_internal="intermediate/internal/verify1"
+    local output_external="intermediate/external/verify1"
 
-input="raw"
-output_internal="intermediate/internal/verify1"
-output_external="intermediate/external/verify1"
+    fetch_input_private $input
 
-fetch_input_blocked $input
+    for filename in $(list_partitions $input); do
+        prio verify1 \
+            --input $input/$filename \
+            --output $output_internal
+    done
 
-for filename in $(list_partitions $input); do
-    prio verify1 \
-        --input $input/$filename \
-        --output $output_internal
-
-    jq -c '.' $output_internal/$filename
-done
-
-send_output_external $output_internal $output_external
-
-###########################################################
-# verify2
-###########################################################
-
-input_internal="intermediate/internal/verify1"
-input_external="intermediate/external/verify1"
-output_internal="intermediate/internal/verify2"
-output_external="intermediate/external/verify2"
-
-fetch_input_blocked $input_external
-
-for filename in $(list_partitions $input_internal); do
-    prio verify2 \
-        --input $input/$filename \
-        --input-internal $input_internal/$filename \
-        --input-external $input_external/$filename \
-        --output $output_internal
-
-    jq -c '.' $output_internal/$filename
-done
-
-send_output_external $output_internal $output_external
+    send_output_external $output_internal $output_external
+}
 
 
-###########################################################
-# aggregate
-###########################################################
+function verify2() {
+    local input_internal="intermediate/internal/verify1"
+    local input_external="intermediate/external/verify1"
+    local output_internal="intermediate/internal/verify2"
+    local output_external="intermediate/external/verify2"
 
-input_internal="intermediate/internal/verify2"
-input_external="intermediate/external/verify2"
-output_internal="intermediate/internal/aggregate"
-output_external="intermediate/external/aggregate"
+    fetch_input_shared $input_external
 
-fetch_input_blocked $input_external
+    for filename in $(list_partitions $input_internal); do
+        prio verify2 \
+            --input $input/$filename \
+            --input-internal $input_internal/$filename \
+            --input-external $input_external/$filename \
+            --output $output_internal
+    done
 
-for filename in $(list_partitions $input_internal); do
-    prio aggregate \
-        --input $input/$filename \
-        --input-internal $input_internal/$filename \
-        --input-external $input_external/$filename \
-        --output $output_internal
+    send_output_external $output_internal $output_external
+}
 
-    jq -c '.' $output_internal/$filename
-done
 
-send_output_external $output_internal $output_external
+function aggregate() {
+    local input_internal="intermediate/internal/verify2"
+    local input_external="intermediate/external/verify2"
+    local output_internal="intermediate/internal/aggregate"
+    local output_external="intermediate/external/aggregate"
 
-###########################################################
-# publish
-###########################################################
+    fetch_input_shared $input_external
 
-input_internal="intermediate/internal/aggregate"
-input_external="intermediate/external/aggregate"
-output="processed"
+    for filename in $(list_partitions $input_internal); do
+        prio aggregate \
+            --input $input/$filename \
+            --input-internal $input_internal/$filename \
+            --input-external $input_external/$filename \
+            --output $output_internal
+    done
 
-fetch_input_blocked $input_external
+    send_output_external $output_internal $output_external
+}
 
-for filename in $(list_partitions $input_internal); do
-    prio publish \
-        --input-internal $input_internal/$filename \
-        --input-external $input_external/$filename \
-        --output $output
 
-    jq -c '.' $output/$filename
-done
+function publish() {
+    local input_internal="intermediate/internal/aggregate"
+    local input_external="intermediate/external/aggregate"
+    local output="processed"
 
-send_output_internal $output
+    fetch_input_shared $input_external
+
+    for filename in $(list_partitions $input_internal); do
+        prio publish \
+            --input-internal $input_internal/$filename \
+            --input-external $input_external/$filename \
+            --output $output
+    done
+
+    jq -c '.' $output/*.ndjson
+
+    send_output_internal $output
+}
+
+
+function main() {
+    cd /tmp && create_folders
+
+    verify1
+    verify2
+    aggregate
+    publish
+}
+
+main "$@"
