@@ -6,9 +6,10 @@ services:
       context: ..
       target: development
     working_dir: /app/application
-    command: bin/process.sh
+    command: bash -c "gcloud auth activate-service-account --key-file /app/.credentials && bin/process.sh"
     volumes:
       - .:/app/application
+      - ~/gcp-service-credentials/priotest-a-prod-dc20730c9063.json:/app/.credentials
     environment:
       - N_DATA=3
       - BATCH_ID=test
@@ -25,9 +26,10 @@ services:
       context: ..
       target: development
     working_dir: /app/application
-    command: bin/process.sh
+    command: bash -c "gcloud auth activate-service-account --key-file /app/.credentials && bin/process.sh"
     volumes:
       - .:/app/application
+      - ~/gcp-service-credentials/priotest-b-prod-93cef8d90cb6.json:/app/.credentials
     environment:
       - N_DATA=3
       - BATCH_ID=test
