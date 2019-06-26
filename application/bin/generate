@@ -21,6 +21,18 @@ function generate_data() {
     python -c "print([int(x % 3 == 0 or x % 5 == 0) for x in range(${N_DATA})])"
 }
 
+function rsync() {
+    local server_id=$1
+    local bucket=$2
+    local cred=$3
+
+    local dest=gs://${bucket}/raw/
+
+    gcloud auth activate-service-account --key-file "${cred}"
+    gsutil rsync -r "server_${server_id}/raw/" "${dest}"
+    touch _SUCCESS
+    gsutil cp _SUCCESS "${dest}"
+}
 
 function main() {
     cd /tmp
@@ -38,11 +50,8 @@ function main() {
             --output-B server_b/raw
     done
 
-    gcloud auth activate-service-account --key-file "${GCP_CREDENTIALS_INTERNAL}"
-    gsutil cp -r server_b/raw "gs://${BUCKET_INTERNAL_PRIVATE}/raw"
-
-    gcloud auth activate-service-account --key-file "${GCP_CREDENTIALS_EXTERNAL}"
-    gsutil cp -r server_b/raw "gs://${BUCKET_EXTERNAL_PRIVATE}/raw"
+    rsync a "${BUCKET_INTERNAL_PRIVATE}" "${GCP_CREDENTIALS_INTERNAL}"
+    rsync b "${BUCKET_EXTERNAL_PRIVATE}" "${GCP_CREDENTIALS_EXTERNAL}"
 }
 
 main "$@"
