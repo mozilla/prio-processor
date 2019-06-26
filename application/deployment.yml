@@ -7,12 +7,12 @@ spec:
   strategy: Recreate
   selector:
     matchLabels:
-      deploy: prio
+      deploy: prio-processor
   template:
     metadata:
       labels:
-        deploy: prio
+        deploy: prio-processor
     spec:
       containers:
         - name: prio-processor 
-          image: mozilla/python-libprio:latest
+          image: mozilla/python-processor:latest
