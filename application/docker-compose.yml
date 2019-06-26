@@ -6,56 +6,58 @@ services:
       context: ..
       target: development
     working_dir: /app/application
-    command: bash -c "gcloud auth activate-service-account --key-file /app/.credentials && bin/process"
+    command: "true"
     volumes:
       - .:/app/application
       - ~/gcp-service-credentials/priotest-a-prod-dc20730c9063.json:/app/.credentials
     environment:
-      - N_DATA=3
+      - N_DATA=10
       - BATCH_ID=test
       - SERVER_ID=A
       - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
-      - PRIVATE_KEY_HEX=19DDC146FB8EE4A0B762A7DAE7E96033F87C9528DBBF8CA899CCD1DB8CD74984
-      - PUBLIC_KEY_HEX_INTERNAL=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78`
-      - PUBLIC_KEY_HEX_EXTERNAL=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
+      - PRIVATE_KEY_HEX=624BFDF22F729BBFD762B3D61930B876F3711B200A10F620FEAC6FD792A2BD08
+      - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
+      - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
       - BUCKET_INTERNAL_PRIVATE=project-a-private
       - BUCKET_INTERNAL_SHARED=project-a-shared
       - BUCKET_EXTERNAL_SHARED=project-b-shared
+      - GCP_CREDENTIALS=/app/.credentials
   server_b:
     build:
       context: ..
       target: development
     working_dir: /app/application
-    command: bash -c "gcloud auth activate-service-account --key-file /app/.credentials && bin/process"
+    command: "true"
     volumes:
       - .:/app/application
       - ~/gcp-service-credentials/priotest-b-prod-93cef8d90cb6.json:/app/.credentials
     environment:
-      - N_DATA=3
+      - N_DATA=10
       - BATCH_ID=test
       - SERVER_ID=B
       - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
-      - PRIVATE_KEY_HEX=E3AA3CC952C8553E46E699646A9DC3CBA7E3D4C7F0779D58574ABF945E259202
-      - PUBLIC_KEY_HEX_INTERNAL=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
-      - PUBLIC_KEY_HEX_EXTERNAL=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78
+      - PRIVATE_KEY_HEX=86EBA021A49C18B1D2885BCAE8C1985D14082F4A130F4862FD3E77DDD0518D3D
+      - PUBLIC_KEY_HEX_INTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
+      - PUBLIC_KEY_HEX_EXTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
       - BUCKET_INTERNAL_PRIVATE=project-b-private
       - BUCKET_INTERNAL_SHARED=project-b-shared
       - BUCKET_EXTERNAL_SHARED=project-a-shared
+      - GCP_CREDENTIALS=/app/.credentials
   client:
     build:
       context: ..
       target: development
     working_dir: /app/application
-    command: bin/generate
+    command: "true"
     volumes:
       - .:/app/application
       - ~/gcp-service-credentials/priotest-a-prod-dc20730c9063.json:/app/.credentials-a
       - ~/gcp-service-credentials/priotest-b-prod-93cef8d90cb6.json:/app/.credentials-b
     environment:
-      - N_DATA=3
+      - N_DATA=10
       - BATCH_ID=test
-      - PUBLIC_KEY_HEX_INTERNAL=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
-      - PUBLIC_KEY_HEX_EXTERNAL=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78
+      - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
+      - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
       - BUCKET_INTERNAL_PRIVATE=project-a-private
       - BUCKET_EXTERNAL_PRIVATE=project-b-private
       - GCP_CREDENTIALS_INTERNAL=/app/.credentials-a

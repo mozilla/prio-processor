@@ -5,22 +5,23 @@
 
 # This scripts defines the batched processing pipeline for use on GCP.
 
-set -eou pipefail
+set -euo pipefail
 set -x
 
-# Parameters that are read through the environment
-: "${N_DATA?}"
-: "${BATCH_ID?}"
-
-: "${SERVER_ID?}"
+set +x
 : "${SHARED_SECRET?}"
 : "${PRIVATE_KEY_HEX?}"
+set -x
+
+: "${N_DATA?}"
+: "${BATCH_ID?}"
+: "${SERVER_ID?}"
 : "${PUBLIC_KEY_HEX_INTERNAL?}"
 : "${PUBLIC_KEY_HEX_EXTERNAL?}"
-
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
 : "${BUCKET_EXTERNAL_SHARED?}"
+: "${GCP_CREDENTIALS?}"
 
 RETRY_LIMIT=5
 BACKOFF_EXPONENT=2
@@ -29,8 +30,11 @@ BACKOFF_EXPONENT=2
 function create_folders() {
     mkdir -p raw
     mkdir -p intermediate/internal/verify1
+    mkdir -p intermediate/external/verify1
     mkdir -p intermediate/internal/verify2
+    mkdir -p intermediate/external/verify2
     mkdir -p intermediate/internal/aggregate
+    mkdir -p intermediate/external/aggregate
     mkdir -p processed
 }
 
@@ -47,7 +51,7 @@ function send_output_external() {
     local output_internal=$1
     local output_external=$2
     local path="gs://${BUCKET_EXTERNAL_SHARED}/${output_external}"
-    gsutil rsync --recursive "${output_internal}/" "${path}/"
+    gsutil -m rsync -r "${output_internal}/" "${path}/"
     touch _SUCCESS
     gsutil cp _SUCCESS "${path}/"
 }
@@ -64,7 +68,7 @@ function send_output_external() {
 function send_output_internal() {
     local output=$1
     local path="gs://${BUCKET_INTERNAL_PRIVATE}/$output"
-    gsutil rsync --recursive "${output}/" "${path}/"
+    gsutil -m rsync -r "${output}/" "${path}/"
     touch _SUCCESS
     gsutil cp _SUCCESS "${path}/"
 }
@@ -82,7 +86,7 @@ function wait_for_data() {
     backoff=2
     while ! gsutil -q stat "${path}"; do
         sleep ${backoff};
-        ((backoff *= $BACKOFF_EXPONENT))
+        ((backoff *= BACKOFF_EXPONENT))
         ((retries++))
         if [[ "${retries}" -gt "${max_retries}" ]]; then
             echo "Reached the maximum number of retries."
@@ -103,7 +107,7 @@ function fetch_input_blocked() {
     local input=$2
     local path="gs://${bucket}/${input}"
     wait_for_data "${path}/_SUCCESS"
-    gsutil rsync --recursive "${path}/" "${input}/"
+    gsutil -m rsync -r "${path}/" "${input}/"
 }
 
 # Wait for data to be written to the internal private bucket before copying.
@@ -164,6 +168,7 @@ function verify1() {
 # Verify that the shares are well-formed by proving a secret-shared
 # non-interactive proof.
 function verify2() {
+    local input="raw"
     local input_internal="intermediate/internal/verify1"
     local input_external="intermediate/external/verify1"
     local output_internal="intermediate/internal/verify2"
@@ -185,6 +190,7 @@ function verify2() {
 
 # Accumulate well-formed shares.
 function aggregate() {
+    local input="raw"
     local input_internal="intermediate/internal/verify2"
     local input_external="intermediate/external/verify2"
     local output_internal="intermediate/internal/aggregate"
@@ -224,8 +230,12 @@ function publish() {
     send_output_internal ${output}
 }
 
+function authenticate() {
+    gcloud auth activate-service-account --key-file "${GCP_CREDENTIALS}"
+}
 
 function main() {
+    authenticate
     cd /tmp && create_folders
 
     verify1

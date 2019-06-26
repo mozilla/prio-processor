@@ -5,15 +5,22 @@
 # this script for verification.
 
 set -euo pipefail
-set -x
 
 docker-compose up -d
 
+function clean_buckets {
+    docker-compose run server_a bin/cleanup
+    docker-compose run server_b bin/cleanup
+}
+
 # Add a cleanup handler for the exit signal
 function cleanup {
+    clean_buckets
     docker-compose down
 }
 trap cleanup EXIT
+
+clean_buckets
 
 # Start server A
 docker-compose run server_a bin/process &

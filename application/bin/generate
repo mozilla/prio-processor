@@ -5,13 +5,12 @@
 
 # This scripts generates data for testing the pipeline.
 
-set -eou pipefail
+set -euo pipefail
 
 : "${N_DATA?}"
 : "${BATCH_ID?}"
 : "${PUBLIC_KEY_HEX_INTERNAL?}"
 : "${PUBLIC_KEY_HEX_EXTERNAL?}"
-
 : "${GCP_CREDENTIALS_INTERNAL?}"
 : "${GCP_CREDENTIALS_EXTERNAL?}"
 : "${BUCKET_INTERNAL_PRIVATE?}"
@@ -41,7 +40,7 @@ function main() {
 
     for i in {1..5}; do
         filename="part-$i.ndjson"
-        for ((j=0; j < i; j++)); do
+        for ((j=0; j < i*10; j++)); do
             generate_data >> $filename
         done
         prio encode-shares \
