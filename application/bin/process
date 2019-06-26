@@ -8,16 +8,19 @@
 set -euo pipefail
 set -x
 
+# re-export variables for GNU parallel 20160222
+# this version of parallel does not contain the env_parallel script
 set +x
-: "${SHARED_SECRET?}"
-: "${PRIVATE_KEY_HEX?}"
+export SHARED_SECRET=${SHARED_SECRET?}
+export PRIVATE_KEY_HEX=${PRIVATE_KEY_HEX?}
 set -x
 
-: "${N_DATA?}"
-: "${BATCH_ID?}"
-: "${SERVER_ID?}"
-: "${PUBLIC_KEY_HEX_INTERNAL?}"
-: "${PUBLIC_KEY_HEX_EXTERNAL?}"
+export N_DATA=${N_DATA?}
+export BATCH_ID=${BATCH_ID?}
+export SERVER_ID=${SERVER_ID?}
+export PUBLIC_KEY_HEX_INTERNAL=${PUBLIC_KEY_HEX_INTERNAL?}
+export PUBLIC_KEY_HEX_EXTERNAL=${PUBLIC_KEY_HEX_EXTERNAL?}
+
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
 : "${BUCKET_EXTERNAL_SHARED?}"
@@ -149,17 +152,20 @@ function list_partitions() {
 # Read the shares for this server and start verification with the external
 # server.
 function verify1() {
-    local input="raw"
-    local output_internal="intermediate/internal/verify1"
-    local output_external="intermediate/external/verify1"
+    export input="raw"
+    export output_internal="intermediate/internal/verify1"
+    export output_external="intermediate/external/verify1"
 
     fetch_input_private ${input}
 
-    for filename in $(list_partitions ${input}); do
+    function process() {
+        local filename=$1
         prio verify1 \
             --input "${input}/${filename}" \
             --output ${output_internal}
-    done
+    }
+    export -f process
+    parallel process ::: "$(list_partitions ${input})"
 
     send_output_external ${output_internal} ${output_external}
 }
@@ -168,21 +174,24 @@ function verify1() {
 # Verify that the shares are well-formed by proving a secret-shared
 # non-interactive proof.
 function verify2() {
-    local input="raw"
-    local input_internal="intermediate/internal/verify1"
-    local input_external="intermediate/external/verify1"
-    local output_internal="intermediate/internal/verify2"
-    local output_external="intermediate/external/verify2"
+    export input="raw"
+    export input_internal="intermediate/internal/verify1"
+    export input_external="intermediate/external/verify1"
+    export output_internal="intermediate/internal/verify2"
+    export output_external="intermediate/external/verify2"
 
     fetch_input_shared ${input_external}
 
-    for filename in $(list_partitions ${input_internal}); do
+    function process() {
+        local filename=$1
         prio verify2 \
             --input "${input}/${filename}" \
             --input-internal "${input_internal}/${filename}" \
             --input-external "${input_external}/${filename}" \
             --output ${output_internal}
-    done
+    }
+    export -f process
+    parallel process ::: "$(list_partitions ${input_internal})"
 
     send_output_external ${output_internal} ${output_external}
 }
@@ -190,21 +199,24 @@ function verify2() {
 
 # Accumulate well-formed shares.
 function aggregate() {
-    local input="raw"
-    local input_internal="intermediate/internal/verify2"
-    local input_external="intermediate/external/verify2"
-    local output_internal="intermediate/internal/aggregate"
-    local output_external="intermediate/external/aggregate"
+    export input="raw"
+    export input_internal="intermediate/internal/verify2"
+    export input_external="intermediate/external/verify2"
+    export output_internal="intermediate/internal/aggregate"
+    export output_external="intermediate/external/aggregate"
 
     fetch_input_shared ${input_external}
 
-    for filename in $(list_partitions ${input_internal}); do
+    function process() {
+        local filename=$1
         prio aggregate \
             --input "${input}/${filename}" \
             --input-internal "${input_internal}/${filename}" \
             --input-external "${input_external}/${filename}" \
             --output ${output_internal}
-    done
+    }
+    export -f process
+    parallel process ::: "$(list_partitions ${input_internal})"
 
     send_output_external ${output_internal} ${output_external}
 }
@@ -212,18 +224,21 @@ function aggregate() {
 
 # Publish the aggregated shares.
 function publish() {
-    local input_internal="intermediate/internal/aggregate"
-    local input_external="intermediate/external/aggregate"
-    local output="processed"
+    export input_internal="intermediate/internal/aggregate"
+    export input_external="intermediate/external/aggregate"
+    export output="processed"
 
     fetch_input_shared ${input_external}
 
-    for filename in $(list_partitions ${input_internal}); do
+    function process() {
+        local filename=$1
         prio publish \
             --input-internal "${input_internal}/${filename}" \
             --input-external "${input_external}/${filename}" \
             --output ${output}
-    done
+    }
+    export -f process
+    parallel process ::: "$(list_partitions ${input_internal})"
 
     jq -c '.' ${output}/*.ndjson
 

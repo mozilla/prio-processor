@@ -20,8 +20,6 @@ function cleanup {
 }
 trap cleanup EXIT
 
-clean_buckets
-
 # Start server A
 docker-compose run server_a bin/process &
 server_a_pid=$!
