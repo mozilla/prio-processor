@@ -15,3 +15,15 @@ make test
 
 # TODO: deploy the application to GKE
 ```
+
+## Overview
+
+The bin folder contains scripts for data processing in Google Cloud Platform
+(GCP).
+
+* `cleanup` - Resets the private and shared buckets to a clean state
+* `generate` - Generate testing data and sync into private buckets
+* `process` - Process multiple partitions of data in parallel, blocking on each
+  step as necessary.
+* `integrate` - Coordinate data generation and processing servers in a local
+  docker-compose workflow.

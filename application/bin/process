@@ -8,8 +8,10 @@
 set -euo pipefail
 set -x
 
-# re-export variables for GNU parallel 20160222
-# this version of parallel does not contain the env_parallel script
+# Re-export variables for GNU parallel 20160222. Newer versions of parallel
+# contain a env_parallel script for exporting the current environment.
+
+# Avoid printing sensitive environment data into the logs
 set +x
 export SHARED_SECRET=${SHARED_SECRET?}
 export PRIVATE_KEY_HEX=${PRIVATE_KEY_HEX?}
