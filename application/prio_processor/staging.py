@@ -13,16 +13,18 @@ class PrioPingTransform(beam.PTransform):
 
 
 @click.command()
+@click.option("--date", type=str, required=True)
 @click.option("--input", type=str, required=True)
 @click.option("--output", type=str, required=True)
-def run(**kwargs):
-    options = PipelineOptions.from_dictionary(kwargs)
+@click.argument("pipeline_args", nargs=-1, type=click.UNPROCESSED)
+def run(date, input, output, pipeline_args):
+    options = PipelineOptions(pipeline_args)
     # propagate global context like imports
     options.view_as(SetupOptions).save_main_session = True
     with beam.Pipeline(options=options) as p:
-        data = p | f"Read: {p.options.input}" >> ReadFromText(p.options.input)
+        data = p | f"Read: {input}" >> ReadFromText(f"{input}/{date}/**/*.ndjson")
         processed = data | PrioPingTransform()
-        processed | f"Write: {p.options.output}" >> WriteToText(p.options.output)
+        processed | f"Write: {output}" >> WriteToText(output, ".njson")
 
 
 if __name__ == "__main__":
