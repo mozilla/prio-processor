@@ -64,7 +64,7 @@ def prio_step(command, config={}, env={}):
 
 
 def main():
-    prio_step("keygen")
+    raise NotImplementedError()
 
 
 if __name__ == "__main__":
