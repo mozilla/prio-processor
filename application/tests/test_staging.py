@@ -107,6 +107,36 @@ def test_transform(extracted):
 
 
 def test_staging_run(moz_fx_data_stage_data, tmpdir):
+    """
+    ├── moz-fx-data-stage-data
+    │   └── telemetry-decoded_gcs-sink-doctype_prio
+    │       └── output
+    │           └── 2019-06-26
+    │               ├── 00
+    │               │   └── telemetry
+    │               │       └── prio
+    │               │           └── 4
+    │               │               ├── part-0.ndjson
+    │               │               └── part-1.ndjson
+    │               └── 01
+    │                   └── telemetry
+    │                       └── prio
+    │                           └── 4
+    │                               ├── part-0.ndjson
+    │                               └── part-1.ndjson
+    └── output
+        ├── _SUCCESS
+        ├── batch_id=content.blocking_blocked_TESTONLY-0
+        │   ├── server_id=a
+        │   │   └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
+        │   └── server_id=b
+        │       └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
+        └── batch_id=content.blocking_blocked_TESTONLY-1
+            ├── server_id=a
+            │   └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
+            └── server_id=b
+                └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
+    """
     output = Path(tmpdir / "output")
     runner = CliRunner()
     result = runner.invoke(
@@ -117,10 +147,101 @@ def test_staging_run(moz_fx_data_stage_data, tmpdir):
             "--input",
             f"{moz_fx_data_stage_data}",
             "--output",
-            f"{output}/part",
+            f"{output}",
         ],
         catch_exceptions=False,
     )
     assert result.exit_code == 0
     assert output.is_dir()
     assert len(os.listdir(output)) > 0
+
+
+def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatch):
+    """Run the entire pipeline again, except fix the number of partitions when
+    repartitioning by range.
+
+    The corresponding partitions for each server should contain the same ids.
+    """
+
+    def mock_estimate_num_partitions(*args, **kwargs):
+        """
+        output
+        ├── _SUCCESS
+        ├── batch_id=content.blocking_blocked_TESTONLY-0
+        │   ├── server_id=a
+        │   │   ├── part-00000-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        │   │   ├── part-00001-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        │   │   ├── part-00002-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        │   │   └── part-00003-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        │   └── server_id=b
+        │       ├── part-00000-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        │       ├── part-00001-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        │       ├── part-00002-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        │       └── part-00003-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        └── batch_id=content.blocking_blocked_TESTONLY-1
+            ├── server_id=a
+            │   ├── part-00004-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+            │   ├── part-00005-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+            │   ├── part-00006-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+            │   └── part-00007-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+            └── server_id=b
+                ├── part-00004-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+                ├── part-00005-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+                ├── part-00006-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+                └── part-00007-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        """
+        return 8
+
+    monkeypatch.setattr(
+        staging, "estimate_num_partitions", mock_estimate_num_partitions
+    )
+
+    output = Path(tmpdir / "output")
+    runner = CliRunner()
+    result = runner.invoke(
+        staging.run,
+        [
+            "--date",
+            BASE_DATE,
+            "--input",
+            f"{moz_fx_data_stage_data}",
+            "--output",
+            f"{output}",
+        ],
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 0
+
+    def list_json(path):
+        return [name for name in os.listdir(path) if name.endswith(".json")]
+
+    def get_id_set(path, part):
+        s = set()
+        with (path / part).open() as f:
+            for row in map(json.loads, f.readlines()):
+                if not row:
+                    continue
+                s.add(row["id"])
+        return s
+
+    # manually verify each of the partitions by hand
+    batch_ids = [
+        "content.blocking_blocked_TESTONLY-0",
+        "content.blocking_blocked_TESTONLY-1",
+    ]
+    for batch_id in batch_ids:
+        path = output / f"batch_id={batch_id}"
+        path_a = path / "server_id=a"
+        path_b = path / "server_id=b"
+
+        assert path_a.is_dir()
+        assert path_b.is_dir()
+
+        # each folder should contain the same partitions
+        assert list_json(path_a) == list_json(path_b)
+
+        for part in list_json(path_a):
+            set_a = get_id_set(path_a, part)
+            set_b = get_id_set(path_b, part)
+            assert len(set_a) > 0
+            assert set_a == set_b

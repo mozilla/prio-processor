@@ -45,9 +45,19 @@ def estimate_num_partitions(df, column="prio", partition_size_mb=250):
 
 
 def transform(data):
+    """Flatten nested prioData into a flattened dataframe that is optimally
+    partitioned for batched processing in a tool agnostic fashion.
+
+    The dataset is first partitioned by the batch_id, which determines the
+    dimension and encoding of the underlying shares. The flattened rows are
+    reassigned a new primary key for coordinating messages between servers. The
+    dataset is then partitioned by server_id. The partitions for each server
+    should contain the same set of join keys.
+    """
     df = (
         data.select(extract_payload_udf("value").alias("value"))
         .select("value.*")
+        # NOTE: is it worth counting duplicates?
         .dropDuplicates(["id"])
         .withColumn("data", explode("prioData"))
         # drop the id and assign a new one per encoding type
@@ -56,16 +66,21 @@ def transform(data):
         .withColumn(
             "id", row_number().over(Window.partitionBy("batch_id").orderBy(lit(0)))
         )
+    )
+
+    num_partitions = estimate_num_partitions(df, col("prio")["a"])
+
+    return (
+        df.repartitionByRange(num_partitions, "batch_id", "id")
         # explode the values per server
         .select("batch_id", "id", explode("prio").alias("server_id", "payload"))
         # reorder the final columns
         .select("batch_id", "server_id", "id", "payload")
     )
-    return df
 
 
 def load(data, output):
-    data.write.json(output)
+    data.write.partitionBy("batch_id", "server_id").json(output, mode="overwrite")
 
 
 @click.command()
