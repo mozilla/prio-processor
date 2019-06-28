@@ -79,8 +79,10 @@ def transform(data):
     )
 
 
-def load(data, output):
-    data.write.partitionBy("batch_id", "server_id").json(output, mode="overwrite")
+def load(data, output, date):
+    data.withColumn("submission_date", lit(date)).write.partitionBy(
+        "submission_date", "batch_id", "server_id"
+    ).json(output, mode="overwrite")
 
 
 @click.command()
@@ -91,7 +93,7 @@ def run(date, input, output):
     spark = SparkSession.builder.getOrCreate()
     pings = extract(spark, input, date)
     processed = transform(pings)
-    load(processed, output)
+    load(processed, output, date)
 
 
 if __name__ == "__main__":

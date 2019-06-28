@@ -108,6 +108,8 @@ def test_transform(extracted):
 
 def test_staging_run(moz_fx_data_stage_data, tmpdir):
     """
+    To update the directory tree, run `tree` over the `tmpdir` folder.
+
     ├── moz-fx-data-stage-data
     │   └── telemetry-decoded_gcs-sink-doctype_prio
     │       └── output
@@ -126,16 +128,17 @@ def test_staging_run(moz_fx_data_stage_data, tmpdir):
     │                               └── part-1.ndjson
     └── output
         ├── _SUCCESS
-        ├── batch_id=content.blocking_blocked_TESTONLY-0
-        │   ├── server_id=a
-        │   │   └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
-        │   └── server_id=b
-        │       └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
-        └── batch_id=content.blocking_blocked_TESTONLY-1
-            ├── server_id=a
-            │   └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
-            └── server_id=b
-                └── part-00000-f77f93f9-b32b-47f2-851c-33c266ff92cf.c000.json
+        └── submission_date=2019-06-26
+            ├── batch_id=content.blocking_blocked_TESTONLY-0
+            │   ├── server_id=a
+            │   │   └── part-00000-312e29a4-ad3e-4451-97b1-c3aeb437ce12.c000.json
+            │   └── server_id=b
+            │       └── part-00000-312e29a4-ad3e-4451-97b1-c3aeb437ce12.c000.json
+            └── batch_id=content.blocking_blocked_TESTONLY-1
+                ├── server_id=a
+                │   └── part-00000-312e29a4-ad3e-4451-97b1-c3aeb437ce12.c000.json
+                └── server_id=b
+                    └── part-00000-312e29a4-ad3e-4451-97b1-c3aeb437ce12.c000.json
     """
     output = Path(tmpdir / "output")
     runner = CliRunner()
@@ -167,28 +170,29 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
         """
         output
         ├── _SUCCESS
-        ├── batch_id=content.blocking_blocked_TESTONLY-0
-        │   ├── server_id=a
-        │   │   ├── part-00000-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        │   │   ├── part-00001-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        │   │   ├── part-00002-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        │   │   └── part-00003-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        │   └── server_id=b
-        │       ├── part-00000-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        │       ├── part-00001-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        │       ├── part-00002-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        │       └── part-00003-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-        └── batch_id=content.blocking_blocked_TESTONLY-1
-            ├── server_id=a
-            │   ├── part-00004-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-            │   ├── part-00005-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-            │   ├── part-00006-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-            │   └── part-00007-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-            └── server_id=b
-                ├── part-00004-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-                ├── part-00005-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-                ├── part-00006-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
-                └── part-00007-301d27d5-8226-43f8-8629-9737b1eadbcb.c000.json
+        └── submission_date=2019-06-26
+            ├── batch_id=content.blocking_blocked_TESTONLY-0
+            │   ├── server_id=a
+            │   │   ├── part-00000-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            │   │   ├── part-00001-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            │   │   ├── part-00002-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            │   │   └── part-00003-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            │   └── server_id=b
+            │       ├── part-00000-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            │       ├── part-00001-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            │       ├── part-00002-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            │       └── part-00003-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+            └── batch_id=content.blocking_blocked_TESTONLY-1
+                ├── server_id=a
+                │   ├── part-00004-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+                │   ├── part-00005-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+                │   ├── part-00006-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+                │   └── part-00007-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+                └── server_id=b
+                    ├── part-00004-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+                    ├── part-00005-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+                    ├── part-00006-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
+                    └── part-00007-8e329ed1-6d7e-4912-9746-6845ca90ad47.c000.json
         """
         return 8
 
@@ -230,7 +234,7 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
         "content.blocking_blocked_TESTONLY-1",
     ]
     for batch_id in batch_ids:
-        path = output / f"batch_id={batch_id}"
+        path = output / f"submission_date={BASE_DATE}" / f"batch_id={batch_id}"
         path_a = path / "server_id=a"
         path_b = path / "server_id=b"
 
