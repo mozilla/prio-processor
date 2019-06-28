@@ -8,6 +8,6 @@ setup(
     author="Anthony Miyaguchi",
     author_email="amiyaguchi@mozilla.com",
     url="https://github.com/mozilla/prio-processor",
-    install_requires=["click", "apache-beam[gcp,test]"],
+    install_requires=["click", "pyspark"],
     packages=["prio_processor"],
 )

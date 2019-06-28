@@ -7,9 +7,6 @@ from uuid import uuid4
 from click.testing import CliRunner
 from prio_processor import staging
 
-import apache_beam as beam
-from apache_beam.testing.test_pipeline import TestPipeline
-from apache_beam.testing.util import assert_that, equal_to
 
 BASE_DATE = "2019-06-26"
 NUM_HOURS = 2
@@ -51,12 +48,9 @@ def moz_fx_data_stage_data(tmpdir, prio_ping):
     return sink_dir
 
 
-def test_prio_ping_transform():
-    with TestPipeline() as p:
-        test_data = list(map(json.dumps, [{"id": "1"}, {"id": "2"}]))
-        data = p | "create test data" >> beam.Create(test_data)
-        result = data | staging.PrioPingTransform()
-        assert_that(result, equal_to(test_data))
+def test_extract(spark, moz_fx_data_stage_data):
+    df = staging.extract(spark, moz_fx_data_stage_data, BASE_DATE)
+    assert df.count() == NUM_HOURS * NUM_PARTS * NUM_PINGS
 
 
 def test_staging_run(moz_fx_data_stage_data, tmpdir):
