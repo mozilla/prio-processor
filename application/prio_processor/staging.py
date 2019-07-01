@@ -3,16 +3,13 @@ import json
 import math
 
 from pyspark.sql import SparkSession, Row, functions as F
-from pyspark.sql.functions import udf, explode, row_number, lit, col, length
-from pyspark.sql.types import StructType, StructField, ArrayType, StringType, MapType
+from pyspark.sql.functions import udf, explode, row_number, lit, col, length, unbase64
+from pyspark.sql.types import StructType, StructField, ArrayType, StringType, MapType, ByteType
 from pyspark.sql.window import Window
 
-
-def extract(spark, path, date):
-    # hour / namespace / type / version / *.ndjson
-    path = f"{path}/{date}/*/*/*/*/*"
-    return spark.read.text(path)
-
+# The raw message also contains a field named attributeMap: Map[str, str], but
+# is safely ignored in this processing job
+pubsub_schema = StructType([StructField("payload", StringType(), False)])
 
 payload_schema = StructType(
     [
@@ -32,11 +29,28 @@ payload_schema = StructType(
     ]
 )
 
-
 @udf(payload_schema)
 def extract_payload_udf(ping):
     data = json.loads(ping)
     return Row(id=data["id"], prioData=data["payload"]["prioData"])
+
+
+def extract(spark, path, date):
+    """Extract data from the moz-fx-data bucket that has been decoded by
+    the gcp-ingestion stack. The messages are newline-delimited json documents
+    representing PubSub messages (refer to the `prio_ping` test fixture for
+    implementation details).
+
+    The directory hierarchy encodes the purpose for each folder as follows:
+        date / hour / namespace / type / version / *.ndjson
+    """
+    path = f"{path}/{date}/*/*/*/*"
+    df = spark.read.json(path, schema=pubsub_schema)
+    return (
+        df
+        .select(extract_payload_udf(unbase64(col("payload"))).alias("extracted"))
+        .select("extracted.*")
+    )
 
 
 def estimate_num_partitions(df, column="prio", partition_size_mb=250):
@@ -55,8 +69,7 @@ def transform(data):
     should contain the same set of join keys.
     """
     df = (
-        data.select(extract_payload_udf("value").alias("value"))
-        .select("value.*")
+        data
         # NOTE: is it worth counting duplicates?
         .dropDuplicates(["id"])
         .withColumn("data", explode("prioData"))
@@ -91,6 +104,7 @@ def load(data, output, date):
 @click.option("--output", type=str, required=True)
 def run(date, input, output):
     spark = SparkSession.builder.getOrCreate()
+    spark.conf.set("fs.gs.implicit.dir.repair.enable", False)
     pings = extract(spark, input, date)
     processed = transform(pings)
     load(processed, output, date)

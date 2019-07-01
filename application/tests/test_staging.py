@@ -7,6 +7,7 @@ from uuid import uuid4
 from click.testing import CliRunner
 from prio_processor import staging
 from pyspark.sql import Row
+from base64 import b64encode
 
 
 BASE_DATE = "2019-06-26"
@@ -15,9 +16,22 @@ NUM_PARTS = 2
 NUM_PINGS = 2
 
 
+def pubsub_message(ping: str):
+    return {
+        "attributeMap": {
+            "document_namespace": "telemetry",
+            "document_type": "prio",
+            "document_version": "4",
+            # ...
+        },
+        "payload": b64encode(ping.encode("utf-8")).decode("utf-8"),
+    }
+
+
 @pytest.fixture()
 def prio_ping():
-    """
+    """ Read a ping as seen from a Firefox client.
+
     ```bash
     $ jq '.payload.prioData | .[] | .encoding' tests/resources/fx-69.0a1.json \
       | sort | uniq -c
@@ -32,6 +46,9 @@ def prio_ping():
 
 @pytest.fixture()
 def moz_fx_data_stage_data(tmpdir, prio_ping):
+    """ Create a bucket that mirrors the google cloud storage sink in the
+    ingestion service.
+    """
 
     # bucket / re-publisher name / output sink
     sink_dir = Path(
@@ -53,7 +70,8 @@ def moz_fx_data_stage_data(tmpdir, prio_ping):
                 for _ in range(NUM_PINGS):
                     ping = prio_ping.copy()
                     ping["id"] = str(uuid4())
-                    f.write(json.dumps(ping))
+                    pubsub = pubsub_message(json.dumps(ping))
+                    f.write(json.dumps(pubsub))
                     f.write("\n")
     return sink_dir
 
@@ -65,6 +83,7 @@ def extracted(spark, moz_fx_data_stage_data):
 
 def test_extract(extracted):
     assert extracted.count() == NUM_HOURS * NUM_PARTS * NUM_PINGS
+    assert not {"id", "prioData"} - set(extracted.columns)
 
 
 def test_estimate_num_partitions(spark):
