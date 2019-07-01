@@ -94,7 +94,7 @@ def transform(data):
 
 def load(data, output, date):
     data.withColumn("submission_date", lit(date)).write.partitionBy(
-        "submission_date", "batch_id", "server_id"
+        "submission_date", "server_id", "batch_id"
     ).json(output, mode="overwrite")
 
 
