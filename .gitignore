@@ -20,6 +20,3 @@ working/
 venv/
 .mc
 .ash_history
-
-.terraform/
-*.tfstate*
