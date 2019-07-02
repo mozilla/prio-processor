@@ -175,6 +175,21 @@ function extract_batch_id() {
     echo "$path" | python3 -c "$code"
 }
 
+# Extract the `batch_id` partition-id from a hadoop-based filepath
+#
+# Arguments:
+#   $1 - path to file
+#
+# Environment:
+#   DATA_CONFIG - used by `extract_batch_id`
+function export_data_dims() {
+    local filename=$1
+    export BATCH_ID
+    export N_DATA
+    BATCH_ID=$(extract_batch_id "${filename}")
+    N_DATA=$(config_get "${BATCH_ID}")
+}
+
 # Read the shares for this server and start verification with the external
 # server.
 function verify1() {
@@ -186,10 +201,7 @@ function verify1() {
 
     function process() {
         local filename=$1
-        export BATCH_ID
-        export N_DATA
-        BATCH_ID=$(extract_batch_id "${filename}")
-        N_DATA=$(config_get "${BATCH_ID}")
+        export_data_dims "$filename"
 
         prio verify1 \
             --input "${input}/${filename}" \
@@ -215,10 +227,7 @@ function verify2() {
 
     function process() {
         local filename=$1
-        export BATCH_ID
-        export N_DATA
-        BATCH_ID=$(extract_batch_id "${filename}")
-        N_DATA=$(config_get "${BATCH_ID}")
+        export_data_dims "$filename"
 
         prio verify2 \
             --input "${input}/${filename}" \
@@ -245,10 +254,7 @@ function aggregate() {
 
     function process() {
         local filename=$1
-        export BATCH_ID
-        export N_DATA
-        BATCH_ID=$(extract_batch_id "${filename}")
-        N_DATA=$(config_get "${BATCH_ID}")
+        export_data_dims "$filename"
 
         prio aggregate \
             --input "${input}/${filename}" \
@@ -273,10 +279,7 @@ function publish() {
 
     function process() {
         local filename=$1
-        export BATCH_ID
-        export N_DATA
-        BATCH_ID=$(extract_batch_id "${filename}")
-        N_DATA=$(config_get "${BATCH_ID}")
+        export_data_dims "$filename"
 
         prio publish \
             --input-internal "${input_internal}/${filename}" \
@@ -302,6 +305,7 @@ function main() {
     # export functions necessary for parallel
     export -f extract_batch_id
     export -f config_get
+    export -f export_data_dims
 
     verify1
     verify2
