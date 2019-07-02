@@ -52,14 +52,14 @@ function main() {
         mkdir -p "${out_b}"
 
         for i in {1..5}; do
-            filename="part-$i.json"
+            filename="${batch_id}-part-$i.json"
             set +x
             for ((j=0; j < i; j++)); do
-                generate_data "${n_data} ">> ${filename}
+                generate_data "${n_data} ">> "${filename}"
             done
             set -x
             prio encode-shares \
-                --input ${filename} \
+                --input "${filename}" \
                 --batch-id "${batch_id}" \
                 --n-data "${n_data}" \
                 --output-A "${out_a}" \
