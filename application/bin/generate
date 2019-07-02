@@ -3,12 +3,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-# This scripts generates data for testing the pipeline.
+# This scripts generates data for testing the pipeline. The data is generated
+# based on the data configuration file.
 
 set -euo pipefail
+set -x
 
-: "${N_DATA?}"
-: "${BATCH_ID?}"
+: "${DATA_CONFIG}"
 : "${PUBLIC_KEY_HEX_INTERNAL?}"
 : "${PUBLIC_KEY_HEX_EXTERNAL?}"
 : "${GCP_CREDENTIALS_INTERNAL?}"
@@ -17,7 +18,8 @@ set -euo pipefail
 : "${BUCKET_EXTERNAL_PRIVATE?}"
 
 function generate_data() {
-    python -c "print([int(x % 3 == 0 or x % 5 == 0) for x in range(${N_DATA})])"
+    local n_data=$1
+    python -c "print([int(x % 3 == 0 or x % 5 == 0) for x in range(${n_data})])"
 }
 
 function rsync() {
@@ -28,25 +30,41 @@ function rsync() {
     local dest=gs://${bucket}/raw/
 
     gcloud auth activate-service-account --key-file "${cred}"
-    gsutil rsync -r "server_${server_id}/raw/" "${dest}"
+    gsutil -m rsync -r "server_${server_id}/raw/" "${dest}"
     touch _SUCCESS
     gsutil cp _SUCCESS "${dest}"
 }
 
 function main() {
     cd /tmp
-    mkdir -p server_a/raw
-    mkdir -p server_b/raw
+    local keys
+    keys=$(jq -r 'keys | join(" ")' "${DATA_CONFIG}")
 
-    for i in {1..5}; do
-        filename="part-$i.ndjson"
-        for ((j=0; j < i*10; j++)); do
-            generate_data >> $filename
+    for batch_id in $keys; do
+        # To get a specific key from the config file, the key must be quoted
+        # within jq.
+        local n_data
+        n_data=$(jq -r ".\"${batch_id}\"" "${DATA_CONFIG}")
+
+        local out_a="server_a/raw/batch_id=${batch_id}"
+        local out_b="server_b/raw/batch_id=${batch_id}"
+        mkdir -p "${out_a}"
+        mkdir -p "${out_b}"
+
+        for i in {1..5}; do
+            filename="part-$i.json"
+            set +x
+            for ((j=0; j < i; j++)); do
+                generate_data "${n_data} ">> ${filename}
+            done
+            set -x
+            prio encode-shares \
+                --input ${filename} \
+                --batch-id "${batch_id}" \
+                --n-data "${n_data}" \
+                --output-A "${out_a}" \
+                --output-B "${out_b}"
         done
-        prio encode-shares \
-            --input $filename \
-            --output-A server_a/raw \
-            --output-B server_b/raw
     done
 
     rsync a "${BUCKET_INTERNAL_PRIVATE}" "${GCP_CREDENTIALS_INTERNAL}"

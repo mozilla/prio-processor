@@ -17,11 +17,10 @@ export SHARED_SECRET=${SHARED_SECRET?}
 export PRIVATE_KEY_HEX=${PRIVATE_KEY_HEX?}
 set -x
 
-export N_DATA=${N_DATA?}
-export BATCH_ID=${BATCH_ID?}
 export SERVER_ID=${SERVER_ID?}
 export PUBLIC_KEY_HEX_INTERNAL=${PUBLIC_KEY_HEX_INTERNAL?}
 export PUBLIC_KEY_HEX_EXTERNAL=${PUBLIC_KEY_HEX_EXTERNAL?}
+export DATA_CONFIG=${DATA_CONFIG}
 
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
@@ -141,15 +140,40 @@ function fetch_input_shared() {
 }
 
 
-# List partitions that are ready for processing.
+# List partitions that are ready for processing
 #
 # Arguments:
 #   $1 - relative path to a folder containing data
 function list_partitions() {
     local input=$1
-    find "${input}" -type f -not -name "_SUCCESS" -printf "%f\n"
+    local skip_front
+    # number of leading paths to skip is the directory depth + 1
+    skip_front=$(echo "${input} " | awk '{ split($0, x, "/"); print(length(x) + 1) }')
+    # print relative paths to input that contain json data
+    find "${input}" -type f -name "*.json" | cut -sd / -f "${skip_front}-"
 }
 
+# Get a value from the config file and export
+#
+# Arguments:
+#   $1 - the batch_id
+#
+# Environment:
+#   DATA_CONFIG
+function config_get() {
+    local batch_id=$1
+    jq -r ".\"${batch_id}\"" "${DATA_CONFIG}"
+}
+
+# Extract the `batch_id` partition-id from a hadoop-based filepath
+#
+# Arguments:
+#   $1 - path to file
+function extract_batch_id() {
+    local path=$1
+    local code='import re; m=re.search(r"batch_id=([^/]*)", input()); print(m[1])'
+    echo "$path" | python3 -c "$code"
+}
 
 # Read the shares for this server and start verification with the external
 # server.
@@ -162,9 +186,14 @@ function verify1() {
 
     function process() {
         local filename=$1
+        export BATCH_ID
+        export N_DATA
+        BATCH_ID=$(extract_batch_id "${filename}")
+        N_DATA=$(config_get "${BATCH_ID}")
+
         prio verify1 \
             --input "${input}/${filename}" \
-            --output ${output_internal}
+            --output "${output_internal}/$(dirname "${filename}")"
     }
     export -f process
     parallel process ::: "$(list_partitions ${input})"
@@ -186,11 +215,16 @@ function verify2() {
 
     function process() {
         local filename=$1
+        export BATCH_ID
+        export N_DATA
+        BATCH_ID=$(extract_batch_id "${filename}")
+        N_DATA=$(config_get "${BATCH_ID}")
+
         prio verify2 \
             --input "${input}/${filename}" \
             --input-internal "${input_internal}/${filename}" \
             --input-external "${input_external}/${filename}" \
-            --output ${output_internal}
+            --output "${output_internal}/$(dirname "${filename}")"
     }
     export -f process
     parallel process ::: "$(list_partitions ${input_internal})"
@@ -211,11 +245,16 @@ function aggregate() {
 
     function process() {
         local filename=$1
+        export BATCH_ID
+        export N_DATA
+        BATCH_ID=$(extract_batch_id "${filename}")
+        N_DATA=$(config_get "${BATCH_ID}")
+
         prio aggregate \
             --input "${input}/${filename}" \
             --input-internal "${input_internal}/${filename}" \
             --input-external "${input_external}/${filename}" \
-            --output ${output_internal}
+            --output "${output_internal}/$(dirname "${filename}")"
     }
     export -f process
     parallel process ::: "$(list_partitions ${input_internal})"
@@ -234,15 +273,20 @@ function publish() {
 
     function process() {
         local filename=$1
+        export BATCH_ID
+        export N_DATA
+        BATCH_ID=$(extract_batch_id "${filename}")
+        N_DATA=$(config_get "${BATCH_ID}")
+
         prio publish \
             --input-internal "${input_internal}/${filename}" \
             --input-external "${input_external}/${filename}" \
-            --output ${output}
+            --output "${output}/$(dirname "${filename}")"
     }
     export -f process
     parallel process ::: "$(list_partitions ${input_internal})"
 
-    jq -c '.' ${output}/*.ndjson
+    jq -c '.' ${output}/**/*.json
 
     send_output_internal ${output}
 }
@@ -254,6 +298,10 @@ function authenticate() {
 function main() {
     authenticate
     cd /tmp && create_folders
+
+    # export functions necessary for parallel
+    export -f extract_batch_id
+    export -f config_get
 
     verify1
     verify2
