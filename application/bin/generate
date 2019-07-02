@@ -71,4 +71,6 @@ function main() {
     rsync b "${BUCKET_EXTERNAL_PRIVATE}" "${GCP_CREDENTIALS_EXTERNAL}"
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
