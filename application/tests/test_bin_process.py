@@ -93,3 +93,8 @@ def test_config_get(process_run_a):
 
     result = process_run_a("config_get non-existent_batch_id")
     assert result.stdout.split()[-1] == "null"
+
+
+def test_extract_batch_id(process_run_a):
+    result = process_run_a("extract_batch_id branch/batch_id=test/leaf")
+    assert result.stdout.split()[-1] == "test"
