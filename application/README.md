@@ -12,8 +12,13 @@ make build
 
 # run the container on localhost
 make test
+```
 
-# TODO: deploy the application to GKE
+Set the following environment variables in a `.env` file in the current directory:
+
+```
+GOOGLE_APPLICATION_CREDENTIALS_A=...
+GOOGLE_APPLICATION_CREDENTIALS_B=...
 ```
 
 ## Overview
@@ -27,3 +32,15 @@ The bin folder contains scripts for data processing in Google Cloud Platform
   step as necessary.
 * `integrate` - Coordinate data generation and processing servers in a local
   docker-compose workflow.
+
+Running integration tests will require setting up two separate GCP projects.
+Each project should have a service account that contains authorization to the
+appropriate storage buckets that are used in this project. In particular, the
+following environment variables are set per server:
+
+```
+BUCKET_INTERNAL_PRIVATE - The bucket containing private data for the server
+BUCKET_INTERNAL_SHARED - The bucket containing incoming messages
+BUCKET_EXTERNAL_SHARED - The bucket containing outgoing messages
+GCP_CREDENTIALS - The location of the JSON google application credentials
+```

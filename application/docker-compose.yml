@@ -9,7 +9,7 @@ services:
     command: "true"
     volumes:
       - .:/app/application
-      - ~/gcp-service-credentials/priotest-a-prod-dc20730c9063.json:/app/.credentials
+      - ${GOOGLE_APPLICATION_CREDENTIALS_A?"missing credentials"}:/app/.credentials
     environment:
       - DATA_CONFIG=/app/application/config/content.json
       - SERVER_ID=A
@@ -29,7 +29,7 @@ services:
     command: "true"
     volumes:
       - .:/app/application
-      - ~/gcp-service-credentials/priotest-b-prod-93cef8d90cb6.json:/app/.credentials
+      - ${GOOGLE_APPLICATION_CREDENTIALS_B?"missing credentials"}:/app/.credentials
     environment:
       - DATA_CONFIG=/app/application/config/content.json
       - SERVER_ID=B
@@ -49,8 +49,8 @@ services:
     command: "true"
     volumes:
       - .:/app/application
-      - ~/gcp-service-credentials/priotest-a-prod-dc20730c9063.json:/app/.credentials-a
-      - ~/gcp-service-credentials/priotest-b-prod-93cef8d90cb6.json:/app/.credentials-b
+      - ${GOOGLE_APPLICATION_CREDENTIALS_A?"missing credentials"}:/app/.credentials-a
+      - ${GOOGLE_APPLICATION_CREDENTIALS_B?"missing credentials"}:/app/.credentials-b
     environment:
       - DATA_CONFIG=/app/application/config/content.json
       - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
