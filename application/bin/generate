@@ -17,55 +17,73 @@ set -x
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_EXTERNAL_PRIVATE?}"
 
-function generate_data() {
-    local n_data=$1
-    python -c "print([int(x % 3 == 0 or x % 5 == 0) for x in range(${n_data})])"
+
+function authenticate() {
+    local cred=$1
+    gcloud auth activate-service-account --key-file "${cred}"
 }
 
 function rsync() {
     local server_id=$1
     local bucket=$2
     local cred=$3
-
     local dest=gs://${bucket}/raw/
 
-    gcloud auth activate-service-account --key-file "${cred}"
+    authenticate "$cred"
     gsutil -m rsync -r "server_${server_id}/raw/" "${dest}"
     touch _SUCCESS
     gsutil cp _SUCCESS "${dest}"
 }
 
+function config_keys() {
+    jq -r 'keys | join("\n")' "${DATA_CONFIG}"
+}
+
+function config_get() {
+    key=$1
+    jq -r ".\"${key}\"" "${DATA_CONFIG}"
+}
+
+function generate_data() {
+    local n_data=$1
+    python -c "print([int(x % 3 == 0 or x % 5 == 0) for x in range(${n_data})])"
+}
+
+
+function generate_dataset() {
+    local batch_id=$1
+    local n_data
+    n_data=$(config_get "$batch_id")
+
+    local out_a="server_a/raw/batch_id=${batch_id}"
+    local out_b="server_b/raw/batch_id=${batch_id}"
+    mkdir -p "${out_a}"
+    mkdir -p "${out_b}"
+
+    for i in {1..5}; do
+        filename="${batch_id}-part-$i.json"
+        set +x
+        for ((j=0; j < i; j++)); do
+            generate_data "${n_data} ">> "${filename}"
+        done
+        set -x
+        prio encode-shares \
+            --input "${filename}" \
+            --batch-id "${batch_id}" \
+            --n-data "${n_data}" \
+            --output-A "${out_a}" \
+            --output-B "${out_b}"
+    done
+}
+
 function main() {
     cd /tmp
-    local keys
-    keys=$(jq -r 'keys | join(" ")' "${DATA_CONFIG}")
 
-    for batch_id in $keys; do
-        # To get a specific key from the config file, the key must be quoted
-        # within jq.
-        local n_data
-        n_data=$(jq -r ".\"${batch_id}\"" "${DATA_CONFIG}")
-
-        local out_a="server_a/raw/batch_id=${batch_id}"
-        local out_b="server_b/raw/batch_id=${batch_id}"
-        mkdir -p "${out_a}"
-        mkdir -p "${out_b}"
-
-        for i in {1..5}; do
-            filename="${batch_id}-part-$i.json"
-            set +x
-            for ((j=0; j < i; j++)); do
-                generate_data "${n_data} ">> "${filename}"
-            done
-            set -x
-            prio encode-shares \
-                --input "${filename}" \
-                --batch-id "${batch_id}" \
-                --n-data "${n_data}" \
-                --output-A "${out_a}" \
-                --output-B "${out_b}"
-        done
-    done
+    export DATA_CONFIG          # used by config_get
+    export -f config_get        # used by generate_dataset
+    export -f generate_data     # used by generate_dataset
+    export -f generate_dataset
+    parallel generate_dataset ::: "$(config_keys)"
 
     rsync a "${BUCKET_INTERNAL_PRIVATE}" "${GCP_CREDENTIALS_INTERNAL}"
     rsync b "${BUCKET_EXTERNAL_PRIVATE}" "${GCP_CREDENTIALS_EXTERNAL}"
