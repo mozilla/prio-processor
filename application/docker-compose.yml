@@ -20,7 +20,7 @@ services:
       - BUCKET_INTERNAL_PRIVATE=project-a-private
       - BUCKET_INTERNAL_SHARED=project-a-shared
       - BUCKET_EXTERNAL_SHARED=project-b-shared
-      - GCP_CREDENTIALS=/app/.credentials
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials
       - RETRY_LIMIT
       - RETRY_DELAY
       - RETRY_BACKOFF_EXPONENT
@@ -43,7 +43,7 @@ services:
       - BUCKET_INTERNAL_PRIVATE=project-b-private
       - BUCKET_INTERNAL_SHARED=project-b-shared
       - BUCKET_EXTERNAL_SHARED=project-a-shared
-      - GCP_CREDENTIALS=/app/.credentials
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials
       - RETRY_LIMIT
       - RETRY_DELAY
       - RETRY_BACKOFF_EXPONENT
@@ -63,5 +63,5 @@ services:
       - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
       - BUCKET_INTERNAL_PRIVATE=project-a-private
       - BUCKET_EXTERNAL_PRIVATE=project-b-private
-      - GCP_CREDENTIALS_INTERNAL=/app/.credentials-a
-      - GCP_CREDENTIALS_EXTERNAL=/app/.credentials-b
+      - GOOGLE_APPLICATION_CREDENTIALS_INTERNAL=/app/.credentials-a
+      - GOOGLE_APPLICATION_CREDENTIALS_EXTERNAL=/app/.credentials-b

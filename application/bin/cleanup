@@ -8,8 +8,8 @@ set -x
 
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
-: "${GCP_CREDENTIALS?}"
+: "${GOOGLE_APPLICATION_CREDENTIALS?}"
 
-gcloud auth activate-service-account --key-file "${GCP_CREDENTIALS}"
+gcloud auth activate-service-account --key-file "${GOOGLE_APPLICATION_CREDENTIALS}"
 (gsutil -m rm "gs://${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
 (gsutil -m rm "gs://${BUCKET_INTERNAL_SHARED}/**" || echo "nothing to delete")

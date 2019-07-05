@@ -20,7 +20,7 @@ set -x
 export SERVER_ID=${SERVER_ID?}
 export PUBLIC_KEY_HEX_INTERNAL=${PUBLIC_KEY_HEX_INTERNAL?}
 export PUBLIC_KEY_HEX_EXTERNAL=${PUBLIC_KEY_HEX_EXTERNAL?}
-export DATA_CONFIG=${DATA_CONFIG}
+export DATA_CONFIG=${DATA_CONFIG?}
 
 # Variables in the following block do not need to be re-exported.
 
@@ -28,7 +28,7 @@ export DATA_CONFIG=${DATA_CONFIG}
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
 : "${BUCKET_EXTERNAL_SHARED?}"
-: "${GCP_CREDENTIALS?}"
+: "${GOOGLE_APPLICATION_CREDENTIALS?}"
 
 # Assign to a default if variables are unset.
 : "${RETRY_LIMIT:=5}"
@@ -291,7 +291,8 @@ function publish() {
 }
 
 function authenticate() {
-    gcloud auth activate-service-account --key-file "${GCP_CREDENTIALS}"
+    local cred="${GOOGLE_APPLICATION_CREDENTIALS?}"
+    gcloud auth activate-service-account --key-file "${cred}"
 }
 
 function main() {
