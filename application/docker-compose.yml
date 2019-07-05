@@ -21,6 +21,9 @@ services:
       - BUCKET_INTERNAL_SHARED=project-a-shared
       - BUCKET_EXTERNAL_SHARED=project-b-shared
       - GCP_CREDENTIALS=/app/.credentials
+      - RETRY_LIMIT
+      - RETRY_DELAY
+      - RETRY_BACKOFF_EXPONENT
   server_b:
     build:
       context: ..
@@ -41,6 +44,9 @@ services:
       - BUCKET_INTERNAL_SHARED=project-b-shared
       - BUCKET_EXTERNAL_SHARED=project-a-shared
       - GCP_CREDENTIALS=/app/.credentials
+      - RETRY_LIMIT
+      - RETRY_DELAY
+      - RETRY_BACKOFF_EXPONENT
   client:
     build:
       context: ..

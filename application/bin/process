@@ -30,8 +30,10 @@ export DATA_CONFIG=${DATA_CONFIG}
 : "${BUCKET_EXTERNAL_SHARED?}"
 : "${GCP_CREDENTIALS?}"
 
-RETRY_LIMIT=5
-BACKOFF_EXPONENT=2
+# Assign to a default if variables are unset.
+: "${RETRY_LIMIT:=5}"
+: "${RETRY_DELAY:=2}"
+: "${RETRY_BACKOFF_EXPONENT:=2}"
 
 
 function create_folders() {
@@ -79,18 +81,19 @@ function wait_for_data() {
     # Wait for a completed batch of data, signaled by the appearance of a
     # _SUCCESS file.
 
-    : "${RETRY_LIMIT?}"     # max number of retries before failing
-    local path=$1           # absolute path of file to stat
+    : "${RETRY_LIMIT?}"                 # number of times to retry
+    : "${RETRY_DELAY?}"                 # the initial delay between retries
+    : "${RETRY_BACKOFF_EXPONENT?}"      # the exponent for exponential backoff
+    local path=$1                       # absolute path of file to stat
 
-    local max_retries=${RETRY_LIMIT?}
     local retries=0
-    local backoff=2
+    local backoff=${RETRY_DELAY}
     set +e
     while ! gsutil -q stat "${path}"; do
         sleep ${backoff};
-        ((backoff *= BACKOFF_EXPONENT))
+        ((backoff *= RETRY_BACKOFF_EXPONENT))
         ((retries++))
-        if [[ "${retries}" -gt "${max_retries}" ]]; then
+        if [[ "${retries}" -gt "${RETRY_LIMIT}" ]]; then
             echo "Reached the maximum number of retries."
             exit 1
         fi
