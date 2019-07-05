@@ -1,0 +1,87 @@
+version: '3'
+
+services:
+  minio:
+    # https://docs.min.io/docs/minio-docker-quickstart-guide
+    # https://docs.min.io/docs/minio-multi-user-quickstart-guide.html
+    image: minio/minio:latest
+    command: server /data
+    ports:
+      - 9000:9000
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+
+  bootstrap:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    working_dir: /root
+    entrypoint: sh
+    command: scripts/bootstrap.sh
+    volumes:
+      - .:/root/
+
+  server_a:
+    build: .
+    working_dir: /app/examples/batched-processing
+    command: "true"
+    volumes:
+      - .:/app/examples/batched-processing
+    depends_on:
+      - minio
+      - bootstrap
+    environment:
+      - N_DATA=3
+      - BATCH_ID=test
+      - SERVER_ID=A
+      - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
+      - PRIVATE_KEY_HEX=19DDC146FB8EE4A0B762A7DAE7E96033F87C9528DBBF8CA899CCD1DB8CD74984
+      - PUBLIC_KEY_HEX_INTERNAL=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78
+      - PUBLIC_KEY_HEX_EXTERNAL=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
+      - MINIO_ACCESS_KEY=server-a
+      - MINIO_SECRET_KEY=password
+      - BUCKET_INTERNAL=server-a
+      - BUCKET_EXTERNAL=server-b
+
+  server_b:
+    build: .
+    working_dir: /app/examples/batched-processing
+    command: "true"
+    volumes:
+      - .:/app/examples/batched-processing
+    depends_on:
+      - minio
+      - bootstrap
+    environment:
+      - N_DATA=3
+      - BATCH_ID=test
+      - SERVER_ID=B
+      - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
+      - PRIVATE_KEY_HEX=E3AA3CC952C8553E46E699646A9DC3CBA7E3D4C7F0779D58574ABF945E259202
+      - PUBLIC_KEY_HEX_INTERNAL=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
+      - PUBLIC_KEY_HEX_EXTERNAL=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78
+      - MINIO_ACCESS_KEY=server-b
+      - MINIO_SECRET_KEY=password
+      - BUCKET_INTERNAL=server-b
+      - BUCKET_EXTERNAL=server-a
+
+  client:
+    build: .
+    working_dir: /app/examples/batched-processing
+    command: "true"
+    volumes:
+      - .:/app/examples/batched-processing
+    depends_on:
+      - server_a
+      - server_b
+    environment:
+      - N_DATA=3
+      - BATCH_ID=test
+      # Server A and B respectively
+      - PUBLIC_KEY_HEX_INTERNAL=445C126981113E5684D517826E508F5731A1B35485BACCD63DAA8120DD11DA78
+      - PUBLIC_KEY_HEX_EXTERNAL=01D5D4F179ED233140CF97F79594F0190528268A99A6CDF57EF0E1569E673642
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+      - BUCKET_SERVER_A=server-a
+      - BUCKET_SERVER_B=server-b
