@@ -201,6 +201,7 @@ def test_processing_generated_data_results_in_published_aggregates(
             for path in fs.walk(server_env["BUCKET_INTERNAL_PRIVATE"])
             if path.endswith(".json") and path.split("/")[1] == "processed"
         ]
+        assert len(paths) > 0
         for path in paths:
             # test data should be name `{batch_id}-part-{part_num}.json`
             part_num = int(path.split("-")[-1].split(".")[0])
