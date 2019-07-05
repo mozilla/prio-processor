@@ -36,11 +36,13 @@ function rsync() {
 }
 
 function config_keys() {
+    : "${DATA_CONFIG?}"
     jq -r 'keys | join("\n")' "${DATA_CONFIG}"
 }
 
 function config_get() {
-    key=$1
+    : "${DATA_CONFIG?}"
+    local key=$1
     jq -r ".\"${key}\"" "${DATA_CONFIG}"
 }
 
