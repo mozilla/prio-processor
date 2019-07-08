@@ -16,6 +16,7 @@ RUN yum install -y epel-release \
                 nss-devel \
                 msgpack-devel \
                 jq \
+                java-1.8.0-openjdk \
                 parallel \
                 tree \
         && yum clean all \
@@ -52,7 +53,7 @@ FROM centos:7 as production
 ENV LANG en_US.utf8
 
 RUN yum install -y epel-release \
-    && yum install -y nss nspr msgpack jq python36 parallel \
+    && yum install -y nss nspr msgpack jq python36 parallel java-1.8.0-openjdk \
     && yum clean all \
     && rm -rf /var/cache/yum
 

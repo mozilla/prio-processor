@@ -27,4 +27,4 @@ build:
 	docker build --target production -t prio:latest .
 
 shell:
-	docker run -it prio:dev bash -c "make && bash"
+	docker run -v $(shell pwd):/app -it prio:dev bash -c "make && bash"

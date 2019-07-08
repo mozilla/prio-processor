@@ -4,7 +4,14 @@ import math
 
 from pyspark.sql import SparkSession, Row, functions as F
 from pyspark.sql.functions import udf, explode, row_number, lit, col, length, unbase64
-from pyspark.sql.types import StructType, StructField, ArrayType, StringType, MapType, ByteType
+from pyspark.sql.types import (
+    StructType,
+    StructField,
+    ArrayType,
+    StringType,
+    MapType,
+    ByteType,
+)
 from pyspark.sql.window import Window
 
 # The raw message also contains a field named attributeMap: Map[str, str], but
@@ -29,6 +36,7 @@ payload_schema = StructType(
     ]
 )
 
+
 @udf(payload_schema)
 def extract_payload_udf(ping):
     data = json.loads(ping)
@@ -46,11 +54,9 @@ def extract(spark, path, date):
     """
     path = f"{path}/{date}/*/*/*/*"
     df = spark.read.json(path, schema=pubsub_schema)
-    return (
-        df
-        .select(extract_payload_udf(unbase64(col("payload"))).alias("extracted"))
-        .select("extracted.*")
-    )
+    return df.select(
+        extract_payload_udf(unbase64(col("payload"))).alias("extracted")
+    ).select("extracted.*")
 
 
 def estimate_num_partitions(df, column="prio", partition_size_mb=250):

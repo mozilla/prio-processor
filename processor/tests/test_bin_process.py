@@ -12,7 +12,9 @@ import pytest
 import yaml
 from dotenv import load_dotenv
 
-if run(["docker-compose", "config"]).returncode != 0:
+try:
+    run(["docker-compose", "config"])
+except:
     pytest.skip("skipping tests that require docker", allow_module_level=True)
 
 load_dotenv()
