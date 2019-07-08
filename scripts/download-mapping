@@ -8,7 +8,13 @@ ORIGIN = namedtuple("Origin", ["name", "hash"])
 
 url = "https://hg.mozilla.org/mozilla-central/raw-file/tip/toolkit/components/telemetry/core/TelemetryOriginData.inc"
 resp = urllib.request.urlopen(url)
-data = map(eval, resp.readlines())
+
+
+def ignore(line):
+    return not (line.startswith(b"//") or not line.strip())
+
+
+data = map(eval, filter(ignore, resp.readlines()))
 
 origins = [datum.name for datum in data]
 
