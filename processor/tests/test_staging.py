@@ -187,31 +187,22 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
 
     def mock_estimate_num_partitions(*args, **kwargs):
         """
-        output
         ├── _SUCCESS
         └── submission_date=2019-06-26
             ├── server_id=a
             │   ├── batch_id=content.blocking_blocked_TESTONLY-0
-            │   │   ├── part-00000-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-            │   │   ├── part-00001-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-            │   │   ├── part-00002-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-            │   │   └── part-00003-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
+            │   │   ├── part-00000-6adba759-6e58-4092-8120-6331705e2e46.c000.json
+            │   │   └── part-00001-6adba759-6e58-4092-8120-6331705e2e46.c000.json
             │   └── batch_id=content.blocking_blocked_TESTONLY-1
-            │       ├── part-00004-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-            │       ├── part-00005-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-            │       ├── part-00006-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-            │       └── part-00007-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
+            │       ├── part-00002-6adba759-6e58-4092-8120-6331705e2e46.c000.json
+            │       └── part-00003-6adba759-6e58-4092-8120-6331705e2e46.c000.json
             └── server_id=b
                 ├── batch_id=content.blocking_blocked_TESTONLY-0
-                │   ├── part-00000-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-                │   ├── part-00001-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-                │   ├── part-00002-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-                │   └── part-00003-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
+                │   ├── part-00000-6adba759-6e58-4092-8120-6331705e2e46.c000.json
+                │   └── part-00001-6adba759-6e58-4092-8120-6331705e2e46.c000.json
                 └── batch_id=content.blocking_blocked_TESTONLY-1
-                    ├── part-00004-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-                    ├── part-00005-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-                    ├── part-00006-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
-                    └── part-00007-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
+                    ├── part-00002-6adba759-6e58-4092-8120-6331705e2e46.c000.json
+                    └── part-00003-6adba759-6e58-4092-8120-6331705e2e46.c000.json
         """
         return 4
 
