@@ -213,7 +213,7 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
                     ├── part-00006-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
                     └── part-00007-8d7b8615-9ce4-4281-aa65-ec8d54218737.c000.json
         """
-        return 8
+        return 4
 
     monkeypatch.setattr(
         staging, "estimate_num_partitions", mock_estimate_num_partitions

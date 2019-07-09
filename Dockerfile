@@ -17,6 +17,7 @@ RUN yum install -y epel-release \
                 msgpack-devel \
                 jq \
                 parallel \
+                tree \
         && yum clean all \
         && rm -rf /var/cache/yum
 
