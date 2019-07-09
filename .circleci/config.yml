@@ -59,18 +59,21 @@ jobs:
             docker load -i /tmp/dev.tar
             docker load -i /tmp/prod.tar
       - run:
-          name: Test Code
-          command: docker run prio:dev
+          name: Test Prio wrapper library
+          command: docker run prio:dev bash -c "tox"
       - run:
-          name: Integration Code
+          name: Test CLI integration with the local filesystem
           command: docker run prio:prod scripts/test-cli-integration
+      - run:
+          name: Run unit-tests for Prio Processor
+          command: docker run prio:dev bash -c "cd processor && tox"
   
   test-batch-example:
     machine: true
-    working_directory: ~/python-libprio/examples/batched-processing
+    working_directory: ~/prio-processor/examples/batched-processing
     steps:
       - checkout:
-          path: ~/python-libprio
+          path: ~/prio-processor
       - restore_cache:
           key: v1-{{.Branch}}
       - run:
@@ -80,7 +83,7 @@ jobs:
           name: Build the compose container
           command: docker-compose build
       - run:
-          name: Run the batched-processing integration test
+          name: Test batched-processing integration with MinIO
           command: make test
 
   deploy:

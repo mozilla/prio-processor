@@ -16,6 +16,9 @@ RUN yum install -y epel-release \
                 nss-devel \
                 msgpack-devel \
                 jq \
+                java-1.8.0-openjdk \
+                parallel \
+                tree \
         && yum clean all \
         && rm -rf /var/cache/yum
 
@@ -26,6 +29,10 @@ RUN ln -s /usr/include/nspr4 /usr/include/nspr \
 # prepare the environment for testing in development
 ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && pip3 install tox setuptools wheel
+
+RUN curl https://sdk.cloud.google.com | bash
+ENV PATH $PATH:~/google-cloud-sdk/bin
+RUN gcloud config set disable_usage_reporting true
 
 # install the app
 WORKDIR /app
@@ -46,7 +53,7 @@ FROM centos:7 as production
 ENV LANG en_US.utf8
 
 RUN yum install -y epel-release \
-    && yum install -y nss nspr msgpack jq python36 \
+    && yum install -y nss nspr msgpack jq python36 parallel java-1.8.0-openjdk \
     && yum clean all \
     && rm -rf /var/cache/yum
 

@@ -1,0 +1,15 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+set -euo pipefail
+set -x
+
+: "${BUCKET_INTERNAL_PRIVATE?}"
+: "${BUCKET_INTERNAL_SHARED?}"
+: "${GOOGLE_APPLICATION_CREDENTIALS?}"
+
+gcloud auth activate-service-account --key-file "${GOOGLE_APPLICATION_CREDENTIALS}"
+(gsutil -m rm "gs://${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
+(gsutil -m rm "gs://${BUCKET_INTERNAL_SHARED}/**" || echo "nothing to delete")

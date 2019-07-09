@@ -127,6 +127,7 @@ def verify1(
 
     name = os.path.basename(input)
     outfile = os.path.join(output, name)
+    os.makedirs(output, exist_ok=True)
     with open(outfile, "w") as f:
         for datum in data:
             share = b64decode(datum["payload"])
@@ -190,6 +191,7 @@ def verify2(
 
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
+    os.makedirs(output, exist_ok=True)
     with open(outfile, "w") as f:
         for datum in data:
             share = b64decode(datum["payload"])
@@ -275,6 +277,7 @@ def aggregate(
 
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
+    os.makedirs(output, exist_ok=True)
     with open(outfile, "w") as f:
         shares = libprio.PrioTotalShare_new()
         libprio.PrioTotalShare_set_data(shares, server)
@@ -331,5 +334,6 @@ def publish(
 
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
+    os.makedirs(output, exist_ok=True)
     with open(outfile, "w") as f:
         json.dump(final, f)
