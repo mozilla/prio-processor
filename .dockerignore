@@ -12,8 +12,8 @@ examples/*/Pipfile.lock
 .vscode
 .tox
 
-build/
 data/
-dist/
-working/
-venv/
+**/build/
+**/dist/
+**/working/
+**/venv/

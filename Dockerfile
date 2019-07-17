@@ -41,10 +41,13 @@ ADD . /app
 RUN make
 
 # build the wheel with the python version on the production image
-RUN python3 setup.py bdist_wheel
+RUN python3 setup.py bdist_wheel && pip3 install dist/prio-*.whl
 
-# install the package into the current development image
-RUN pip3 install .
+# build the processor
+WORKDIR /app/processor
+RUN pip3 install . && python3 setup.py bdist_egg
+
+WORKDIR /app
 CMD make test
 
 
@@ -60,11 +63,16 @@ RUN yum install -y epel-release \
 RUN groupadd --gid 10001 app && \
     useradd -g app --uid 10001 --shell /usr/sbin/nologin --create-home \
         --home-dir /app app
+RUN chown -R 10001:10001 /app
 
 WORKDIR /app
 COPY --from=development /app .
 ENV PATH="$PATH:~/.local/bin"
-RUN python3 -m ensurepip && pip3 install pytest dist/prio-*.whl
+RUN python3 -m ensurepip \
+        && pip3 install \
+                pytest \
+                ./dist/prio-*.whl \
+                ./processor
 
 USER app
 CMD pytest && scripts/test-cli-integration
