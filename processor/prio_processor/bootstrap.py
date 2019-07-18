@@ -29,10 +29,10 @@ def run(output, token):
     if len(egg_listing) > 1:
         raise RuntimeError("there are multiple eggs")
 
-    fs = GCSFileSystem(output, token=token)
+    fs = GCSFileSystem(token=token)
 
     egg = egg_listing[0]
-    outfile = "output/prio_processor.egg"
+    outfile = f"{output}/prio_processor.egg"
     logging.info(f"writing {egg} to {outfile}")
     fs.put(egg, outfile)
 
