@@ -31,7 +31,7 @@ ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && pip3 install tox setuptools wheel
 
 RUN curl https://sdk.cloud.google.com | bash
-ENV PATH $PATH:~/google-cloud-sdk/bin
+ENV PATH="$PATH:~/google-cloud-sdk/bin"
 RUN gcloud config set disable_usage_reporting true
 
 # install the app
@@ -56,17 +56,18 @@ FROM centos:7 as production
 ENV LANG en_US.utf8
 
 RUN yum install -y epel-release \
-    && yum install -y nss nspr msgpack jq python36 parallel java-1.8.0-openjdk \
+    && yum install -y which nss nspr msgpack jq python36 parallel java-1.8.0-openjdk \
     && yum clean all \
     && rm -rf /var/cache/yum
 
 RUN groupadd --gid 10001 app && \
     useradd -g app --uid 10001 --shell /usr/sbin/nologin --create-home \
         --home-dir /app app
-RUN chown -R 10001:10001 /app
 
 WORKDIR /app
 COPY --from=development /app .
+RUN chown -R 10001:10001 /app
+
 ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip \
         && pip3 install \
@@ -75,6 +76,10 @@ RUN python3 -m ensurepip \
                 ./processor
 
 USER app
+RUN curl https://sdk.cloud.google.com | bash
+ENV PATH="$PATH:~/google-cloud-sdk/bin"
+RUN gcloud config set disable_usage_reporting true
+
 CMD pytest && scripts/test-cli-integration
 
 
