@@ -14,6 +14,7 @@ from gcsfs import GCSFileSystem
 )
 @click.option(
     "--token",
+    type=str,
     envvar="GOOGLE_APPLICATION_CREDENTIALS",
     help="Path to google application credentials",
     required=False,
@@ -31,8 +32,9 @@ def run(output, token):
     fs = GCSFileSystem(output, token=token)
 
     egg = egg_listing[0]
-    logging.info(f"writing {egg} to {output}/{egg}")
-    fs.put(egg, f"{output}/{egg}")
+    outfile = "output/prio_processor.egg"
+    logging.info(f"writing {egg} to {outfile}")
+    fs.put(egg, outfile)
 
     logging.info(f"writing runner.py to {output}/runner.py")
     with fs.open(f"{output}/runner.py", "w") as f:
