@@ -1,6 +1,6 @@
-# python-libprio
+# prio-processor
 
-[![CircleCI](https://circleci.com/gh/mozilla/python-libprio.svg?style=svg)](https://circleci.com/gh/mozilla/python-libprio)
+[![CircleCI](https://circleci.com/gh/mozilla/prio-processor.svg?style=svg)](https://circleci.com/gh/mozilla/prio-processor)
 
 Prio is a system for aggregating data in a privacy-preserving way. This
 repository includes a Python wrapper around [libprio](https://github.com/mozilla/libprio) 
@@ -82,3 +82,4 @@ applications that can be built using this set of tools.
 * `asyncio` - An asynchronous pipeline.
 * `docker-asyncio` - An asynchronous pipeline using a publish-subscribe
   architecture.
+* `batched-processing` - A batched-object processing system using docker and minio.
