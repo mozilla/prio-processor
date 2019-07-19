@@ -8,6 +8,7 @@ setup(
     author="Anthony Miyaguchi",
     author_email="amiyaguchi@mozilla.com",
     url="https://github.com/mozilla/prio-processor",
-    install_requires=["click", "pyspark >= 2.4.0"],
+    entry_points={"console_scripts": ["prio-processor=prio_processor.__main__:entry_point"]},
+    install_requires=["click", "gcsfs", "pyspark >= 2.4.0"],
     packages=["prio_processor"],
 )

@@ -31,7 +31,7 @@ ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && pip3 install tox setuptools wheel
 
 RUN curl https://sdk.cloud.google.com | bash
-ENV PATH $PATH:~/google-cloud-sdk/bin
+ENV PATH="$PATH:~/google-cloud-sdk/bin"
 RUN gcloud config set disable_usage_reporting true
 
 # install the app
@@ -41,10 +41,13 @@ ADD . /app
 RUN make
 
 # build the wheel with the python version on the production image
-RUN python3 setup.py bdist_wheel
+RUN python3 setup.py bdist_wheel && pip3 install dist/prio-*.whl
 
-# install the package into the current development image
-RUN pip3 install .
+# build the processor
+WORKDIR /app/processor
+RUN pip3 install . && python3 setup.py bdist_egg
+
+WORKDIR /app
 CMD make test
 
 
@@ -53,7 +56,7 @@ FROM centos:7 as production
 ENV LANG en_US.utf8
 
 RUN yum install -y epel-release \
-    && yum install -y nss nspr msgpack jq python36 parallel java-1.8.0-openjdk \
+    && yum install -y which nss nspr msgpack jq python36 parallel java-1.8.0-openjdk \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -63,10 +66,20 @@ RUN groupadd --gid 10001 app && \
 
 WORKDIR /app
 COPY --from=development /app .
+RUN chown -R 10001:10001 /app
+
 ENV PATH="$PATH:~/.local/bin"
-RUN python3 -m ensurepip && pip3 install pytest dist/prio-*.whl
+RUN python3 -m ensurepip \
+        && pip3 install \
+                pytest \
+                ./dist/prio-*.whl \
+                ./processor
 
 USER app
+RUN curl https://sdk.cloud.google.com | bash
+ENV PATH="$PATH:~/google-cloud-sdk/bin"
+RUN gcloud config set disable_usage_reporting true
+
 CMD pytest && scripts/test-cli-integration
 
 
