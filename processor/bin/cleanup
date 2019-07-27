@@ -8,8 +8,21 @@ set -x
 
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
-: "${GOOGLE_APPLICATION_CREDENTIALS?}"
+: "${GOOGLE_APPLICATION_CREDENTIALS:=}"
 
-gcloud auth activate-service-account --key-file "${GOOGLE_APPLICATION_CREDENTIALS}"
+function authenticate() {
+    local cred=${GOOGLE_APPLICATION_CREDENTIALS}
+    local test_bucket=${BUCKET_INTERNAL_PRIVATE}
+
+    if [[ -n "${cred}" ]]; then
+        gcloud auth activate-service-account --key-file "${cred}"
+    else
+        # https://cloud.google.com/kubernetes-engine/docs/tutorials/authenticating-to-cloud-platform
+        echo "No JSON credentials provided, using default scopes."
+    fi
+    gsutil ls "gs://${test_bucket}"
+}
+
+authenticate
 (gsutil -m rm "gs://${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
 (gsutil -m rm "gs://${BUCKET_INTERNAL_SHARED}/**" || echo "nothing to delete")
