@@ -37,13 +37,13 @@ def ansi_escape(text):
 
 
 def process_run(command: str, service: str, env: dict = {}) -> CompletedProcess:
+    env_str = " ".join(f"-e {k}={v}" for k, v in env.items())
     result = run(
         [
             "bash",
             "-c",
-            f'docker-compose run {service} bash -c ". bin/process; {command}"',
+            f'docker-compose run {env_str} {service} bash -c ". bin/process; {command}"',
         ],
-        env={**environ, **env},
         stdout=PIPE,
     )
     result.stdout = ansi_escape(result.stdout.decode())
@@ -134,12 +134,22 @@ def test_extract_batch_id(process_run_a):
     assert result.stdout.split()[-1] == "test"
 
 
+def test_scope_based_authentication_fails_locally(server_a_env):
+    result = process_run(
+        "authenticate",
+        service="server_a",
+        env={**server_a_env, **{"GOOGLE_APPLICATION_CREDENTIALS": ""}},
+    )
+    with pytest.raises(subprocess.CalledProcessError):
+        result.check_returncode()
+
+
 def test_buckets_are_empty_after_cleanup(cleanup, server_a_env, server_b_env):
     run(["bash", "-c", "docker-compose run client bin/generate"])
 
     # test the state of server a
     assert len(gcsfs_a().walk(server_a_env["BUCKET_INTERNAL_PRIVATE"])) > 0
-    assert len(gcsfs_a().walk(server_b_env["BUCKET_INTERNAL_SHARED"])) == 0
+    assert len(gcsfs_a().walk(server_a_env["BUCKET_INTERNAL_SHARED"])) == 0
 
     # test the state of server b
     assert len(gcsfs_b().walk(server_b_env["BUCKET_INTERNAL_PRIVATE"])) > 0
