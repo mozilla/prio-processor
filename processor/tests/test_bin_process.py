@@ -166,7 +166,7 @@ def test_generated_data_follows_filesystem_convention(
 ):
     run(["bash", "-c", "docker-compose run client bin/generate"])
 
-    n_batch_ids = 4
+    n_batch_ids = 5
     n_parts_per_batch = 5
 
     files_a = gcsfs_a().walk(server_a_env["BUCKET_INTERNAL_PRIVATE"])
@@ -226,3 +226,16 @@ def test_processing_generated_data_results_in_published_aggregates(
 
     _validate(gcsfs_a(), server_a_env)
     _validate(gcsfs_b(), server_b_env)
+
+    # assert that bad-id is not in the final published set
+    paths = gcsfs_a().walk(server_a_env["BUCKET_INTERNAL_PRIVATE"])
+    processed = [p for p in paths if "processed" in p]
+    raw = [p for p in paths if "raw" in p]
+
+    # query contains bad-id and other valid ids
+    assert any(["batch_id=bad-id" in p for p in raw])
+    assert any(["batch_id=content.blocking_blocked_TESTONLY-0" in p for p in raw])
+
+    # query does not contain bad-id, since it's skipped
+    assert not any(["batch_id=bad-id" in p for p in processed])
+    assert any(["batch_id=content.blocking_blocked_TESTONLY-0" in p for p in processed])
