@@ -196,6 +196,10 @@ function verify1() {
     function process() {
         local filename=$1
         export_data_dimensions "$filename"
+        if [[ $N_DATA == "null" ]]; then
+            echo "$BATCH_ID has unknown dimension, skipping..."
+            return
+        fi
 
         prio verify1 \
             --input "${input}/${filename}" \
@@ -222,6 +226,10 @@ function verify2() {
     function process() {
         local filename=$1
         export_data_dimensions "$filename"
+        if [[ $N_DATA == "null" ]]; then
+            echo "$BATCH_ID has unknown dimension, skipping..."
+            return
+        fi
 
         prio verify2 \
             --input "${input}/${filename}" \
@@ -250,6 +258,10 @@ function aggregate() {
     function process() {
         local filename=$1
         export_data_dimensions "$filename"
+        if [[ $N_DATA == "null" ]]; then
+            echo "$BATCH_ID has unknown dimension, skipping..."
+            return
+        fi
 
         prio aggregate \
             --input "${input}/${filename}" \
@@ -276,6 +288,10 @@ function publish() {
     function process() {
         local filename=$1
         export_data_dimensions "$filename"
+        if [[ $N_DATA == "null" ]]; then
+            echo "$BATCH_ID has unknown dimension, skipping..."
+            return
+        fi
 
         prio publish \
             --input-internal "${input_internal}/${filename}" \

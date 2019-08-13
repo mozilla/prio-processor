@@ -56,6 +56,9 @@ function generate_dataset() {
     local batch_id=$1
     local n_data
     n_data=$(config_get "$batch_id")
+    if [[ $n_data == "null" ]]; then
+        n_data=10
+    fi
 
     local out_a="server_a/raw/batch_id=${batch_id}"
     local out_b="server_b/raw/batch_id=${batch_id}"
@@ -86,6 +89,9 @@ function main() {
     export -f generate_data     # used by generate_dataset
     export -f generate_dataset
     parallel generate_dataset ::: "$(config_keys)"
+
+    # also generate a batch-id with unknown dimensions
+    generate_dataset "bad-id"
 
     rsync a "${BUCKET_INTERNAL_PRIVATE}" "${GOOGLE_APPLICATION_CREDENTIALS_INTERNAL}"
     rsync b "${BUCKET_EXTERNAL_PRIVATE}" "${GOOGLE_APPLICATION_CREDENTIALS_EXTERNAL}"
