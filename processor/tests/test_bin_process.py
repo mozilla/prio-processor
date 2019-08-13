@@ -232,10 +232,10 @@ def test_processing_generated_data_results_in_published_aggregates(
     processed = [p for p in paths if "processed" in p]
     raw = [p for p in paths if "raw" in p]
 
-    # query contains bad-id and other valid ids
+    # raw paths contains bad-id and other valid ids
     assert any(["batch_id=bad-id" in p for p in raw])
     assert any(["batch_id=content.blocking_blocked_TESTONLY-0" in p for p in raw])
 
-    # query does not contain bad-id, since it's skipped
+    # bad-id is skipped and not part of the processed paths
     assert not any(["batch_id=bad-id" in p for p in processed])
     assert any(["batch_id=content.blocking_blocked_TESTONLY-0" in p for p in processed])
