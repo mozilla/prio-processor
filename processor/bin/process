@@ -301,8 +301,6 @@ function publish() {
     export -f process
     parallel process ::: "$(list_partitions ${input_internal})"
 
-    jq -c '.' ${output}/**/*.json
-
     send_output_internal ${output}
 }
 
