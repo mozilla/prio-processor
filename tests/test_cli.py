@@ -1,4 +1,5 @@
 from base64 import b64decode, b64encode
+import fileinput
 import json
 import os
 import pytest
@@ -332,3 +333,81 @@ def test_aggregate_end_to_end(tmp_path, shared_seed, keygen_server_a, keygen_ser
         server_b_published_output_filename,
     ):
         assert json.load(open(filename)) == [3, 2, 1]
+
+
+def test_partial_success(tmp_path, shared_seed):
+    key_a = _keygen()
+    key_b = _keygen()
+    key_c = _keygen()
+
+    batch_id = "test"
+    n_data = 3
+    base_args = ["--n-data", n_data, "--batch-id", batch_id]
+
+    runner = CliRunner()
+
+    def encode(key_0, key_1, output_path):
+        input_path = tmp_path / "tmp"
+        with open(input_path, "w") as f:
+            f.write(json.dumps([1, 0, 1]))
+
+        result = runner.invoke(
+            commands.encode_shares,
+            base_args
+            + [
+                "--public-key-hex-internal",
+                key_0["public_key"],
+                "--public-key-hex-external",
+                key_1["public_key"],
+                "--input",
+                input_path,
+                "--output-A",
+                output_path,
+                "--output-B",
+                tmp_path / "ignored",
+            ],
+        )
+        assert result.exit_code == 0
+
+    # generate two sets of data points with different pairs of keys
+    out_0 = tmp_path / "out-0"
+    out_1 = tmp_path / "out-1"
+    out_full = tmp_path / "out"
+    out_verify1 = tmp_path / "verify1"
+
+    encode(key_c, key_a, out_0)
+    encode(key_c, key_b, out_1)
+
+    # concatenate the two files together
+    with open(out_full, "w") as f_out, fileinput.input([out_0, out_1]) as f_in:
+        for line in f_in:
+            f_out.write(line)
+
+    # run through verify 1 and check the total number of lines
+    result = runner.invoke(
+        commands.verify1,
+        base_args
+        + [
+            "--server-id",
+            "A",
+            "--private-key-hex",
+            key_c["private_key"],
+            "--shared-secret",
+            shared_seed,
+            "--public-key-hex-internal",
+            key_c["public_key"],
+            "--public-key-hex-external",
+            key_a["public_key"],
+            "--input",
+            out_full,
+            "--output",
+            out_verify1,
+        ],
+    )
+    assert result.exit_code == 0
+
+    with open(out_full, "r") as f:
+        assert len(f.readlines()) == 2
+
+    with open(out_verify1, "r") as f:
+        assert len(f.readlines()) == 1

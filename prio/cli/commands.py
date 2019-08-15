@@ -4,6 +4,7 @@ import json
 import os
 from base64 import b64decode, b64encode
 from uuid import uuid4
+import logging
 
 from .. import libprio
 from .options import (
@@ -128,15 +129,23 @@ def verify1(
     name = os.path.basename(input)
     outfile = os.path.join(output, name)
     os.makedirs(output, exist_ok=True)
+
+    total = 0
+    error = 0
     with open(outfile, "w") as f:
         for datum in data:
-            share = b64decode(datum["payload"])
-            libprio.PrioVerifier_set_data(verifier, share)
-            libprio.PrioPacketVerify1_set_data(packet, verifier)
-            packet_data = libprio.PrioPacketVerify1_write(packet)
-            datum["payload"] = b64encode(packet_data).decode()
-            json.dump(datum, f)
-            f.write("\n")
+            total += 1
+            try:
+                share = b64decode(datum["payload"])
+                libprio.PrioVerifier_set_data(verifier, share)
+                libprio.PrioPacketVerify1_set_data(packet, verifier)
+                packet_data = libprio.PrioPacketVerify1_write(packet)
+                datum["payload"] = b64encode(packet_data).decode()
+                json.dump(datum, f)
+                f.write("\n")
+            except RuntimeError:
+                error += 1
+    click.echo(f"{error} errors out of {total} total")
 
 
 @click.command()
@@ -192,23 +201,31 @@ def verify2(
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
     os.makedirs(output, exist_ok=True)
+
+    total = 0
+    error = 0
     with open(outfile, "w") as f:
         for datum in data:
-            share = b64decode(datum["payload"])
-            internal = b64decode(internal_index[datum["id"]])
-            external = b64decode(external_index[datum["id"]])
+            total += 1
+            try:
+                share = b64decode(datum["payload"])
+                internal = b64decode(internal_index[datum["id"]])
+                external = b64decode(external_index[datum["id"]])
 
-            libprio.PrioVerifier_set_data(verifier, share)
-            libprio.PrioPacketVerify1_read(packet1_internal, internal, config)
-            libprio.PrioPacketVerify1_read(packet1_external, external, config)
+                libprio.PrioVerifier_set_data(verifier, share)
+                libprio.PrioPacketVerify1_read(packet1_internal, internal, config)
+                libprio.PrioPacketVerify1_read(packet1_external, external, config)
 
-            libprio.PrioPacketVerify2_set_data(
-                packet, verifier, packet1_internal, packet1_external
-            )
-            packet_data = libprio.PrioPacketVerify2_write(packet)
-            datum["payload"] = b64encode(packet_data).decode()
-            json.dump(datum, f)
-            f.write("\n")
+                libprio.PrioPacketVerify2_set_data(
+                    packet, verifier, packet1_internal, packet1_external
+                )
+                packet_data = libprio.PrioPacketVerify2_write(packet)
+                datum["payload"] = b64encode(packet_data).decode()
+                json.dump(datum, f)
+                f.write("\n")
+            except RuntimeError:
+                error += 1
+    click.echo(f"{error} errors out of {total} total")
 
 
 @click.command()
@@ -260,20 +277,23 @@ def aggregate(
     internal_index = {d["id"]: d["payload"] for d in data_internal}
     external_index = {d["id"]: d["payload"] for d in data_external}
 
+    total = 0
+    error = 0
     for datum in data:
-        share = b64decode(datum["payload"])
-        internal = b64decode(internal_index[datum["id"]])
-        external = b64decode(external_index[datum["id"]])
-
-        libprio.PrioVerifier_set_data(verifier, share)
-        libprio.PrioPacketVerify2_read(packet2_internal, internal, config)
-        libprio.PrioPacketVerify2_read(packet2_external, external, config)
+        total += 1
         try:
+            share = b64decode(datum["payload"])
+            internal = b64decode(internal_index[datum["id"]])
+            external = b64decode(external_index[datum["id"]])
+
+            libprio.PrioVerifier_set_data(verifier, share)
+            libprio.PrioPacketVerify2_read(packet2_internal, internal, config)
+            libprio.PrioPacketVerify2_read(packet2_external, external, config)
             libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
+            libprio.PrioServer_aggregate(server, verifier)
         except RuntimeError:
-            # the current packet is invalid
-            continue
-        libprio.PrioServer_aggregate(server, verifier)
+            error += 1
+    click.echo(f"{error} errors out of {total} total")
 
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
