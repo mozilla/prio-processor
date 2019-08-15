@@ -335,7 +335,7 @@ def test_aggregate_end_to_end(tmp_path, shared_seed, keygen_server_a, keygen_ser
         assert json.load(open(filename)) == [3, 2, 1]
 
 
-def test_partial_success(tmp_path, shared_seed):
+def test_verify1_ignores_bad_payloads_in_batch(tmp_path, shared_seed):
     key_a = _keygen()
     key_b = _keygen()
     key_c = _keygen()
@@ -346,44 +346,49 @@ def test_partial_success(tmp_path, shared_seed):
 
     runner = CliRunner()
 
-    def encode(key_0, key_1, output_path):
-        input_path = tmp_path / "tmp"
-        with open(input_path, "w") as f:
-            f.write(json.dumps([1, 0, 1]))
+    # create dependencies for encode function
+    data_path = tmp_path / "data.json"
+    with open(data_path, "w") as f:
+        f.write(json.dumps([1, 0, 1]))
+    ignore = tmp_path / "ignore"
+    ignore.mkdir()
 
-        result = runner.invoke(
-            commands.encode_shares,
-            base_args
-            + [
-                "--public-key-hex-internal",
-                key_0["public_key"],
-                "--public-key-hex-external",
-                key_1["public_key"],
-                "--input",
-                input_path,
-                "--output-A",
-                output_path,
-                "--output-B",
-                tmp_path / "ignored",
-            ],
-        )
+    def encode(key_0, key_1, output_path):
+        args = base_args + [
+            "--public-key-hex-internal",
+            key_0["public_key"],
+            "--public-key-hex-external",
+            key_1["public_key"],
+            "--input",
+            data_path,
+            "--output-A",
+            output_path,
+            "--output-B",
+            ignore,
+        ]
+        result = runner.invoke(commands.encode_shares, args)
         assert result.exit_code == 0
 
     # generate two sets of data points with different pairs of keys
     out_0 = tmp_path / "out-0"
     out_1 = tmp_path / "out-1"
-    out_full = tmp_path / "out"
+    out_0.mkdir()
+    out_1.mkdir()
+
+    out_full = tmp_path / "out.json"
     out_verify1 = tmp_path / "verify1"
 
-    encode(key_c, key_a, out_0)
-    encode(key_c, key_b, out_1)
+    encode(key_a, key_c, out_0)
+    encode(key_b, key_c, out_1)
 
     # concatenate the two files together
-    with open(out_full, "w") as f_out, fileinput.input([out_0, out_1]) as f_in:
+    with open(out_full, "w") as f_out, fileinput.input(
+        [out_0 / "data.json", out_1 / "data.json"]
+    ) as f_in:
         for line in f_in:
             f_out.write(line)
 
-    # run through verify 1 and check the total number of lines
+    # run through verify 1, using key a as the private key
     result = runner.invoke(
         commands.verify1,
         base_args
@@ -391,13 +396,13 @@ def test_partial_success(tmp_path, shared_seed):
             "--server-id",
             "A",
             "--private-key-hex",
-            key_c["private_key"],
+            key_a["private_key"],
             "--shared-secret",
             shared_seed,
             "--public-key-hex-internal",
-            key_c["public_key"],
-            "--public-key-hex-external",
             key_a["public_key"],
+            "--public-key-hex-external",
+            key_c["public_key"],
             "--input",
             out_full,
             "--output",
@@ -406,8 +411,10 @@ def test_partial_success(tmp_path, shared_seed):
     )
     assert result.exit_code == 0
 
+    # the input file has 2 lines
     with open(out_full, "r") as f:
         assert len(f.readlines()) == 2
 
-    with open(out_verify1, "r") as f:
+    # the output file has 1 line
+    with open(out_verify1 / "out.json", "r") as f:
         assert len(f.readlines()) == 1
