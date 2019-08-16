@@ -4,7 +4,6 @@ import json
 import os
 from base64 import b64decode, b64encode
 from uuid import uuid4
-import logging
 
 from .. import libprio
 from .options import (
@@ -130,8 +129,7 @@ def verify1(
     outfile = os.path.join(output, name)
     os.makedirs(output, exist_ok=True)
 
-    total = 0
-    error = 0
+    total, error = 0, 0
     with open(outfile, "w") as f:
         for datum in data:
             total += 1
@@ -202,8 +200,7 @@ def verify2(
     outfile = os.path.join(output, name)
     os.makedirs(output, exist_ok=True)
 
-    total = 0
-    error = 0
+    total, error = 0, 0
     with open(outfile, "w") as f:
         for datum in data:
             total += 1
@@ -277,8 +274,7 @@ def aggregate(
     internal_index = {d["id"]: d["payload"] for d in data_internal}
     external_index = {d["id"]: d["payload"] for d in data_external}
 
-    total = 0
-    error = 0
+    total, error = 0, 0
     for datum in data:
         total += 1
         try:
