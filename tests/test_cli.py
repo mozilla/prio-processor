@@ -1,4 +1,5 @@
 from base64 import b64decode, b64encode
+import fileinput
 import json
 import os
 import pytest
@@ -332,3 +333,98 @@ def test_aggregate_end_to_end(tmp_path, shared_seed, keygen_server_a, keygen_ser
         server_b_published_output_filename,
     ):
         assert json.load(open(filename)) == [3, 2, 1]
+
+
+def test_verify1_ignores_invalid_payloads_in_batch(tmp_path, shared_seed):
+    """Create a single partition where the payload for server A is encoded using
+    two different keys. The mismatched payload should be ignored."""
+
+    key_a, key_b, key_c = [_keygen() for _ in range(3)]
+    base_args = ["--n-data", 3, "--batch-id", "test"]
+
+    runner = CliRunner()
+
+    # Source data for encode
+    data_path = tmp_path / "data.json"
+    with open(data_path, "w") as f:
+        f.write(json.dumps([1, 0, 1]))
+
+    # Folder for data that is ignored in the test
+    ignore = tmp_path / "ignore"
+    ignore.mkdir()
+
+    # Folder containing data encoded using key_a
+    out_a = tmp_path / "out-a"
+    out_a.mkdir()
+
+    # Folder containing data encoded using key_b
+    out_b = tmp_path / "out-b"
+    out_b.mkdir()
+
+    # Concatenated file of inputs
+    out_full = tmp_path / "out.json"
+
+    # Output of verify1
+    out_verify1 = tmp_path / "verify1"
+
+    def encode(key_0, key_1, output_path):
+        result = runner.invoke(
+            commands.encode_shares,
+            base_args
+            + [
+                "--public-key-hex-internal",
+                key_0["public_key"],
+                "--public-key-hex-external",
+                key_1["public_key"],
+                "--input",
+                data_path,
+                "--output-A",
+                output_path,
+                "--output-B",
+                ignore,
+            ],
+        )
+        assert result.exit_code == 0
+
+    # generate two sets of data points with different pairs of keys. This is the
+    # source of error.
+    encode(key_a, key_c, out_a)
+    encode(key_b, key_c, out_b)
+
+    # concatenate the two files together
+    parts = [out_a / "data.json", out_b / "data.json"]
+    with open(out_full, "w") as f_out, fileinput.input(parts) as f_in:
+        for line in f_in:
+            f_out.write(line)
+
+    # run through verify 1, using key_a as the private key. The payloads encoded
+    # using key_b will be ignored.
+    result = runner.invoke(
+        commands.verify1,
+        base_args
+        + [
+            "--server-id",
+            "A",
+            "--private-key-hex",
+            key_a["private_key"],
+            "--shared-secret",
+            shared_seed,
+            "--public-key-hex-internal",
+            key_a["public_key"],
+            "--public-key-hex-external",
+            key_c["public_key"],
+            "--input",
+            out_full,
+            "--output",
+            out_verify1,
+        ],
+    )
+    assert result.exit_code == 0
+
+    # the input file has 2 lines
+    with open(out_full, "r") as f:
+        assert len(f.readlines()) == 2
+
+    # the output file has 1 line
+    with open(out_verify1 / "out.json", "r") as f:
+        assert len(f.readlines()) == 1
