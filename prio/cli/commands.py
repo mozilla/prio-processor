@@ -220,7 +220,7 @@ def verify2(
                 datum["payload"] = b64encode(packet_data).decode()
                 json.dump(datum, f)
                 f.write("\n")
-            except RuntimeError:
+            except (RuntimeError, KeyError):
                 error += 1
     click.echo(f"{error} errors out of {total} total")
 
@@ -287,7 +287,7 @@ def aggregate(
             libprio.PrioPacketVerify2_read(packet2_external, external, config)
             libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
             libprio.PrioServer_aggregate(server, verifier)
-        except RuntimeError:
+        except (RuntimeError, KeyError):
             error += 1
     click.echo(f"{error} errors out of {total} total")
 
