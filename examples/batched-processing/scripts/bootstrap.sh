@@ -13,6 +13,10 @@ mc mb $TARGET/server-b
 mc admin policy add $TARGET server-a policy/server-a.json
 mc admin policy add $TARGET server-b policy/server-b.json
 
-# mc admin user add TARGET ACCESSKEY SECRETKEY POLICYNAME
-mc admin user add $TARGET server-a password server-a
-mc admin user add $TARGET server-b password server-b
+# mc admin user add TARGET ACCESSKEY SECRETKEY
+mc admin user add $TARGET server-a password
+mc admin user add $TARGET server-b password
+
+# mc admin policy set TARGET POLICYNAME user=ACCESSKEY
+mc admin policy set $TARGET server-a user=server-a
+mc admin policy set $TARGET server-b user=server-b

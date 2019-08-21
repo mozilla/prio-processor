@@ -78,6 +78,10 @@ function generate_dataset() {
             --n-data "${n_data}" \
             --output-A "${out_a}" \
             --output-B "${out_b}"
+
+        # test for robustness by inserting an invalid entry into the shares
+        echo '{"id": "asdf", "payload": "asdf"}' >> "${out_a}/${filename}"
+        echo '{"id": "asdf", "payload": "asdf"}' >> "${out_b}/${filename}"
     done
 }
 
