@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import click
 import json
 import math
@@ -14,49 +15,61 @@ from pyspark.sql.types import (
 )
 from pyspark.sql.window import Window
 
-# The raw message also contains a field named attributeMap: Map[str, str], but
-# is safely ignored in this processing job
-pubsub_schema = StructType([StructField("payload", StringType(), False)])
 
-payload_schema = StructType(
-    [
-        StructField("id", StringType(), False),
-        StructField(
-            "prioData",
-            ArrayType(
-                StructType(
-                    [
-                        StructField("encoding", StringType(), False),
-                        StructField("prio", MapType(StringType(), StringType()), False),
-                    ]
-                )
+class ExtractPrioPing(ABC):
+    payload_schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField(
+                "prioData",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField("encoding", StringType(), True),
+                            StructField(
+                                "prio", MapType(StringType(), StringType()), True
+                            ),
+                        ]
+                    )
+                ),
+                True,
             ),
-            False,
-        ),
-    ]
-)
+        ]
+    )
+
+    def __init__(self, spark):
+        self.spark = spark
+
+    @abstractmethod
+    def extract(self, path, date):
+        pass
 
 
-@udf(payload_schema)
-def extract_payload_udf(ping):
-    data = json.loads(ping)
-    return Row(id=data["id"], prioData=data["payload"]["prioData"])
+class CloudStorageExtract(ExtractPrioPing):
+    @staticmethod
+    @udf(ExtractPrioPing.payload_schema)
+    def extract_payload_udf(ping):
+        data = json.loads(ping)
+        return Row(id=data["id"], prioData=data["payload"]["prioData"])
 
+    def extract(self, path, date):
+        """Extract data from the moz-fx-data bucket that has been decoded by
+        the gcp-ingestion stack. The messages are newline-delimited json
+        documents representing PubSub messages (refer to the `prio_ping` test
+        fixture for implementation details).
 
-def extract(spark, path, date):
-    """Extract data from the moz-fx-data bucket that has been decoded by
-    the gcp-ingestion stack. The messages are newline-delimited json documents
-    representing PubSub messages (refer to the `prio_ping` test fixture for
-    implementation details).
+        The directory hierarchy encodes the purpose for each folder as follows:
+            date / hour / namespace / type / version / *.ndjson
+        """
+        # The raw message also contains a field named attributeMap: Map[str,
+        # str], but is safely ignored in this processing job
+        pubsub_schema = StructType([StructField("payload", StringType(), False)])
 
-    The directory hierarchy encodes the purpose for each folder as follows:
-        date / hour / namespace / type / version / *.ndjson
-    """
-    path = f"{path}/{date}/*/*/*/*"
-    df = spark.read.json(path, schema=pubsub_schema)
-    return df.select(
-        extract_payload_udf(unbase64(col("payload"))).alias("extracted")
-    ).select("extracted.*")
+        path = f"{path}/{date}/*/*/*/*"
+        df = self.spark.read.json(path, schema=pubsub_schema)
+        return df.select(
+            self.extract_payload_udf(unbase64(col("payload"))).alias("extracted")
+        ).select("extracted.*")
 
 
 def estimate_num_partitions(df, column="prio", partition_size_mb=250):
@@ -111,7 +124,7 @@ def load(data, output, date):
 def run(date, input, output):
     spark = SparkSession.builder.getOrCreate()
     spark.conf.set("fs.gs.implicit.dir.repair.enable", False)
-    pings = extract(spark, input, date)
+    pings = CloudStorageExtract(spark).extract(input, date)
     processed = transform(pings)
     load(processed, output, date)
 
