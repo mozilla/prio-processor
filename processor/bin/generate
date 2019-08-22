@@ -61,6 +61,7 @@ function generate_dataset() {
     local n_data
     n_data=$(config_get "$batch_id")
     if [[ $n_data == "null" ]]; then
+        echo "unknown dimensions for ${batch_id}"
         n_data=10
     fi
 
@@ -84,8 +85,10 @@ function generate_dataset() {
             --output-B "${out_b}"
 
         # test for robustness by inserting an invalid entry into the shares
+        set +x
         echo '{"id": "asdf", "payload": "asdf"}' >> "${out_a}/${filename}"
         echo '{"id": "asdf", "payload": "asdf"}' >> "${out_b}/${filename}"
+        set -x
     done
 }
 
