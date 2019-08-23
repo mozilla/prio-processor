@@ -62,10 +62,12 @@ Run the job.
 gcloud dataproc jobs submit pyspark \
     gs://<BUCKET>/bootstrap/runner.py \
     --cluster test-cluster  \
+    --jars gs://spark-lib/bigquery/spark-bigquery-latest.jar \
     --py-files gs://<BUCKET>/bootstrap/prio_processor.egg \
         -- \
+        --source bigquery \
         --date <YYYY-MM-DD> \
-        --input gs://moz-fx-data-stage-data/telemetry-decoded_gcs-sink-doctype_prio/output \
+        --input moz-fx-data-shar-nonprod-efed.payload_bytes_decoded.telemetry_telemetry__prio_v4 \
         --output gs://<BUCKET>/prio_staging/
 ```
 

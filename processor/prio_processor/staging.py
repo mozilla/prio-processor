@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 import click
+import gzip
 import json
 import math
 
+from datetime import datetime, timedelta
 from pyspark.sql import SparkSession, Row, functions as F
 from pyspark.sql.functions import udf, explode, row_number, lit, col, length, unbase64
 from pyspark.sql.types import (
@@ -72,6 +74,33 @@ class CloudStorageExtract(ExtractPrioPing):
         ).select("extracted.*")
 
 
+class BigQueryStorageExtract(ExtractPrioPing):
+    @staticmethod
+    @udf(ExtractPrioPing.payload_schema)
+    def extract_payload_udf(ping):
+        data = json.loads(gzip.decompress(ping).decode("utf-8"))
+        return Row(id=data["id"], prioData=data["payload"]["prioData"])
+
+    def extract(self, table, date):
+        """Extract data from the payload_bytes_decoded BigQuery table."""
+        fmt = "%Y-%m-%d"
+        dt = datetime.strptime("2019-08-20", fmt)
+        date_upper = datetime.strftime(dt + timedelta(1), fmt)
+
+        df = (
+            self.spark.format("bigquery")
+            .option("table", table)
+            .option(
+                "filter",
+                f"submission_timestamp >= '{date}' AND submission_timestamp < '{date_upper}",
+            )
+            .load()
+        )
+        return df.select(
+            self.extract_payload_udf(col("payload")).alias("extracted")
+        ).select("extracted.*")
+
+
 def estimate_num_partitions(df, column="prio", partition_size_mb=250):
     size_b = df.select(F.sum(length(column)).alias("size")).collect()[0].size
     return math.ceil(size_b * 1.0 / 10 ** 6 / partition_size_mb)
@@ -118,13 +147,41 @@ def load(data, output, date):
 
 
 @click.command()
-@click.option("--date", type=str, required=True)
-@click.option("--input", type=str, required=True)
-@click.option("--output", type=str, required=True)
-def run(date, input, output):
+@click.option(
+    "--date",
+    type=str,
+    required=True,
+    help="The submission date for filtering in YYYY-MM-DD format",
+)
+@click.option(
+    "--input",
+    type=str,
+    required=True,
+    help="The fully-qualified GCS path or BigQuery table name",
+)
+@click.option("--output", type=str, required=True, help="Output path")
+@click.option(
+    "--source",
+    type=click.Choice(["gcs", "bigquery"]),
+    default="gcs",
+    help="The storage location for reading raw prio pings",
+)
+@click.option(
+    "--credentials",
+    type=str,
+    envvar="GOOGLE_APPLICATION_CREDENTIALS",
+    help="Path to google application credentials",
+    required=False,
+)
+def run(date, input, output, source, credentials):
     spark = SparkSession.builder.getOrCreate()
     spark.conf.set("fs.gs.implicit.dir.repair.enable", False)
-    pings = CloudStorageExtract(spark).extract(input, date)
+    if credentials:
+        spark.conf.set("credentialsFile", credentials)
+
+    extract_method = {"gcs": CloudStorageExtract, "bigquery": BigQueryExtract}
+
+    pings = extract_method[source](spark).extract(input, date)
     processed = transform(pings)
     load(processed, output, date)
 
