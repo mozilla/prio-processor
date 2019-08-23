@@ -76,6 +76,12 @@ class CloudStorageExtract(ExtractPrioPing):
 
 class BigQueryStorageExtract(ExtractPrioPing):
     @staticmethod
+    def date_add(date_ds: str, days: int) -> str:
+        fmt = "%Y-%m-%d"
+        dt = datetime.strptime(date_ds, fmt)
+        return datetime.strftime(dt + timedelta(days), fmt)
+
+    @staticmethod
     @udf(ExtractPrioPing.payload_schema)
     def extract_payload_udf(ping):
         data = json.loads(gzip.decompress(ping).decode("utf-8"))
@@ -83,16 +89,13 @@ class BigQueryStorageExtract(ExtractPrioPing):
 
     def extract(self, table, date):
         """Extract data from the payload_bytes_decoded BigQuery table."""
-        fmt = "%Y-%m-%d"
-        dt = datetime.strptime("2019-08-20", fmt)
-        date_upper = datetime.strftime(dt + timedelta(1), fmt)
-
         df = (
-            self.spark.format("bigquery")
+            self.spark.read.format("bigquery")
             .option("table", table)
             .option(
                 "filter",
-                f"submission_timestamp >= '{date}' AND submission_timestamp < '{date_upper}",
+                f"submission_timestamp >= '{date}'"
+                f" AND submission_timestamp < '{self.date_add(date, 1)}'",
             )
             .load()
         )
@@ -179,7 +182,7 @@ def run(date, input, output, source, credentials):
     if credentials:
         spark.conf.set("credentialsFile", credentials)
 
-    extract_method = {"gcs": CloudStorageExtract, "bigquery": BigQueryExtract}
+    extract_method = {"gcs": CloudStorageExtract, "bigquery": BigQueryStorageExtract}
 
     pings = extract_method[source](spark).extract(input, date)
     processed = transform(pings)
