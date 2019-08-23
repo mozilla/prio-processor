@@ -332,7 +332,7 @@ def test_aggregate_end_to_end(tmp_path, shared_seed, keygen_server_a, keygen_ser
         server_a_published_output_filename,
         server_b_published_output_filename,
     ):
-        assert json.load(open(filename)) == [3, 2, 1]
+        assert json.load(open(filename))["payload"] == [3, 2, 1]
 
 
 def test_verify1_ignores_invalid_payloads_in_batch(tmp_path, shared_seed):
