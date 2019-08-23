@@ -166,7 +166,12 @@ def test_generated_data_follows_filesystem_convention(
 ):
     run(["bash", "-c", "docker-compose run admin bin/generate"])
 
-    n_batch_ids = 5
+    path = Path(__file__).parent.parent / "config" / "content.json"
+    with open(path) as f:
+        n_batch_ids = len(json.load(f).keys())
+
+    # include "bad-id"
+    n_batch_ids += 1
     n_parts_per_batch = 5
 
     files_a = gcsfs_a().walk(server_a_env["BUCKET_INTERNAL_PRIVATE"])
@@ -217,7 +222,7 @@ def test_processing_generated_data_results_in_published_aggregates(
         for path in paths:
             # test data should be name `{batch_id}-part-{part_num}.json`
             part_num = int(path.split("-")[-1].split(".")[0])
-            data = json.load(fs.open(path))
+            data = json.load(fs.open(path))["payload"]
 
             n = len(data)
             assert n > 0

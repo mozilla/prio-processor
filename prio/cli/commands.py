@@ -3,6 +3,7 @@ import array
 import json
 import os
 from base64 import b64decode, b64encode
+from datetime import datetime
 from uuid import uuid4
 
 from .. import libprio
@@ -346,10 +347,14 @@ def publish(
         share_internal, share_external = share_external, share_internal
 
     final = libprio.PrioTotalShare_final(config, share_internal, share_external)
-    final = list(array.array("L", final))
+    data = {
+        "id": str(uuid4()),
+        "timestamp": datetime.utcnow().isoformat(),
+        "payload": list(array.array("L", final)),
+    }
 
     name = os.path.basename(input_internal)
     outfile = os.path.join(output, name)
     os.makedirs(output, exist_ok=True)
     with open(outfile, "w") as f:
-        json.dump(final, f)
+        json.dump(data, f)
