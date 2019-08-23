@@ -1,8 +1,22 @@
-import click
 import glob
 import logging
+import os
+from shutil import copyfile
 
+import click
 from gcsfs import GCSFileSystem
+
+
+class LocalFileSystem:
+    """Shim for writing files locally."""
+
+    def put(self, src, dst):
+        dirname = os.path.dirname(dst)
+        os.makedirs(dirname, exist_ok=True)
+        copyfile(src, dst)
+
+    def open(self, *args, **kwargs):
+        return open(*args, **kwargs)
 
 
 @click.command()
@@ -13,13 +27,13 @@ from gcsfs import GCSFileSystem
     help="The output directory for temporary files required by dataproc",
 )
 @click.option(
-    "--token",
+    "--credentials",
     type=str,
     envvar="GOOGLE_APPLICATION_CREDENTIALS",
     help="Path to google application credentials",
     required=False,
 )
-def run(output, token):
+def run(output, credentials):
     """This script uploads the artifacts needed to run the `staging` job."""
 
     output = output.rstrip("/")
@@ -29,7 +43,10 @@ def run(output, token):
     if len(egg_listing) > 1:
         raise RuntimeError("there are multiple eggs")
 
-    fs = GCSFileSystem(token=token)
+    if output.startswith("gs://"):
+        fs = GCSFileSystem(token=credentials)
+    else:
+        fs = LocalFileSystem()
 
     egg = egg_listing[0]
     outfile = f"{output}/prio_processor.egg"
