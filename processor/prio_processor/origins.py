@@ -22,6 +22,9 @@ def run(url, output):
     resp = urllib.request.urlopen(url)
     parsed = map(eval, filter(ignore, resp.readlines()))
     data = [transform(idx, origin) for idx, origin in enumerate(parsed)]
+    data.append(
+        {"name": "__UNKNOWN__", "hash": "__UNKNOWN__", "index": data[-1]["index"] + 1}
+    )
     output.write(json.dumps(data, indent=2))
 
 
