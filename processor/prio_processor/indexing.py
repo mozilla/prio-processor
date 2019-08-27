@@ -1,4 +1,4 @@
-"""Map prio-aggregated data to their origins."""
+"""Map Prio-aggregated data to their corresponding origins."""
 import json
 
 import click
@@ -49,7 +49,7 @@ def transform(aggregates, config, origins):
     )
     def _apply_structure(batch_id, payload):
         """Create a user-defined function that maps partitioned batch-ids into
-        rows containing all the necessary information."""
+        list of structures containing the aggregate value and its metadata."""
 
         # assumption: hyphens are used to define a partition of origins
         if batch_id not in config:
@@ -60,9 +60,11 @@ def transform(aggregates, config, origins):
         batch_id = split[0]
         part_num = int(split[1])
 
+        # the offset is relative to the origins list
         if part_num == 0:
             offset = 0
         elif part_num == 1:
+            # pick up where the last part left off
             offset = config[f"{batch_id}-0"]
         else:
             # Hard-fail, this code path should not occur if the config file is
@@ -101,6 +103,7 @@ def load(df, output):
     "--origins", type=str, required=True, help="JSON document with origins data"
 )
 def run(input, output, config, origins):
+    """Take the resulting Prio aggregates and map the indices to their original origins."""
     spark = SparkSession.builder.getOrCreate()
     extracted = extract(spark, input)
 

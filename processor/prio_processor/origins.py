@@ -20,9 +20,13 @@ def transform(index, origin):
 @click.option("--url", type=str, default=TELEMETRY_ORIGIN_DATA)
 @click.option("--output", type=click.File("w"), default="-")
 def run(url, output):
+    """Fetch data about origins being collected by Firefox telemetry via Prio."""
     resp = urllib.request.urlopen(url)
     parsed = map(eval, filter(ignore, resp.readlines()))
     data = [transform(idx, origin) for idx, origin in enumerate(parsed)]
+
+    # in-band metadata about origin telemetry
+    # https://searchfox.org/mozilla-central/rev/325c1a707819602feff736f129cb36055ba6d94f/toolkit/components/telemetry/core/TelemetryOrigin.cpp#145-149
     data.append(
         {"name": "__UNKNOWN__", "hash": "__UNKNOWN__", "index": data[-1]["index"] + 1}
     )
