@@ -1,19 +1,20 @@
-from abc import ABC, abstractmethod
-import click
 import gzip
 import json
 import math
-
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-from pyspark.sql import SparkSession, Row, functions as F
-from pyspark.sql.functions import udf, explode, row_number, lit, col, length, unbase64
+
+import click
+from pyspark.sql import Row, SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.functions import col, explode, length, lit, row_number, udf, unbase64
 from pyspark.sql.types import (
-    StructType,
-    StructField,
     ArrayType,
-    StringType,
-    MapType,
     ByteType,
+    MapType,
+    StringType,
+    StructField,
+    StructType,
 )
 from pyspark.sql.window import Window
 

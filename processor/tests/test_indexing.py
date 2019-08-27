@@ -1,12 +1,12 @@
-import pytest
 import json
-
+from datetime import datetime
 from pathlib import Path
+from uuid import uuid4
+
+import pytest
 from click.testing import CliRunner
 from prio_processor import indexing
 from pyspark.sql import Row
-from uuid import uuid4
-from datetime import datetime
 
 
 @pytest.fixture()

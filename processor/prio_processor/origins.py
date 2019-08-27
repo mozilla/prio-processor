@@ -1,7 +1,8 @@
-import click
+import json
 import urllib.request
 from collections import namedtuple
-import json
+
+import click
 
 TELEMETRY_ORIGIN_DATA = "https://hg.mozilla.org/mozilla-central/raw-file/tip/toolkit/components/telemetry/core/TelemetryOriginData.inc"
 ORIGIN = namedtuple("Origin", ["name", "hash"])

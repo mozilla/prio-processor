@@ -1,16 +1,17 @@
 """Map prio-aggregated data to their origins."""
-import click
 import json
+
+import click
+from jsonschema import validate
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf, explode
+from pyspark.sql.functions import explode, udf
 from pyspark.sql.types import (
     ArrayType,
-    StructType,
-    StructField,
-    StringType,
     IntegerType,
+    StringType,
+    StructField,
+    StructType,
 )
-from jsonschema import validate
 
 
 def validate_origins(origins):

@@ -1,9 +1,9 @@
-import click
 import glob
 import logging
 import os
-
 from shutil import copyfile
+
+import click
 from gcsfs import GCSFileSystem
 
 
