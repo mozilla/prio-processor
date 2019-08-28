@@ -83,8 +83,7 @@ def transform(aggregates, config, origins):
 
 
 def load(df, output):
-    df.repartition(1).write.json(output)
-    spark.read.json(output).show()
+    df.repartition(1).write.mode("overwrite").json(output)
 
 
 @click.command()
@@ -117,6 +116,7 @@ def run(input, output, config, origins):
 
     transformed = transform(extracted, config_data, origin_data)
     load(transformed, output)
+    transformed.show(truncate=False)
 
 
 if __name__ == "__main__":
