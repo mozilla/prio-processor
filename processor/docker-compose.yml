@@ -41,7 +41,7 @@ services:
       - BUCKET_INTERNAL_SHARED=moz-fx-prio-b-nonprod-shared
       - BUCKET_EXTERNAL_SHARED=moz-fx-prio-a-nonprod-shared
       - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials
-  client:
+  admin:
     build:
       context: ..
       target: development
@@ -49,13 +49,12 @@ services:
     command: "true"
     volumes:
       - .:/app/processor
-      - ${GOOGLE_APPLICATION_CREDENTIALS_A?"missing credentials"}:/app/.credentials-a
-      - ${GOOGLE_APPLICATION_CREDENTIALS_B?"missing credentials"}:/app/.credentials-b
+      - ${GOOGLE_APPLICATION_CREDENTIALS_ADMIN?"missing credentials"}:/app/.credentials
     environment:
       - DATA_CONFIG=/app/processor/config/content.json
+      - ORIGIN_CONFIG=/app/processor/config/telemetry_origin_data_inc.json
       - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
       - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
       - BUCKET_INTERNAL_PRIVATE=moz-fx-prio-a-nonprod-private
       - BUCKET_EXTERNAL_PRIVATE=moz-fx-prio-b-nonprod-private
-      - GOOGLE_APPLICATION_CREDENTIALS_INTERNAL=/app/.credentials-a
-      - GOOGLE_APPLICATION_CREDENTIALS_EXTERNAL=/app/.credentials-b
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials

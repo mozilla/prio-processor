@@ -20,11 +20,16 @@ directory:
 ```bash
 GOOGLE_APPLICATION_CREDENTIALS_A=...
 GOOGLE_APPLICATION_CREDENTIALS_B=...
+GOOGLE_APPLICATION_CREDENTIALS_ADMIN=...
 ```
 
-The integration tests are currently configured for `moz-fx-priotest-project-a`
-and `moz-fx-priotest-project-b` Google Cloud Platform. To request service
-account access, file a bug under [Data Platform and Tools ::
+To simplify testing, resources for each container may be co-located in the same
+project. In this case, all three application credential variables may point to
+the same service account.
+
+The integration tests are currently configured for `prio-a-nonprod`,
+`prio-b-nonprod`, and `prio-admin-nonprod` under Google Cloud Platform. To
+request service account access, file a bug under [Data Platform and Tools ::
 Operations](https://bugzilla.mozilla.org/enter_bug.cgi?product=Data%20Platform%20and%20Tools).
 
 ### Running the `staging` job
@@ -65,6 +70,7 @@ gcloud dataproc jobs submit pyspark \
     --jars gs://spark-lib/bigquery/spark-bigquery-latest.jar \
     --py-files gs://<BUCKET>/bootstrap/prio_processor.egg \
         -- \
+        staging \
         --source bigquery \
         --date <YYYY-MM-DD> \
         --input moz-fx-data-shar-nonprod-efed.payload_bytes_decoded.telemetry_telemetry__prio_v4 \

@@ -84,6 +84,7 @@ def transform(aggregates, config, origins):
 
 def load(df, output):
     df.repartition(1).write.json(output)
+    spark.read.json(output).show()
 
 
 @click.command()
