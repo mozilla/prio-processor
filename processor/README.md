@@ -70,6 +70,7 @@ gcloud dataproc jobs submit pyspark \
     --jars gs://spark-lib/bigquery/spark-bigquery-latest.jar \
     --py-files gs://<BUCKET>/bootstrap/prio_processor.egg \
         -- \
+        staging \
         --source bigquery \
         --date <YYYY-MM-DD> \
         --input moz-fx-data-shar-nonprod-efed.payload_bytes_decoded.telemetry_telemetry__prio_v4 \
