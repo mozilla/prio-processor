@@ -36,3 +36,5 @@ docker-compose run admin bin/generate
 # until timeout in server A.
 wait $server_a_pid
 wait $server_b_pid
+
+docker-compose run admin bin/insert
