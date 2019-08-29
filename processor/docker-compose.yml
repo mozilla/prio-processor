@@ -17,9 +17,9 @@ services:
       - PRIVATE_KEY_HEX=624BFDF22F729BBFD762B3D61930B876F3711B200A10F620FEAC6FD792A2BD08
       - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
       - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
-      - BUCKET_INTERNAL_PRIVATE=project-a-private
-      - BUCKET_INTERNAL_SHARED=project-a-shared
-      - BUCKET_EXTERNAL_SHARED=project-b-shared
+      - BUCKET_INTERNAL_PRIVATE=moz-fx-prio-a-nonprod-private
+      - BUCKET_INTERNAL_SHARED=moz-fx-prio-a-nonprod-shared
+      - BUCKET_EXTERNAL_SHARED=moz-fx-prio-b-nonprod-shared
       - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials
   server_b:
     build:
@@ -37,11 +37,11 @@ services:
       - PRIVATE_KEY_HEX=86EBA021A49C18B1D2885BCAE8C1985D14082F4A130F4862FD3E77DDD0518D3D
       - PUBLIC_KEY_HEX_INTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
       - PUBLIC_KEY_HEX_EXTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
-      - BUCKET_INTERNAL_PRIVATE=project-b-private
-      - BUCKET_INTERNAL_SHARED=project-b-shared
-      - BUCKET_EXTERNAL_SHARED=project-a-shared
+      - BUCKET_INTERNAL_PRIVATE=moz-fx-prio-b-nonprod-private
+      - BUCKET_INTERNAL_SHARED=moz-fx-prio-b-nonprod-shared
+      - BUCKET_EXTERNAL_SHARED=moz-fx-prio-a-nonprod-shared
       - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials
-  client:
+  admin:
     build:
       context: ..
       target: development
@@ -49,13 +49,11 @@ services:
     command: "true"
     volumes:
       - .:/app/processor
-      - ${GOOGLE_APPLICATION_CREDENTIALS_A?"missing credentials"}:/app/.credentials-a
-      - ${GOOGLE_APPLICATION_CREDENTIALS_B?"missing credentials"}:/app/.credentials-b
+      - ${GOOGLE_APPLICATION_CREDENTIALS_ADMIN?"missing credentials"}:/app/.credentials
     environment:
       - DATA_CONFIG=/app/processor/config/content.json
       - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
       - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
-      - BUCKET_INTERNAL_PRIVATE=project-a-private
-      - BUCKET_EXTERNAL_PRIVATE=project-b-private
-      - GOOGLE_APPLICATION_CREDENTIALS_INTERNAL=/app/.credentials-a
-      - GOOGLE_APPLICATION_CREDENTIALS_EXTERNAL=/app/.credentials-b
+      - BUCKET_INTERNAL_PRIVATE=moz-fx-prio-a-nonprod-private
+      - BUCKET_EXTERNAL_PRIVATE=moz-fx-prio-b-nonprod-private
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials
