@@ -4,7 +4,6 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 set -euo pipefail
-set -x
 
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
@@ -22,6 +21,8 @@ function authenticate() {
     fi
     gsutil ls "gs://${test_bucket}"
 }
+
+echo "Running cleanup..."
 
 authenticate
 (gsutil -m rm "gs://${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
