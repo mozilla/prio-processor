@@ -29,7 +29,7 @@ docker-compose run server_b bin/process &
 server_b_pid=$!
 
 # Copy data into the appropriate buckets
-docker-compose run client bin/generate
+docker-compose run admin bin/generate
 
 # Return the exit code of the backgrounded docker-compose container. Since
 # `wait` is a blocking function, a failure in server B will not be detected
