@@ -181,7 +181,7 @@ def test_generated_data_follows_filesystem_convention(
     # directory structure
     # bucket / raw / batch_id={value} / *.json
     def process(path):
-        batch_id_idx = 2
+        batch_id_idx = 3
         return path.split("/")[batch_id_idx].split("=")[-1]
 
     batch_ids = [process(x) for x in files_a if x.endswith(".json")]

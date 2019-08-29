@@ -65,8 +65,11 @@ function generate_dataset() {
         n_data=10
     fi
 
-    local out_a="server_a/raw/batch_id=${batch_id}"
-    local out_b="server_b/raw/batch_id=${batch_id}"
+    local date
+    date=$(date +%Y-%m-%d)
+
+    local out_a="server_a/raw/submission_date=${date}/batch_id=${batch_id}"
+    local out_b="server_b/raw/submission_date=${date}/batch_id=${batch_id}"
     mkdir -p "${out_a}"
     mkdir -p "${out_b}"
 
