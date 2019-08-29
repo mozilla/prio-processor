@@ -58,3 +58,6 @@ services:
       - BUCKET_INTERNAL_PRIVATE=moz-fx-prio-a-nonprod-private
       - BUCKET_EXTERNAL_PRIVATE=moz-fx-prio-b-nonprod-private
       - GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials
+      - DATASET=telemetry
+      - TABLE=content_blocking_dev
+      - BQ_REPLACE=true
