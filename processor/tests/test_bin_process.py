@@ -82,8 +82,8 @@ def server_b_env(docker_compose_yml):
 
 
 @pytest.fixture()
-def client_env(docker_compose_yml):
-    return docker_compose_yml["services"]["client"]["environment"]
+def admin_env(docker_compose_yml):
+    return docker_compose_yml["services"]["admin"]["environment"]
 
 
 @pytest.fixture()
@@ -93,22 +93,22 @@ def process_run_a(server_a_env):
 
 def test_docker_compose_yml_exists(docker_compose_yml):
     config = docker_compose_yml
-    assert not {"server_a", "server_b", "client"} - set(config["services"].keys())
+    assert not {"server_a", "server_b", "admin"} - set(config["services"].keys())
 
 
 def test_docker_compose_yml_contains_consistent_keys(
-    server_a_env, server_b_env, client_env
+    server_a_env, server_b_env, admin_env
 ):
     assert (
         server_a_env["PUBLIC_KEY_HEX_INTERNAL"]
         == server_b_env["PUBLIC_KEY_HEX_EXTERNAL"]
-        == client_env["PUBLIC_KEY_HEX_INTERNAL"]
+        == admin_env["PUBLIC_KEY_HEX_INTERNAL"]
     )
 
     assert (
         server_a_env["PUBLIC_KEY_HEX_EXTERNAL"]
         == server_b_env["PUBLIC_KEY_HEX_INTERNAL"]
-        == client_env["PUBLIC_KEY_HEX_EXTERNAL"]
+        == admin_env["PUBLIC_KEY_HEX_EXTERNAL"]
     )
 
 
@@ -145,7 +145,7 @@ def test_scope_based_authentication_fails_locally(server_a_env):
 
 
 def test_buckets_are_empty_after_cleanup(cleanup, server_a_env, server_b_env):
-    run(["bash", "-c", "docker-compose run client bin/generate"])
+    run(["bash", "-c", "docker-compose run admin bin/generate"])
 
     # test the state of server a
     assert len(gcsfs_a().walk(server_a_env["BUCKET_INTERNAL_PRIVATE"])) > 0
@@ -164,7 +164,7 @@ def test_buckets_are_empty_after_cleanup(cleanup, server_a_env, server_b_env):
 def test_generated_data_follows_filesystem_convention(
     cleanup, server_a_env, server_b_env
 ):
-    run(["bash", "-c", "docker-compose run client bin/generate"])
+    run(["bash", "-c", "docker-compose run admin bin/generate"])
 
     n_batch_ids = 5
     n_parts_per_batch = 5
@@ -181,7 +181,7 @@ def test_generated_data_follows_filesystem_convention(
     # directory structure
     # bucket / raw / batch_id={value} / *.json
     def process(path):
-        batch_id_idx = 2
+        batch_id_idx = 3
         return path.split("/")[batch_id_idx].split("=")[-1]
 
     batch_ids = [process(x) for x in files_a if x.endswith(".json")]
@@ -197,7 +197,7 @@ def test_processing_generated_data_results_in_published_aggregates(
     cleanup, server_a_env, server_b_env
 ):
     # NOTE: a test failure will spit out a large amount of text
-    run(["bash", "-c", "docker-compose run client bin/generate"])
+    run(["bash", "-c", "docker-compose run admin bin/generate"])
     server_a = Popen(["bash", "-c", "docker-compose run server_a bin/process"])
     server_b = Popen(["bash", "-c", "docker-compose run server_b bin/process"])
 

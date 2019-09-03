@@ -1,6 +1,18 @@
 {
+    "content.blocking_blocked-0": 2046,
+    "content.blocking_blocked-1": 441,
     "content.blocking_blocked_TESTONLY-0": 2046,
     "content.blocking_blocked_TESTONLY-1": 441,
+    "content.blocking_opener_after_user_interaction_exempt-0": 2046,
+    "content.blocking_opener_after_user_interaction_exempt-1": 441,
+    "content.blocking_opener_after_user_interaction_exempt_TESTONLY-0": 2046,
+    "content.blocking_opener_after_user_interaction_exempt_TESTONLY-1": 441,
+    "content.blocking_opener_exempt-0": 2046,
+    "content.blocking_opener_exempt-1": 441,
+    "content.blocking_opener_exempt_TESTONLY-0": 2046,
+    "content.blocking_opener_exempt_TESTONLY-1": 441,
+    "content.blocking_storage_access_api_exempt-0": 2046,
+    "content.blocking_storage_access_api_exempt-1": 441,
     "content.blocking_storage_access_api_exempt_TESTONLY-0": 2046,
     "content.blocking_storage_access_api_exempt_TESTONLY-1": 441
 }
