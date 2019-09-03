@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 
 import click
-from pyspark.sql import Row, SparkSession
+from pyspark.sql import DataFrame, Row, SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.functions import col, explode, length, lit, row_number, udf, unbase64
 from pyspark.sql.types import (
@@ -40,22 +40,22 @@ class ExtractPrioPing(ABC):
         ]
     )
 
-    def __init__(self, spark):
+    def __init__(self, spark: SparkSession):
         self.spark = spark
 
     @abstractmethod
-    def extract(self, path, date):
+    def extract(self, path: str, date: str) -> DataFrame:
         pass
 
 
 class CloudStorageExtract(ExtractPrioPing):
     @staticmethod
     @udf(ExtractPrioPing.payload_schema)
-    def extract_payload_udf(ping):
+    def extract_payload_udf(ping: str) -> Row:
         data = json.loads(ping)
         return Row(id=data["id"], prioData=data["payload"]["prioData"])
 
-    def extract(self, path, date):
+    def extract(self, path: str, date: str) -> DataFrame:
         """Extract data from the moz-fx-data bucket that has been decoded by
         the gcp-ingestion stack. The messages are newline-delimited json
         documents representing PubSub messages (refer to the `prio_ping` test
@@ -84,11 +84,11 @@ class BigQueryStorageExtract(ExtractPrioPing):
 
     @staticmethod
     @udf(ExtractPrioPing.payload_schema)
-    def extract_payload_udf(ping):
+    def extract_payload_udf(ping: bytes) -> Row:
         data = json.loads(gzip.decompress(ping).decode("utf-8"))
         return Row(id=data["id"], prioData=data["payload"]["prioData"])
 
-    def extract(self, table, date):
+    def extract(self, table: str, date: str) -> DataFrame:
         """Extract data from the payload_bytes_decoded BigQuery table."""
         df = (
             self.spark.read.format("bigquery")
@@ -105,12 +105,14 @@ class BigQueryStorageExtract(ExtractPrioPing):
         ).select("extracted.*")
 
 
-def estimate_num_partitions(df, column="prio", partition_size_mb=250):
+def estimate_num_partitions(
+    df: DataFrame, column: str = "prio", partition_size_mb: int = 250
+) -> int:
     size_b = df.select(F.sum(length(column)).alias("size")).collect()[0].size
     return math.ceil(size_b * 1.0 / 10 ** 6 / partition_size_mb)
 
 
-def transform(data):
+def transform(data: DataFrame) -> DataFrame:
     """Flatten nested prioData into a flattened dataframe that is optimally
     partitioned for batched processing in a tool agnostic fashion.
 
@@ -144,7 +146,7 @@ def transform(data):
     )
 
 
-def load(data, output, date):
+def load(data: DataFrame, output: str, date: str):
     data.withColumn("submission_date", lit(date)).write.partitionBy(
         "submission_date", "server_id", "batch_id"
     ).json(output, mode="overwrite")
