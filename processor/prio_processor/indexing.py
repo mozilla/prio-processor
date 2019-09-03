@@ -57,6 +57,7 @@ def transform(aggregates, config, origins):
 
         # currently all batch-ids contain a single hyphen with 2 parts
         split = batch_id.split("-")
+        assert len(split) == 2, "currently only supports batch-ids in 2 parts"
         batch_id = split[0]
         part_num = int(split[1])
 
