@@ -1,70 +1,118 @@
-import click
+import gzip
 import json
 import math
+from abc import ABC, abstractmethod
+from datetime import datetime, timedelta
 
-from pyspark.sql import SparkSession, Row, functions as F
-from pyspark.sql.functions import udf, explode, row_number, lit, col, length, unbase64
+import click
+from pyspark.sql import DataFrame, Row, SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.functions import col, explode, length, lit, row_number, udf, unbase64
 from pyspark.sql.types import (
-    StructType,
-    StructField,
     ArrayType,
-    StringType,
-    MapType,
     ByteType,
+    MapType,
+    StringType,
+    StructField,
+    StructType,
 )
 from pyspark.sql.window import Window
 
-# The raw message also contains a field named attributeMap: Map[str, str], but
-# is safely ignored in this processing job
-pubsub_schema = StructType([StructField("payload", StringType(), False)])
 
-payload_schema = StructType(
-    [
-        StructField("id", StringType(), False),
-        StructField(
-            "prioData",
-            ArrayType(
-                StructType(
-                    [
-                        StructField("encoding", StringType(), False),
-                        StructField("prio", MapType(StringType(), StringType()), False),
-                    ]
-                )
+class ExtractPrioPing(ABC):
+    payload_schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField(
+                "prioData",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField("encoding", StringType(), True),
+                            StructField(
+                                "prio", MapType(StringType(), StringType()), True
+                            ),
+                        ]
+                    )
+                ),
+                True,
             ),
-            False,
-        ),
-    ]
-)
+        ]
+    )
+
+    def __init__(self, spark: SparkSession):
+        self.spark = spark
+
+    @abstractmethod
+    def extract(self, path: str, date: str) -> DataFrame:
+        pass
 
 
-@udf(payload_schema)
-def extract_payload_udf(ping):
-    data = json.loads(ping)
-    return Row(id=data["id"], prioData=data["payload"]["prioData"])
+class CloudStorageExtract(ExtractPrioPing):
+    @staticmethod
+    @udf(ExtractPrioPing.payload_schema)
+    def extract_payload_udf(ping: str) -> Row:
+        data = json.loads(ping)
+        return Row(id=data["id"], prioData=data["payload"]["prioData"])
+
+    def extract(self, path: str, date: str) -> DataFrame:
+        """Extract data from the moz-fx-data bucket that has been decoded by
+        the gcp-ingestion stack. The messages are newline-delimited json
+        documents representing PubSub messages (refer to the `prio_ping` test
+        fixture for implementation details).
+
+        The directory hierarchy encodes the purpose for each folder as follows:
+            date / hour / namespace / type / version / *.ndjson
+        """
+        # The raw message also contains a field named attributeMap: Map[str,
+        # str], but is safely ignored in this processing job
+        pubsub_schema = StructType([StructField("payload", StringType(), False)])
+
+        path = f"{path}/{date}/*/*/*/*"
+        df = self.spark.read.json(path, schema=pubsub_schema)
+        return df.select(
+            self.extract_payload_udf(unbase64(col("payload"))).alias("extracted")
+        ).select("extracted.*")
 
 
-def extract(spark, path, date):
-    """Extract data from the moz-fx-data bucket that has been decoded by
-    the gcp-ingestion stack. The messages are newline-delimited json documents
-    representing PubSub messages (refer to the `prio_ping` test fixture for
-    implementation details).
+class BigQueryStorageExtract(ExtractPrioPing):
+    @staticmethod
+    def date_add(date_ds: str, days: int) -> str:
+        fmt = "%Y-%m-%d"
+        dt = datetime.strptime(date_ds, fmt)
+        return datetime.strftime(dt + timedelta(days), fmt)
 
-    The directory hierarchy encodes the purpose for each folder as follows:
-        date / hour / namespace / type / version / *.ndjson
-    """
-    path = f"{path}/{date}/*/*/*/*"
-    df = spark.read.json(path, schema=pubsub_schema)
-    return df.select(
-        extract_payload_udf(unbase64(col("payload"))).alias("extracted")
-    ).select("extracted.*")
+    @staticmethod
+    @udf(ExtractPrioPing.payload_schema)
+    def extract_payload_udf(ping: bytes) -> Row:
+        data = json.loads(gzip.decompress(ping).decode("utf-8"))
+        return Row(id=data["id"], prioData=data["payload"]["prioData"])
+
+    def extract(self, table: str, date: str) -> DataFrame:
+        """Extract data from the payload_bytes_decoded BigQuery table."""
+        df = (
+            self.spark.read.format("bigquery")
+            .option("table", table)
+            .option(
+                "filter",
+                f"submission_timestamp >= '{date}'"
+                f" AND submission_timestamp < '{self.date_add(date, 1)}'",
+            )
+            .load()
+        )
+        return df.select(
+            self.extract_payload_udf(col("payload")).alias("extracted")
+        ).select("extracted.*")
 
 
-def estimate_num_partitions(df, column="prio", partition_size_mb=250):
+def estimate_num_partitions(
+    df: DataFrame, column: str = "prio", partition_size_mb: int = 250
+) -> int:
     size_b = df.select(F.sum(length(column)).alias("size")).collect()[0].size
     return math.ceil(size_b * 1.0 / 10 ** 6 / partition_size_mb)
 
 
-def transform(data):
+def transform(data: DataFrame) -> DataFrame:
     """Flatten nested prioData into a flattened dataframe that is optimally
     partitioned for batched processing in a tool agnostic fashion.
 
@@ -98,20 +146,48 @@ def transform(data):
     )
 
 
-def load(data, output, date):
+def load(data: DataFrame, output: str, date: str):
     data.withColumn("submission_date", lit(date)).write.partitionBy(
         "submission_date", "server_id", "batch_id"
     ).json(output, mode="overwrite")
 
 
 @click.command()
-@click.option("--date", type=str, required=True)
-@click.option("--input", type=str, required=True)
-@click.option("--output", type=str, required=True)
-def run(date, input, output):
+@click.option(
+    "--date",
+    type=str,
+    required=True,
+    help="The submission date for filtering in YYYY-MM-DD format",
+)
+@click.option(
+    "--input",
+    type=str,
+    required=True,
+    help="The fully-qualified GCS path or BigQuery table name",
+)
+@click.option("--output", type=str, required=True, help="Output path")
+@click.option(
+    "--source",
+    type=click.Choice(["gcs", "bigquery"]),
+    default="gcs",
+    help="The storage location for reading raw prio pings",
+)
+@click.option(
+    "--credentials",
+    type=str,
+    envvar="GOOGLE_APPLICATION_CREDENTIALS",
+    help="Path to google application credentials",
+    required=False,
+)
+def run(date, input, output, source, credentials):
     spark = SparkSession.builder.getOrCreate()
     spark.conf.set("fs.gs.implicit.dir.repair.enable", False)
-    pings = extract(spark, input, date)
+    if credentials:
+        spark.conf.set("credentialsFile", credentials)
+
+    extract_method = {"gcs": CloudStorageExtract, "bigquery": BigQueryStorageExtract}
+
+    pings = extract_method[source](spark).extract(input, date)
     processed = transform(pings)
     load(processed, output, date)
 

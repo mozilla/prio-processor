@@ -47,6 +47,9 @@ RUN python3 setup.py bdist_wheel && pip3 install dist/prio-*.whl
 WORKDIR /app/processor
 RUN pip3 install . && python3 setup.py bdist_egg
 
+ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
+ENV PYSPARK_PYTHON=python3
+
 WORKDIR /app
 CMD make test
 
@@ -74,6 +77,9 @@ RUN python3 -m ensurepip \
                 pytest \
                 ./dist/prio-*.whl \
                 ./processor
+
+ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
+ENV PYSPARK_PYTHON=python3
 
 USER app
 RUN curl https://sdk.cloud.google.com | bash

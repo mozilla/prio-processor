@@ -78,12 +78,13 @@ def moz_fx_data_stage_data(tmpdir, prio_ping):
 
 @pytest.fixture()
 def extracted(spark, moz_fx_data_stage_data):
-    return staging.extract(spark, moz_fx_data_stage_data, BASE_DATE)
+    return staging.CloudStorageExtract(spark).extract(moz_fx_data_stage_data, BASE_DATE)
 
 
 def test_extract(extracted):
     assert extracted.count() == NUM_HOURS * NUM_PARTS * NUM_PINGS
     assert not {"id", "prioData"} - set(extracted.columns)
+    assert extracted.schema == staging.ExtractPrioPing.payload_schema
 
 
 def test_estimate_num_partitions(spark):
