@@ -1,0 +1,90 @@
+#!/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# Script to map aggregates to origins and insert the results into BigQuery.
+
+set -euo pipefail
+set -x
+
+: "${BUCKET_INTERNAL_PRIVATE}"
+: "${DATA_CONFIG}"
+: "${ORIGIN_CONFIG}"
+: "${GOOGLE_APPLICATION_CREDENTIALS?:=}"
+
+: "${DATASET:-telemetry}"
+: "${TABLE:-content_blocking_dev}"
+
+# set to "true" to overwrite the existing table
+: "${BQ_REPLACE:-false}"
+
+function authenticate() {
+    local cred=${GOOGLE_APPLICATION_CREDENTIALS}
+
+    if [[ -n "${cred}" ]]; then
+        gcloud auth activate-service-account --key-file "${cred}"
+    else
+        # https://cloud.google.com/kubernetes-engine/docs/tutorials/authenticating-to-cloud-platform
+        echo "No JSON credentials provided, using default scopes."
+    fi
+}
+
+function index() {
+    # Map the resulting aggregates against the list of origins.
+
+    local input=$1
+    local output=$2
+
+    resources=$(mktemp -d -t resources-XXX)
+    prio-processor bootstrap --output "${resources}"
+    gsutil cp gs://spark-lib/bigquery/spark-bigquery-latest.jar "${resources}"
+
+    spark-submit \
+        --jars "${resources}/spark-bigquery-latest.jar" \
+        --py-files "${resources}/prio_processor.egg" \
+        "${resources}/runner.py" \
+            index \
+            --input "${input}" \
+            --output "${output}" \
+            --config "${DATA_CONFIG}" \
+            --origins "${ORIGIN_CONFIG}"
+}
+
+function insert() {
+    # Insert processed data into a BigQuery table in the current project.
+
+    local input=$1
+    local dataset=$2
+    local table=$3
+
+    if ! bq ls | grep "${dataset}" > /dev/null ; then
+        echo "creating dataset: ${dataset}"
+        bq mk "${dataset}"
+    fi
+
+    bq load \
+        --source_format=NEWLINE_DELIMITED_JSON \
+        --autodetect \
+        --replace="${BQ_REPLACE}" \
+        "${dataset}.${table}" \
+        "${input}"
+
+    bq query "select count(*) from ${dataset}.${table}"
+}
+
+function main() {
+    data_in=$(mktemp -d -t data-XXX)
+    data_out=$(mktemp -d -t data-XXX)
+
+    authenticate
+
+    gsutil -m cp -r "gs://${BUCKET_INTERNAL_PRIVATE}/processed/" "${data_in}"
+    index "${data_in}" "${data_out}"
+
+    insert "${data_out}"/*.json "${DATASET}" "${TABLE}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

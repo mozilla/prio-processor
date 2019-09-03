@@ -55,7 +55,7 @@ def run(output, credentials):
 
     logging.info(f"writing runner.py to {output}/runner.py")
     with fs.open(f"{output}/runner.py", "w") as f:
-        f.write("from prio_processor import staging; staging.run()")
+        f.write("from prio_processor import cli; cli.entry_point()")
 
 
 if __name__ == "__main__":
