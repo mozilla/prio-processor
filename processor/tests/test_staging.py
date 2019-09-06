@@ -11,6 +11,7 @@ from base64 import b64encode
 
 
 BASE_DATE = "2019-06-26"
+BASE_DATE_NEXT = "2019-06-27"
 NUM_HOURS = 2
 NUM_PARTS = 2
 NUM_PINGS = 2
@@ -62,7 +63,7 @@ def moz_fx_data_stage_data(tmpdir, prio_ping):
     folders = [
         sink_dir / BASE_DATE / f"{hour:02d}" / "telemetry" / "prio" / "4"
         for hour in range(NUM_HOURS)
-    ]
+    ] + [sink_dir / BASE_DATE_NEXT / "00" / "telemetry" / "prio" / "4"]
     for folder in folders:
         folder.mkdir(parents=True)
         for part_id in range(NUM_PARTS):
@@ -260,3 +261,60 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
             set_b = get_id_set(path_b, part)
             assert len(set_a) > 0
             assert set_a == set_b
+
+
+def test_staging_run_incremental(moz_fx_data_stage_data, tmpdir):
+    output = Path(tmpdir / "output")
+    runner = CliRunner()
+    runner.invoke(
+        staging.run,
+        [
+            "--date",
+            BASE_DATE,
+            "--input",
+            f"{moz_fx_data_stage_data}",
+            "--output",
+            f"{output}",
+        ],
+        catch_exceptions=False,
+    )
+
+    runner.invoke(
+        staging.run,
+        [
+            "--date",
+            BASE_DATE_NEXT,
+            "--input",
+            f"{moz_fx_data_stage_data}",
+            "--output",
+            f"{output}",
+        ],
+        catch_exceptions=False,
+    )
+    dates = sorted(
+        [p.split("=")[1] for p in os.listdir(output) if "submission_date=" in p]
+    )
+    assert dates == [BASE_DATE, BASE_DATE_NEXT]
+
+
+def test_staging_run_idempotent(spark, moz_fx_data_stage_data, tmpdir):
+    output = str(tmpdir / "output")
+
+    def run() -> int:
+        CliRunner().invoke(
+            staging.run,
+            [
+                "--date",
+                BASE_DATE,
+                "--input",
+                f"{moz_fx_data_stage_data}",
+                "--output",
+                f"{output}",
+            ],
+            catch_exceptions=False,
+        )
+        return spark.read.json(output).count()
+
+    initial = run()
+    rerun = run()
+    assert initial == rerun
