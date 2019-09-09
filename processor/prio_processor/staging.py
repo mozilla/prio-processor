@@ -182,6 +182,7 @@ def load(data: DataFrame, output: str, date: str):
 def run(date, input, output, source, credentials):
     spark = SparkSession.builder.getOrCreate()
     spark.conf.set("fs.gs.implicit.dir.repair.enable", False)
+    spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
     if credentials:
         spark.conf.set("credentialsFile", credentials)
 

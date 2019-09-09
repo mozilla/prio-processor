@@ -11,6 +11,7 @@ from base64 import b64encode
 
 
 BASE_DATE = "2019-06-26"
+BASE_DATE_NEXT = "2019-06-27"
 NUM_HOURS = 2
 NUM_PARTS = 2
 NUM_PINGS = 2
@@ -45,14 +46,14 @@ def prio_ping():
 
 
 @pytest.fixture()
-def moz_fx_data_stage_data(tmpdir, prio_ping):
+def moz_fx_data_stage_data(tmp_path, prio_ping):
     """ Create a bucket that mirrors the google cloud storage sink in the
     ingestion service.
     """
 
     # bucket / re-publisher name / output sink
     sink_dir = Path(
-        tmpdir
+        tmp_path
         / "moz-fx-data-stage-data"
         / "telemetry-decoded_gcs-sink-doctype_prio"
         / "output"
@@ -62,7 +63,7 @@ def moz_fx_data_stage_data(tmpdir, prio_ping):
     folders = [
         sink_dir / BASE_DATE / f"{hour:02d}" / "telemetry" / "prio" / "4"
         for hour in range(NUM_HOURS)
-    ]
+    ] + [sink_dir / BASE_DATE_NEXT / "00" / "telemetry" / "prio" / "4"]
     for folder in folders:
         folder.mkdir(parents=True)
         for part_id in range(NUM_PARTS):
@@ -126,9 +127,9 @@ def test_transform(extracted):
     assert unique_ids == 3 * 8
 
 
-def test_staging_run(moz_fx_data_stage_data, tmpdir):
+def test_staging_run(moz_fx_data_stage_data, tmp_path):
     """
-    To update the directory tree, run `tree` over the `tmpdir` folder.
+    To update the directory tree, run `tree` over the `tmp_path` folder.
 
     ├── moz-fx-data-stage-data
     │   └── telemetry-decoded_gcs-sink-doctype_prio
@@ -160,7 +161,7 @@ def test_staging_run(moz_fx_data_stage_data, tmpdir):
                 └── batch_id=content.blocking_blocked_TESTONLY-1
                     └── part-00000-8bd2216c-55dc-49df-9d95-59349163c9a6.c000.json
     """
-    output = Path(tmpdir / "output")
+    output = Path(tmp_path / "output")
     runner = CliRunner()
     result = runner.invoke(
         staging.run,
@@ -168,9 +169,9 @@ def test_staging_run(moz_fx_data_stage_data, tmpdir):
             "--date",
             BASE_DATE,
             "--input",
-            f"{moz_fx_data_stage_data}",
+            str(moz_fx_data_stage_data),
             "--output",
-            f"{output}",
+            str(output),
         ],
         catch_exceptions=False,
     )
@@ -179,7 +180,7 @@ def test_staging_run(moz_fx_data_stage_data, tmpdir):
     assert len(os.listdir(output)) > 0
 
 
-def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatch):
+def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmp_path, monkeypatch):
     """Run the entire pipeline again, except fix the number of partitions when
     repartitioning by range.
 
@@ -211,7 +212,7 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
         staging, "estimate_num_partitions", mock_estimate_num_partitions
     )
 
-    output = Path(tmpdir / "output")
+    output = Path(tmp_path / "output")
     runner = CliRunner()
     result = runner.invoke(
         staging.run,
@@ -219,9 +220,9 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
             "--date",
             BASE_DATE,
             "--input",
-            f"{moz_fx_data_stage_data}",
+            str(moz_fx_data_stage_data),
             "--output",
-            f"{output}",
+            str(output),
         ],
         catch_exceptions=False,
     )
@@ -260,3 +261,60 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmpdir, monkeypatc
             set_b = get_id_set(path_b, part)
             assert len(set_a) > 0
             assert set_a == set_b
+
+
+def test_staging_run_incremental(moz_fx_data_stage_data, tmp_path):
+    output = str(tmp_path / "output")
+    runner = CliRunner()
+    runner.invoke(
+        staging.run,
+        [
+            "--date",
+            BASE_DATE,
+            "--input",
+            str(moz_fx_data_stage_data),
+            "--output",
+            output,
+        ],
+        catch_exceptions=False,
+    )
+
+    runner.invoke(
+        staging.run,
+        [
+            "--date",
+            BASE_DATE_NEXT,
+            "--input",
+            str(moz_fx_data_stage_data),
+            "--output",
+            output,
+        ],
+        catch_exceptions=False,
+    )
+    dates = sorted(
+        [p.split("=")[1] for p in os.listdir(output) if "submission_date=" in p]
+    )
+    assert dates == [BASE_DATE, BASE_DATE_NEXT]
+
+
+def test_staging_run_idempotent(spark, moz_fx_data_stage_data, tmp_path):
+    output = tmp_path / "output"
+
+    def run() -> int:
+        CliRunner().invoke(
+            staging.run,
+            [
+                "--date",
+                BASE_DATE,
+                "--input",
+                str(moz_fx_data_stage_data),
+                "--output",
+                str(output),
+            ],
+            catch_exceptions=False,
+        )
+        return spark.read.json(str(output)).count()
+
+    initial = run()
+    rerun = run()
+    assert initial == rerun
