@@ -2,7 +2,7 @@
 
 `mozilla/prio-processor` is a container application that implements the privacy
 and correctness guarantees of Prio, a privacy-preserving aggregation system. The
-processor interoperates with the Firefox Data Platform by an agreed convention
+processor inter-operates with the Firefox Data Platform by an agreed convention
 of data exchange across cloud storage.
 
 The initial release (v1.0) contain an automated workflow for batched processing
@@ -11,10 +11,120 @@ pings](https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/tele
 that are ingested via
 [mozilla/gcp-ingestion](https://github.com/mozilla/gcp-ingestion).
 
-
 This processor aggregates [Origin Telemetry
 pings](https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/collection/origin.html)
 configured to measure blocklist exceptions in Firefox on pre-release channels.
+
+## Quick start
+
+```bash
+# build the container
+make build
+
+# run the container on localhost
+make test
+```
+
+Set the following environment variables in a `.env` file in the current
+directory:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS_A=...
+GOOGLE_APPLICATION_CREDENTIALS_B=...
+GOOGLE_APPLICATION_CREDENTIALS_ADMIN=...
+```
+
+To simplify testing, resources for each container may be co-located in the same
+project. In this case, all three application credential variables may point to
+the same service account.
+
+The integration tests are currently configured for `prio-a-nonprod`,
+`prio-b-nonprod`, and `prio-admin-nonprod` under Google Cloud Platform. To
+request service account access, file a bug under [Data Platform and Tools ::
+Operations](https://bugzilla.mozilla.org/enter_bug.cgi?product=Data%20Platform%20and%20Tools).
+
+### Running the `staging` job
+
+A Spark job populates the processors with data from Mozilla's ingestion system.
+You will need a project that is configured in the Firefox data operations
+sandbox, configured with a service account for running Cloud DataProc. Data is
+staged for processing by reading data from a warehoused location into buckets
+that are polled for processing.
+
+Run the bootstrap command from the container to populate a prefix in a
+storage bucket with the python module.
+
+```bash
+docker run \
+    -e GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials \
+    -v <CREDENTIAL_FILE>:/app/.credentials \
+    -it mozilla/prio-processor:latest bash -c \
+        "cd processor; prio-processor bootstrap --output gs://<BUCKET>/bootstrap/"
+```
+
+Initialize a dataproc cluster with the appropriate dependencies installed:
+
+```bash
+gcloud dataproc clusters create test-cluster \
+    --zone <ZONE> \
+    --image-version 1.4 \
+    --metadata 'PIP_PACKAGES=click' \
+    --service-account <SERVICE_ACCOUNT_ADDRESS> \
+    --initialization-actions \
+        gs://dataproc-initialization-actions/python/pip-install.sh
+```
+
+Run the job.
+
+```bash
+gcloud dataproc jobs submit pyspark \
+    gs://<BUCKET>/bootstrap/runner.py \
+    --cluster test-cluster  \
+    --jars gs://spark-lib/bigquery/spark-bigquery-latest.jar \
+    --py-files gs://<BUCKET>/bootstrap/prio_processor.egg \
+        -- \
+        staging \
+        --source bigquery \
+        --date <YYYY-MM-DD> \
+        --input moz-fx-data-shar-nonprod-efed.payload_bytes_decoded.telemetry_telemetry__prio_v4 \
+        --output gs://<BUCKET>/prio_staging/
+```
+
+Clean up the resources, and copy the files into the private buckets to initiate
+the batched processing scheme.
+
+```bash
+gsutil rm -r gs://<BUCKET>/bootstrap/
+gcloud dataproc clusters delete test-cluster
+```
+
+See [PR#62](https://github.com/mozilla/prio-processor/pull/62#issue-298714211)
+for more details.
+
+Finally, start the processor. Be sure to configure the appropriate variables.
+
+```bash
+docker run \
+    -e SERVER_ID \
+    -e SHARED_SECRET \
+    -e PRIVATE_KEY_HEX \
+    -e PUBLIC_KEY_HEX_INTERNAL \
+    -e PUBLIC_KEY_HEX_EXTERNAL \
+    -e BUCKET_INTERNAL_PRIVATE \
+    -e BUCKET_INTERNAL_SHARED \
+    -e BUCKET_EXTERNAL_SHARED \
+    -e RETRY_LIMIT=90 \
+    -e RETRY_DELAY=10 \
+    -e RETRY_BACKOFF_EXPONENT=1 \
+    -e DATA_CONFIG=/app/processor/config/content.json \
+    -e GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials \
+    -v <CREDENTIAL_FILE>:/app/.credentials \
+    -it mozilla/prio-processor:latest \
+    processor/bin/process
+```
+
+Once data has been detected under `${BUCKET_INTERNAL_PRIVATE}/raw`, the server
+will begin processing.
 
 ## Container application overview
 
@@ -42,6 +152,9 @@ docker pull mozilla/prio-processor:latest
 | `BUCKET_INTERNAL_SHARED`         | The bucket containing data from the processor's previous stage.                  |
 | `BUCKET_EXTERNAL_SHARED`         | The bucket containing incoming data from the co-processor's previous stage.      |
 | `GOOGLE_APPLICATION_CREDENTIALS` | The path on the container filesystem containing GCP service account credentials. |
+| `RETRY_LIMIT`                    | The number of retry attempts for fetching shared data.                           |
+| `RETRY_DELAY`                    | The number of seconds to wait before retrying.                                   |
+| `RETRY_BACKOFF_EXPONENT`         | Used to implement exponential backoff.                                           |
 
 Data configuration should be mounted into the `/app/processor/config` directory
 and set via `DATA_CONFIG`. Likewise, the GCP service account JSON key-file
@@ -69,165 +182,11 @@ docker run prio:dev
 docker run -it prio:dev bash
 
 # start the server
-docker run prio:latest
+docker run prio:prod
 ```
 
 See the prio-processor README for more details about the development
 environment.
-
-### python-libprio
-
-`python-libprio` is a Python3 extension module that wraps the Prio routines. It
-implements a SWIG interface for building Python wrappers.
-
-The wrapper generated by the SWIG interface file mirrors the structure of code
-in "mprio.h".
-
-```python
-from prio.libprio import *
-
-data_in = ...   # <class 'bytes'>
-server = ...    # <class 'PyCapsule'>
-
-verifier = PrioVerifier_new(server)
-packet = PrioPacketVerify1_new()
-
-PrioVerifier_set_data(verifier, data)
-PrioPacketVerify1_set_data(packet, verifier)
-
-data_out = PrioPacketVerify1_write(packet)
-```
-
-The `prio` module provides an higher-level API that handles initialization,
-reference-counting and serialization.
-
-```python
-from prio.prio import *
-import pickle
-
-data_in = ...   # <class 'bytes'>
-server = ...    # <class 'Server'>
-
-with Prio() as p:
-    verifier = p.Verifier(server, data_in)
-    data_out = pickle.dumps(verifier.create_verify1())
-```
-
-These libraries are used to build up a series of examples that include
-asynchronous I/O, multi-processing, and container orchestration.
-
-### The `prio` cli tool
-
-The `prio` command-line interface (CLI) encapsulates data processing into a
-series of sub-commands. Each command is self-contained and comes with a help
-page.
-
-```bash
-$ prio --help
-
-Usage: prio [OPTIONS] COMMAND [ARGS]...
-
-  Command line utility for prio.
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  aggregate      Generate an aggregate share from a batch of verified SNIPs
-  encode-shares  Encode JSON bit-vector into base64-encoded shares.
-  keygen         Generate a curve25519 key pair as json.
-  publish        Generate a final aggregate and remap data to a content...
-  shared-seed    Generate a shared server secret in base64.
-  verify1        Decode a batch of shares
-  verify2        Verify a batch of SNIPs
-```
-
-The CLI uses `click` for option parsing and command structure. The `jq` tool is
-the primary tool to diagnose data.
-
-```sh
-# Create a new JSON key and store it to a file.
-$ prio keygen > keyfile
-
-# Create 
-$ jq 'keys'  keyfile
-[
-  "private_key",
-  "public_key"
-]
-
-$ jq -r '.public_key' keyfile
-"AF90AA5CE9B8D34D1777770C64F2CB44739EF625C61E263FB308DA85BE4D2016"
-```
-
-The `prio` commands accept arguments either the environment or the command-line.
-This example of creating a shared proof utilizes `jq` and `prio` in shell.
-
-```sh
-#!/bin/sh
-
-export PUBLIC_KEY_HEX_INTERNAL=$(prio keygen | jq -r '.public_key')
-export PUBLIC_KEY_HEX_EXTERNAL=$(prio keygen | jq -r '.public_key')
-
-cd /tmp
-mkdir -p data/a data/b
-
-# an array with ten `1`s
-n_data=10
-python3 -c "print([1]*${n_data})" > data/part-0.json
-
-prio encode-shares \
-    --n-data ${n_data} \
-    --batch-id "testing.test-0" \
-    --input /tmp/data/part-0.json \
-    --output-A /tmp/data/a \
-    --output-B /tmp/data/b
-    # --public-key-hex-internal is read from the environment
-    # --public-key-hex-external is read from the environment
-
-cd -
-```
-
-Data looks like this:
-
-```json
-{
-  "id": "7dc16f11-87bf-4631-944a-4b63a8646502",
-  "payload": "BvSRhK0vxVp+/6plOy+lVw9h1soYKA0N/QB130p7qV2CXai9tkNjqZQAihhm..."
-}
-```
-
-### Parallel processing
-
-The `prio-processor process` script uses [GNU
-Parallel](https://www.gnu.org/software/parallel/) to maximize resource
-utilization. The `prio-processor staging` command will transform data from the
-"prio" ping into `(id, packet)` records, range partitioned by their batch
-identifiers.
-
-```bash
-function list_partitions() {
-  # return a list of paths to available partitions
-  ...
-}
-
-function verify1() {
-  # ensure options have been set for `prio verify1`
-  local input=$1
-  prio verify1 ...
-}
-
-# Re-export any necessary environment variables.
-...
-# Export the function so a separate GNU Parallel process can use it.
-export -f verify1
-
-# Process all partitions in parallel using a semaphore equal to the core count.
-parallel verify1 :: $(list_partitions)
-```
-
- 
-## Data Exchange
 
 ### Ranged Partitioning
 
@@ -320,6 +279,12 @@ filesystem
             └── verify2
 ```
 
+#### Configuring cloud storage
+
+Currently, only Google Cloud Storage has been thoroughly tested. However, the
+tooling supports S3 compatible file-stores via
+[`gsutil`](https://cloud.google.com/storage/docs/interoperability).
+
 ### Triggering mechanism
 
 The processor is designed for ad-hoc usage that can be scheduled externally. The
@@ -331,21 +296,6 @@ and `publish`.
 
 Once all stages are complete, the processor will terminate and clear the state
 of the buckets.
-
-#### Retries and exponential back-off
-
-The following variables control exponential back-off:
-
-```bash
-RETRY_LIMIT
-RETRY_DELAY
-RETRY_BACKOFF_EXPONENT
-```
-
-### Configuring cloud storage
-
-There is support for s3 and gcs storage via
-[`gsutil`](https://cloud.google.com/storage/docs/interoperability).
 
 ### Scheduling
 
