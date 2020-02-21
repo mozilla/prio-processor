@@ -60,17 +60,17 @@ jobs:
             docker load -i /tmp/prod.tar
       - run:
           name: Test Prio wrapper library
-          command: docker run prio:dev bash -c "tox"
+          command: docker run prio:dev bash -c "cd prio && tox"
       - run:
           name: Test CLI integration with the local filesystem
-          command: docker run prio:prod scripts/test-cli-integration
+          command: docker run prio:prod prio/scripts/test-cli-integration
       - run:
           name: Run unit-tests for Prio Processor
           command: docker run prio:dev bash -c "cd processor && tox"
   
   test-batch-example:
     machine: true
-    working_directory: ~/prio-processor/examples/batched-processing
+    working_directory: ~/prio-processor/prio/examples/batched-processing
     steps:
       - checkout:
           path: ~/prio-processor
