@@ -24,10 +24,10 @@ services:
 
   server_a:
     build: .
-    working_dir: /app/examples/batched-processing
+    working_dir: /app/prio/examples/batched-processing
     command: "true"
     volumes:
-      - .:/app/examples/batched-processing
+      - .:/app/prio/examples/batched-processing
     depends_on:
       - minio
       - bootstrap
@@ -46,10 +46,10 @@ services:
 
   server_b:
     build: .
-    working_dir: /app/examples/batched-processing
+    working_dir: /app/prio/examples/batched-processing
     command: "true"
     volumes:
-      - .:/app/examples/batched-processing
+      - .:/app/prio/examples/batched-processing
     depends_on:
       - minio
       - bootstrap
@@ -68,10 +68,10 @@ services:
 
   client:
     build: .
-    working_dir: /app/examples/batched-processing
+    working_dir: /app/prio/examples/batched-processing
     command: "true"
     volumes:
-      - .:/app/examples/batched-processing
+      - .:/app/prio/examples/batched-processing
     depends_on:
       - server_a
       - server_b
