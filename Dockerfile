@@ -38,6 +38,7 @@ RUN gcloud config set disable_usage_reporting true
 WORKDIR /app
 ADD . /app
 
+WORKDIR /app/prio
 RUN make
 
 # build the wheel with the python version on the production image
@@ -75,7 +76,7 @@ ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip \
         && pip3 install \
                 pytest \
-                ./dist/prio-*.whl \
+                ./prio/dist/prio-*.whl \
                 ./processor
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
