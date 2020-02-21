@@ -1,11 +1,12 @@
 **/*.pyc
 **/*.pyo
 **/__pycache__
+**/.ipynb_checkpoints
 *.so
 *.egg-info
 MANIFEST
 
-examples/*/Pipfile.lock
+**/examples/*/Pipfile.lock
 
 .coverage
 .pytest_cache
