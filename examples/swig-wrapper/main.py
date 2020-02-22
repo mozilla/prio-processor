@@ -44,8 +44,8 @@ prio.PrioPacketVerify2_set_data(p2A, vA, p1A, p1B)
 prio.PrioPacketVerify2_set_data(p2B, vB, p1A, p1B)
 
 # Check validity of the request
-prio.PrioVerifier_isValid (vA, p2A, p2B)
-prio.PrioVerifier_isValid (vB, p2A, p2B)
+prio.PrioVerifier_isValid(vA, p2A, p2B)
+prio.PrioVerifier_isValid(vB, p2A, p2B)
 
 prio.PrioServer_aggregate(sA, vA)
 prio.PrioServer_aggregate(sB, vB)
@@ -55,7 +55,8 @@ prio.PrioTotalShare_set_data(tA, sA)
 prio.PrioTotalShare_set_data(tB, sB)
 
 output = prio.PrioTotalShare_final(cfg, tA, tB)
-output = array('L', output)
+output = array("L", output)
 
 # check the output
-assert(list(data_items) == list(output))
+assert list(data_items) == list(output), "results do not match"
+print(f"{list(output)}")
