@@ -34,17 +34,14 @@ jobs:
           name: Build staged images
           command: |
             docker build --target development -t prio:dev .
-            docker build --target production -t prio:prod .
       - run:
           name: Save image into cache
           command: |
             docker save -o /tmp/dev.tar "prio:dev"
-            docker save -o /tmp/prod.tar "prio:prod"
       - save_cache:
           key: v1-{{ .Branch }}-{{ epoch }}
           paths:
             - /tmp/dev.tar
-            - /tmp/prod.tar
 
   test:
     docker:
@@ -57,13 +54,12 @@ jobs:
           name: Restore cache
           command: |
             docker load -i /tmp/dev.tar
-            docker load -i /tmp/prod.tar
       - run:
           name: Test Prio wrapper library
           command: docker run prio:dev bash -c "cd prio && tox"
       - run:
           name: Test CLI integration with the local filesystem
-          command: docker run prio:prod prio/scripts/test-cli-integration
+          command: docker run prio:dev prio/scripts/test-cli-integration
       - run:
           name: Run unit-tests for Prio Processor
           command: docker run prio:dev bash -c "cd processor && tox"
@@ -95,7 +91,12 @@ jobs:
           key: v1-{{ .Branch }}
       - run:
           name: Restore cache
-          command: docker load -i /tmp/prod.tar
+          # NOTE: the assumption is that the layer can be reused to copy the
+          # prebuilt wheels. Otherwise it gets redone from scratch.
+          command: docker load -i /tmp/dev.tar
+      - run:
+          name: Build production image
+          command: docker build --target production -t prio:prod .
       - run:
           name: Deploy to Dockerhub
           command: |
