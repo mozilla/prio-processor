@@ -52,7 +52,7 @@ ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
 WORKDIR /app
-CMD tox --workdir prio && tox --workdir processor
+CMD cd prio && tox &&  cd ../processor && tox
 
 
 # Define the production container
@@ -87,7 +87,7 @@ RUN curl https://sdk.cloud.google.com | bash
 ENV PATH="$PATH:~/google-cloud-sdk/bin"
 RUN gcloud config set disable_usage_reporting true
 
-CMD pytest && scripts/test-cli-integration
+CMD pytest prio && prio/scripts/test-cli-integration
 
 
 # References
