@@ -1,10 +1,14 @@
 # libprio benchmarks
 
-Information about payload sizes and client encoding time as a function of input size.
+Information about payload sizes and client encoding time as a function of input
+size.
 
-## To reproduce
+## Reproducing results
 
+```bash
+pip install -r requirements.txt
+python3 main.py
 ```
-$ pipenv lock && pipenv sync
-$ jupyter notebook
-```
+
+![encrypted sizes](./encrypted_sizes.png)
+![client encoding time](./client_encoding_time.png)
