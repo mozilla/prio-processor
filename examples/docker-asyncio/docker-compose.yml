@@ -14,9 +14,7 @@ services:
       - server_b
     command: >
       bash -c "cd examples/docker-asyncio &&
-      pipenv sync &&
-      wait-for-it rabbitmq:5672 -- pipenv run \
-        python client.py \
+      wait-for-it rabbitmq:5672 -- python3 client.py \
           --pubkey-A F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51 \
           --pubkey-B 15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07 \
           --n-clients 10 \
@@ -28,9 +26,7 @@ services:
       - rabbitmq
     command: >
       bash -c "cd examples/docker-asyncio &&
-      pipenv sync &&
-      wait-for-it rabbitmq:5672 -- pipenv run \
-        python server.py \
+      wait-for-it rabbitmq:5672 -- python3 server.py \
           --pubkey F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51 \
           --pvtkey 7A0AA608C08CB74A86409F5026865435B2F17F40B20636CEFD2656585097FBE0 \
           --pubkey-other 15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07 \
@@ -43,9 +39,7 @@ services:
       - rabbitmq
     command: >
       bash -c "cd examples/docker-asyncio &&
-      pipenv sync &&
-      wait-for-it rabbitmq:5672 -- pipenv run \
-        python server.py \
+      wait-for-it rabbitmq:5672 -- python3 server.py \
           --pubkey 15DC84D87C73A36120E0389D4ABCD433EDC5147DC71A4093E2A5952968D51F07 \
           --pvtkey 50C7329DE18DE3087A0DE963D5585A4DB7A156C7A29FA854760373B053D86919 \
           --pubkey-other F63F2FB9B823B7B672684A526AC467DCFC110D4BB242F6DF0D3EA9F09CE14B51 \

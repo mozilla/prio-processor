@@ -7,17 +7,15 @@ It will communicate over an amqp channel as an alternative to RPC.
 
 ## Running the example
 
-```
-$ pipenv sync --dev
-$ pipenv run docker-compose build
-$ pipenv run docker-compose up
+```bash
+make build
+make run
+make clean
 ```
 
+Results in:
 
-## Example logs
-
-```
-$ docker-compose up
+```bash
 Starting docker-asyncio_rabbitmq_1 ... done
 Starting docker-asyncio_server_b_1 ... done
 Starting docker-asyncio_server_a_1 ... done

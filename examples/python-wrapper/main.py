@@ -53,3 +53,4 @@ output = prio.total_share_final(cfg, tA, tB)
 
 # check the output
 assert(list(data_items) == list(output))
+print(f"{list(output)}")

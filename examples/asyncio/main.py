@@ -78,7 +78,7 @@ async def client_produce(client, data_items, queue_a, queue_b, n_clients):
 
 
 async def main():
-    n_clients = 10
+    n_clients = 4
     n_data = 133
     server_secret = prio.PRGSeed()
     skA, pkA = prio.create_keypair()

@@ -5,8 +5,9 @@ RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnub
 RUN chmod +x /usr/local/bin/wait-for-it
 
 RUN pip3 install \
-    aioamqp \
+    s3fs \
+    pyarrow \
     click \
-    aio-pika
+    pandas \
 
 CMD bash

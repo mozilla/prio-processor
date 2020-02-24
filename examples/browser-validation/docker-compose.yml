@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app/examples/docker-asyncio
+    command: python3 main.py
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - PRIO_DATE 
+      - PRIO_PINGS 
+      - PRIO_PUBKEY_A 
+      - PRIO_PVTKEY_A 
+      - PRIO_PUBKEY_B 
+      - PRIO_PVTKEY_B 
