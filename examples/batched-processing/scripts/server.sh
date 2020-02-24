@@ -42,7 +42,7 @@ function poll_for_data() {
     # k=4, 15 seconds, 0.2 minutes
     # k=6, 63 seconds, 1.1 minutes
     # k=10, 1023 seconds, 17.1 minutes
-    max_retries=6
+    max_retries=4
     retries=0
     backoff=2
     while ! mc stat $1 &>/dev/null; do

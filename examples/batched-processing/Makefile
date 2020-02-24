@@ -4,3 +4,6 @@ build:
 
 test:
 	scripts/integration.sh
+
+clean:
+	docker-compose down

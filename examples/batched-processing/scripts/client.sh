@@ -62,5 +62,5 @@ mc cp --recursive $output_a/ $TARGET/$output_a/
 mc cp --recursive $output_b/ $TARGET/$output_b/
 
 touch _SUCCESS
-mc cp _SUCCESS $TARGET/$output_a/
-mc cp _SUCCESS $TARGET/$output_b/
+mc cp _SUCCESS $TARGET/$output_a/_SUCCESS
+mc cp _SUCCESS $TARGET/$output_b/_SUCCESS
