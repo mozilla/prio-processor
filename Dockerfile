@@ -28,7 +28,7 @@ RUN ln -s /usr/include/nspr4 /usr/include/nspr \
 
 # prepare the environment for testing in development
 ENV PATH="$PATH:~/.local/bin"
-RUN python3 -m ensurepip && pip3 install tox setuptools wheel
+RUN python3 -m ensurepip && pip3 install tox setuptools wheel black
 
 RUN curl https://sdk.cloud.google.com | bash
 ENV PATH="$PATH:~/google-cloud-sdk/bin"
