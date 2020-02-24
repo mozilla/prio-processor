@@ -52,7 +52,7 @@ ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
 WORKDIR /app
-CMD make test
+CMD tox --workdir prio && tox --workdir processor
 
 
 # Define the production container
