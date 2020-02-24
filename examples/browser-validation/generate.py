@@ -16,20 +16,20 @@ def construct(build_id, user_default, newtab, pdf, data_a, data_b):
             "histograms": {
                 "BROWSER_IS_USER_DEFAULT": {"sum": user_default},
                 "NEWTAB_PAGE_ENABLED": {"sum": newtab},
-                "PDF_VIEWER_USED": {"sum": pdf}
+                "PDF_VIEWER_USED": {"sum": pdf},
             },
             "prio": {
                 "a": {k: int(v) for k, v in enumerate(data_a)},
-                "b": {k: int(v) for k, v in enumerate(data_b)}
-            }
-        }
+                "b": {k: int(v) for k, v in enumerate(data_b)},
+            },
+        },
     }
     return ping
 
 
 def generate(build_id, client):
     data = []
-    for vector in product([0,1], [0,1], [0,1]):
+    for vector in product([0, 1], [0, 1], [0, 1]):
         args = list(vector) + client.encode(bytes(vector))
         ping = construct(build_id, *args)
         data.append(ping)
@@ -49,7 +49,7 @@ def main(path, batch_id):
     skB, pkB = prio.create_keypair()
 
     # create the client
-    cfg = prio.Config(N_DATA, pkA, pkB, bytes(batch_id, 'utf-8'))
+    cfg = prio.Config(N_DATA, pkA, pkB, bytes(batch_id, "utf-8"))
     client = prio.Client(cfg)
 
     # generate test data
@@ -58,7 +58,9 @@ def main(path, batch_id):
         write(f, data)
 
     # print a command to use
-    def clean(s): return s[:-1].decode('utf-8') 
+    def clean(s):
+        return s[:-1].decode("utf-8")
+
     args = {
         "--pings": path,
         "--pubkey-A": clean(pkA.export_hex()),
@@ -70,5 +72,5 @@ def main(path, batch_id):
     print(f"python main.py \\{argstr}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

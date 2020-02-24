@@ -20,6 +20,7 @@ PACKET_VERIFY_2 = 2
 
 Packet = namedtuple("Packet", ["id", "type", "data"])
 
+
 async def server_consume(server, read_queue, write_queue):
     # maintain state of the server's shares in the verifier, along with the
     # generated verification packets
@@ -34,9 +35,8 @@ async def server_consume(server, read_queue, write_queue):
         v, p1, p2 = cache.get(pid, (None, None, None))
 
         def log(line):
-             logger.info("Server {}, PID {}: {}".format(server.server_id, pid, line))
+            logger.info("Server {}, PID {}: {}".format(server.server_id, pid, line))
 
-        
         # out of order packet execution is dealt with by pushing data back
         # into the queue
 
@@ -83,7 +83,7 @@ async def main():
     server_secret = prio.PRGSeed()
     skA, pkA = prio.create_keypair()
     skB, pkB = prio.create_keypair()
-    
+
     cfg = prio.Config(n_data, pkA, pkB, b"test_batch")
     sA = prio.Server(cfg, prio.PRIO_SERVER_A, skA, server_secret)
     sB = prio.Server(cfg, prio.PRIO_SERVER_B, skB, server_secret)
@@ -99,8 +99,7 @@ async def main():
 
     consumers = asyncio.ensure_future(
         asyncio.gather(
-            server_consume(sA, queue_a, queue_b),
-            server_consume(sB, queue_b, queue_a),
+            server_consume(sA, queue_a, queue_b), server_consume(sB, queue_b, queue_a)
         )
     )
 
@@ -111,11 +110,12 @@ async def main():
 
     output = prio.total_share_final(cfg, t_a, t_b)
 
-    expected = [item*n_clients for item in list(data_items)]
-    assert(list(output) == expected)
+    expected = [item * n_clients for item in list(data_items)]
+    assert list(output) == expected
 
     consumers.cancel()
     logger.info("Done!")
+
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
