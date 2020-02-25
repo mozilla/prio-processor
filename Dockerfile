@@ -28,7 +28,7 @@ RUN ln -s /usr/include/nspr4 /usr/include/nspr \
 
 # prepare the environment for testing in development
 ENV PATH="$PATH:~/.local/bin"
-RUN python3 -m ensurepip && pip3 install tox setuptools wheel
+RUN python3 -m ensurepip && pip3 install tox setuptools wheel black
 
 RUN curl https://sdk.cloud.google.com | bash
 ENV PATH="$PATH:~/google-cloud-sdk/bin"
@@ -38,6 +38,7 @@ RUN gcloud config set disable_usage_reporting true
 WORKDIR /app
 ADD . /app
 
+WORKDIR /app/prio
 RUN make
 
 # build the wheel with the python version on the production image
@@ -51,7 +52,7 @@ ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
 WORKDIR /app
-CMD make test
+CMD cd prio && tox &&  cd ../processor && tox
 
 
 # Define the production container
@@ -75,7 +76,7 @@ ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip \
         && pip3 install \
                 pytest \
-                ./dist/prio-*.whl \
+                ./prio/dist/prio-*.whl \
                 ./processor
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
@@ -86,7 +87,7 @@ RUN curl https://sdk.cloud.google.com | bash
 ENV PATH="$PATH:~/google-cloud-sdk/bin"
 RUN gcloud config set disable_usage_reporting true
 
-CMD pytest && scripts/test-cli-integration
+CMD pytest prio && prio/scripts/test-cli-integration
 
 
 # References

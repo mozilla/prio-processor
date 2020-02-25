@@ -2,7 +2,7 @@ build:
 	docker build --target development -t prio:dev ../..
 	docker-compose build
 
-up:
+run:
 	docker-compose up
 
 clean:

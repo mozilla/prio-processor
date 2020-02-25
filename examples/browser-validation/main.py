@@ -32,7 +32,7 @@ def extract(date, bucket, prefix, cache=False):
     # NOTE: 20181005220146 is the first valid build_id
     # see: https://hg.mozilla.org/mozilla-central/rev/3e1d1b6a529e
     min_build_id = "20181005220146"
-    filtered = df.loc[df['build_id'] >= min_build_id]
+    filtered = df.loc[df["build_id"] >= min_build_id]
 
     if cache:
         logging.info(f"Caching dataframe at {cache_file}")
@@ -44,8 +44,8 @@ def extract(date, bucket, prefix, cache=False):
 
 
 def get_values_sorted(d):
-  tuples = [(int(k), int(v)) for k, v in d.items()]
-  return [x[1] for x in sorted(tuples)]
+    tuples = [(int(k), int(v)) for k, v in d.items()]
+    return [x[1] for x in sorted(tuples)]
 
 
 def extract_ping(f):
@@ -55,17 +55,17 @@ def extract_ping(f):
         payload = ping["payload"]
         row = {}
 
-        row['build_id'] = ping["environment"]["build"]["buildId"]
+        row["build_id"] = ping["environment"]["build"]["buildId"]
 
-        names = ['browser_is_user_default', 'newtab_page_enabled', 'pdf_viewer_used']
+        names = ["browser_is_user_default", "newtab_page_enabled", "pdf_viewer_used"]
         for name in names:
-            hist = payload['histograms'].get(name.upper())
-            bucket_sum = (hist or {}).get('sum', 0)
+            hist = payload["histograms"].get(name.upper())
+            bucket_sum = (hist or {}).get("sum", 0)
             row[name] = int(bool(bucket_sum))
 
-        prio_data = payload['prio']
-        row['prio_data_a'] = np.array(get_values_sorted(prio_data['a']))
-        row['prio_data_b'] = np.array(get_values_sorted(prio_data['b']))
+        prio_data = payload["prio"]
+        row["prio_data_a"] = np.array(get_values_sorted(prio_data["a"]))
+        row["prio_data_b"] = np.array(get_values_sorted(prio_data["b"]))
 
         data.append(row)
 
@@ -78,7 +78,10 @@ def prio_aggregate(init_func, group):
 
     prio_null_data = 0
     prio_invalid = 0
-    def compact(x): return bytes(x.astype('uint8'))
+
+    def compact(x):
+        return bytes(x.astype("uint8"))
+
     data = zip(group.prio_data_a.apply(compact), group.prio_data_b.apply(compact))
     for data_a, data_b in data:
         if not data_a or not data_b:
@@ -112,7 +115,7 @@ def prio_aggregate(init_func, group):
     d = {
         "prio_control": control,
         "prio_observed": total,
-        "prio_diff": (control - total).astype('int'),
+        "prio_diff": (control - total).astype("int"),
         "prio_null_data": prio_null_data,
         "prio_invalid": prio_invalid,
         "count": len(group.index),
@@ -129,12 +132,26 @@ def prio_aggregate(init_func, group):
 @click.option("--groupby", type=str, help="comma-delimited groupby keys")
 @click.option("--interactive/--no-interactive", default=False)
 @click.option("--cache/--no-cache", default=False)
-@click.option("--pings", type=click.File('r'))
+@click.option("--pings", type=click.File("r"))
 @click.option("--bucket", default="net-mozaws-prod-us-west-2-pipeline-analysis")
 @click.option("--prefix", default="amiyaguchi/prio/v1")
-def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, groupby, interactive, cache, pings, bucket, prefix):
+def main(
+    date,
+    pubkey_a,
+    pvtkey_a,
+    pubkey_b,
+    pvtkey_b,
+    groupby,
+    interactive,
+    cache,
+    pings,
+    bucket,
+    prefix,
+):
     if not (date or pings):
-        raise click.BadOptionUsage("date", "Specify either a submission-date or a local ping-set!")
+        raise click.BadOptionUsage(
+            "date", "Specify either a submission-date or a local ping-set!"
+        )
 
     pubkey_a = bytes(pubkey_a, "utf-8")
     pvtkey_a = bytes(pvtkey_a, "utf-8")
@@ -160,8 +177,7 @@ def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, groupby, interactive, cac
 
     keys = [key.strip() for key in groupby.split()] if groupby else []
     df = (
-        input_df
-        .groupby(["build_id"] + keys)
+        input_df.groupby(["build_id"] + keys)
         .apply(partial(prio_aggregate, init_servers))
         .sort_values("build_id", ascending=False)
     )
@@ -170,5 +186,5 @@ def main(date, pubkey_a, pvtkey_a, pubkey_b, pvtkey_b, groupby, interactive, cac
         code.interact(local=locals())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(auto_envvar_prefix="PRIO")

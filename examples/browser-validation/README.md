@@ -5,10 +5,10 @@ This example validates the results from a pilot experiment.
 ## Usage
 
 Setup
-```
-$ pipenv lock
-$ pipenv sync --dev
-$ pipenv shell
+
+```bash
+make run
+make test
 ```
 
 To test against generated data, run the `generate.py` script.

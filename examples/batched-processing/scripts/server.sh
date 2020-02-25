@@ -36,6 +36,12 @@ mkdir -p processed
 #   $1 - Absolute path to a file
 function poll_for_data() {
     set +e
+
+    # Cumulative time of retries until max_retries k is reached.
+    # >>> sum(2**i for i in range(k))
+    # k=4, 15 seconds, 0.2 minutes
+    # k=6, 63 seconds, 1.1 minutes
+    # k=10, 1023 seconds, 17.1 minutes
     max_retries=4
     retries=0
     backoff=2

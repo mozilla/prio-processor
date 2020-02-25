@@ -1,0 +1,4 @@
+matplotlib
+numpy
+tqdm
+-e file:../../prio
