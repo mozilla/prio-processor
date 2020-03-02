@@ -4,6 +4,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 set -euo pipefail
+set -x
 
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
@@ -11,7 +12,6 @@ set -euo pipefail
 
 function authenticate() {
     local cred=${GOOGLE_APPLICATION_CREDENTIALS}
-    local test_bucket=${BUCKET_INTERNAL_PRIVATE}
 
     if [[ -n "${cred}" ]]; then
         gcloud auth activate-service-account --key-file "${cred}"
@@ -19,11 +19,12 @@ function authenticate() {
         # https://cloud.google.com/kubernetes-engine/docs/tutorials/authenticating-to-cloud-platform
         echo "No JSON credentials provided, using default scopes."
     fi
-    gsutil ls "gs://${test_bucket}"
+    gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
+    gsutil ls "${BUCKET_INTERNAL_SHARED}"
 }
 
 echo "Running cleanup..."
 
 authenticate
-(gsutil -m rm "gs://${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
-(gsutil -m rm "gs://${BUCKET_INTERNAL_SHARED}/**" || echo "nothing to delete")
+(gsutil -m rm "${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
+(gsutil -m rm "${BUCKET_INTERNAL_SHARED}/**" || echo "nothing to delete")
