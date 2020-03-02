@@ -14,7 +14,7 @@ jobs:
       - image: docker:stable-git
     steps:
       - checkout
-      - run: 
+      - run:
           name: "Pull Submodules"
           command: |
             git submodule init
@@ -31,7 +31,7 @@ jobs:
             "$CIRCLE_PROJECT_REPONAME" \
             "$CIRCLE_BUILD_URL" > version.json
       - run:
-          name: Build staged images
+          name: Build development image
           command: |
             docker build --target development -t prio:dev .
       - run:
@@ -63,7 +63,7 @@ jobs:
       - run:
           name: Run unit-tests for Prio Processor
           command: docker run prio:dev bash -c "cd processor && tox"
-  
+
   test-batch-example:
     machine: true
     working_directory: ~/prio-processor/examples/batched-processing
@@ -86,17 +86,30 @@ jobs:
     docker:
       - image: docker:stable-git
     steps:
-      - setup_remote_docker
-      - restore_cache:
-          key: v1-{{ .Branch }}
+      - checkout
       - run:
-          name: Restore cache
-          # NOTE: the assumption is that the layer can be reused to copy the
-          # prebuilt wheels. Otherwise it gets redone from scratch.
-          command: docker load -i /tmp/dev.tar
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update
+      - setup_remote_docker
+      - run:
+          name: Create a version.json
+          command: |
+            # create a version.json per https://github.com/mozilla-services/Dockerflow/blob/master/docs/version_object.md
+            printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' \
+            "$CIRCLE_SHA1" \
+            "$CIRCLE_TAG" \
+            "$CIRCLE_PROJECT_USERNAME" \
+            "$CIRCLE_PROJECT_REPONAME" \
+            "$CIRCLE_BUILD_URL" > version.json
       - run:
           name: Build production image
-          command: docker build --target production -t prio:prod .
+          command: |
+            docker build --target production -t prio:prod .
+      - run:
+          name: Run sanity checks in production image
+          command: docker run prio:dev
       - run:
           name: Deploy to Dockerhub
           command: |
