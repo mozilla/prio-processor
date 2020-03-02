@@ -56,7 +56,7 @@ function send_output_external() {
     local output_internal=$1                # path to internal output
     local output_external=$2                # relative path to external output
 
-    local path="gs://${BUCKET_EXTERNAL_SHARED}/${output_external}"
+    local path="${BUCKET_EXTERNAL_SHARED}/${output_external}"
     gsutil -m rsync -r "${output_internal}/" "${path}/"
     touch _SUCCESS
     gsutil cp _SUCCESS "${path}/"
@@ -70,7 +70,7 @@ function send_output_internal() {
     : "${BUCKET_INTERNAL_PRIVATE?}"         # bucket of internal server
     local output=$1                         # relative path to output
 
-    local path="gs://${BUCKET_INTERNAL_PRIVATE}/${output}"
+    local path="${BUCKET_INTERNAL_PRIVATE}/${output}"
     gsutil -m rsync -r "${output}/" "${path}/"
     touch _SUCCESS
     gsutil cp _SUCCESS "${path}/"
@@ -108,7 +108,7 @@ function fetch_input_blocked() {
     local bucket=$1     # input bucket
     local input=$2      # relative path to input data
 
-    local path="gs://${bucket}/${input}"
+    local path="${bucket}/${input}"
     wait_for_data "${path}/_SUCCESS"
     gsutil -m rsync -r "${path}/" "${input}/"
 }
@@ -313,9 +313,9 @@ function authenticate() {
         # https://cloud.google.com/kubernetes-engine/docs/tutorials/authenticating-to-cloud-platform
         echo "No JSON credentials provided, using default scopes."
     fi
-    gsutil ls "gs://${BUCKET_INTERNAL_PRIVATE?}"
-    gsutil ls "gs://${BUCKET_INTERNAL_SHARED?}"
-    gsutil ls "gs://${BUCKET_EXTERNAL_SHARED?}"
+    gsutil ls "${BUCKET_INTERNAL_PRIVATE?}"
+    gsutil ls "${BUCKET_INTERNAL_SHARED?}"
+    gsutil ls "${BUCKET_EXTERNAL_SHARED?}"
 }
 
 function main() {
