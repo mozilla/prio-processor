@@ -34,3 +34,17 @@ cd prio
 make
 make test
 ```
+
+## Adding new Python dependencies
+
+To add new Python dependencies to the container, use `pip-tools` to manage the
+`requirements.txt`.
+
+```bash
+pip install pip-tools
+
+# add new requirement to requirements.in
+
+# generate a new requirements.txt
+pip-compile
+```
