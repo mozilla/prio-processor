@@ -48,7 +48,6 @@ RUN pip3 install -r requirements.txt
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
-WORKDIR /app
 CMD cd prio && tox && cd .. && \
         cd processor && tox && cd .. \
         prio/scripts/test-cli-integration && \
