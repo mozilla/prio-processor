@@ -43,7 +43,8 @@ WORKDIR /app/prio
 RUN make
 
 WORKDIR /app
-RUN pip3 install -r requirements.txt
+RUN pip3 install --upgrade pip && \
+        pip3 install -r requirements.txt
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
@@ -73,7 +74,9 @@ COPY --from=development /app .
 RUN chown -R 10001:10001 /app
 
 ENV PATH="$PATH:~/.local/bin"
-RUN python3 -m ensurepip && pip3 install -r requirements.txt
+RUN python3 -m ensurepip && \
+        pip3 install --upgrade pip && \
+        pip3 install -r requirements.txt
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
