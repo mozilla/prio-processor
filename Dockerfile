@@ -38,21 +38,22 @@ RUN gcloud config set disable_usage_reporting true
 WORKDIR /app
 ADD . /app
 
+# Build the prio wrapper
 WORKDIR /app/prio
 RUN make
 
-# build the wheel with the python version on the production image
-RUN python3 setup.py bdist_wheel && pip3 install dist/prio-*.whl
-
-# build the processor
-WORKDIR /app/processor
-RUN pip3 install . && python3 setup.py bdist_egg
+WORKDIR /app
+RUN pip3 install --upgrade pip && \
+        pip3 install -r requirements.txt
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
-WORKDIR /app
-CMD cd prio && tox &&  cd ../processor && tox
+CMD cd prio && tox && cd .. && \
+        cd processor && tox && cd .. \
+        prio/scripts/test-cli-integration && \
+        prio --help && \
+        prio-processor --help
 
 
 # Define the production container
@@ -73,11 +74,9 @@ COPY --from=development /app .
 RUN chown -R 10001:10001 /app
 
 ENV PATH="$PATH:~/.local/bin"
-RUN python3 -m ensurepip \
-        && pip3 install \
-                pytest \
-                ./prio/dist/prio-*.whl \
-                ./processor
+RUN python3 -m ensurepip && \
+        pip3 install --upgrade pip && \
+        pip3 install -r requirements.txt
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
@@ -87,8 +86,10 @@ RUN curl https://sdk.cloud.google.com | bash
 ENV PATH="$PATH:~/google-cloud-sdk/bin"
 RUN gcloud config set disable_usage_reporting true
 
-CMD pytest prio && prio/scripts/test-cli-integration
-
+CMD pytest prio && \
+        prio/scripts/test-cli-integration && \
+        prio --help && \
+        prio-processor --help
 
 # References
 # https://docs.docker.com/develop/develop-images/multistage-build/
