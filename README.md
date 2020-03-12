@@ -45,6 +45,6 @@ pip install pip-tools
 
 # add new requirement to requirements.in
 
-# generate a new requirements.txt
-pip-compile
+# generate a new requirements.txt, allowing setuptools to be updated
+pip-compile --allow-unsafe
 ```
