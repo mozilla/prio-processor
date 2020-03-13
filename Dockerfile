@@ -42,6 +42,9 @@ ADD . /app
 WORKDIR /app/prio
 RUN make
 
+WORKDIR /app/processor
+RUN python3 setup.py bdist_egg
+
 WORKDIR /app
 RUN pip3 install --upgrade pip && \
         pip3 install -r requirements.txt
