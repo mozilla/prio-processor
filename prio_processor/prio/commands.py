@@ -42,6 +42,7 @@ def entry_point():
 
 
 @entry_point.command()
+@PrioContext()
 def shared_seed():
     """Generate a shared server secret in base64."""
     seed = libprio.PrioPRGSeed_randomize()
@@ -49,11 +50,12 @@ def shared_seed():
 
 
 @entry_point.command()
+@PrioContext()
 def keygen():
     """Generate a curve25519 key pair as json."""
     private, public = libprio.Keypair_new()
-    private_hex = libprio.PrivateKey_export_hex(private).decode("utf-8")[:-1]
-    public_hex = libprio.PublicKey_export_hex(public).decode("utf-8")[:-1]
+    private_hex = libprio.PrivateKey_export_hex(private).decode("utf-8")
+    public_hex = libprio.PublicKey_export_hex(public).decode("utf-8")
     data = json.dumps({"private_key": private_hex, "public_key": public_hex})
     click.echo(data)
 
@@ -63,6 +65,7 @@ def keygen():
 @public_key
 @input_1
 @output_2
+@PrioContext()
 def encode_shares(
     batch_id,
     n_data,
@@ -101,6 +104,7 @@ def encode_shares(
 @public_key
 @input_1
 @output_1
+@PrioContext()
 def verify1(
     batch_id,
     n_data,
@@ -159,6 +163,7 @@ def verify1(
 @input_1
 @input_2
 @output_1
+@PrioContext()
 def verify2(
     batch_id,
     n_data,
@@ -238,6 +243,7 @@ def verify2(
 @input_1
 @input_2
 @output_1
+@PrioContext()
 def aggregate(
     batch_id,
     n_data,
@@ -313,6 +319,7 @@ def aggregate(
 @public_key
 @input_2
 @output_1
+@PrioContext()
 def publish(
     batch_id,
     n_data,
