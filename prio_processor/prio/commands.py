@@ -6,7 +6,7 @@ from base64 import b64decode, b64encode
 from datetime import datetime
 from uuid import uuid4
 
-from .. import libprio
+from prio import libprio, PrioContext
 from .options import (
     data_config,
     server_config,
@@ -36,14 +36,19 @@ def match_server(server_id):
     return libprio.PRIO_SERVER_A if server_id == "A" else libprio.PRIO_SERVER_B
 
 
-@click.command()
+@click.group()
+def entry_point():
+    pass
+
+
+@entry_point.command()
 def shared_seed():
     """Generate a shared server secret in base64."""
     seed = libprio.PrioPRGSeed_randomize()
     click.echo(b64encode(seed))
 
 
-@click.command()
+@entry_point.command()
 def keygen():
     """Generate a curve25519 key pair as json."""
     private, public = libprio.Keypair_new()
@@ -53,7 +58,7 @@ def keygen():
     click.echo(data)
 
 
-@click.command()
+@entry_point.command()
 @data_config
 @public_key
 @input_1
@@ -90,7 +95,7 @@ def encode_shares(
             fp_b.write("\n")
 
 
-@click.command()
+@entry_point.command()
 @data_config
 @server_config
 @public_key
@@ -147,7 +152,7 @@ def verify1(
     click.echo(f"{error} errors out of {total} total")
 
 
-@click.command()
+@entry_point.command()
 @data_config
 @server_config
 @public_key
@@ -226,7 +231,7 @@ def verify2(
     click.echo(f"{error} errors out of {total} total")
 
 
-@click.command()
+@entry_point.command()
 @data_config
 @server_config
 @public_key
@@ -302,7 +307,7 @@ def aggregate(
         json.dump(b64encode(data).decode(), f)
 
 
-@click.command()
+@entry_point.command()
 @data_config
 @server_config
 @public_key
@@ -358,3 +363,7 @@ def publish(
     os.makedirs(output, exist_ok=True)
     with open(outfile, "w") as f:
         json.dump(data, f)
+
+
+if __name__ == "__main__":
+    entry_point()

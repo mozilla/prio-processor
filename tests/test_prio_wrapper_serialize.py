@@ -4,20 +4,32 @@
 
 import pickle
 import pytest
-from prio import prio
+from prio_processor.prio import wrapper as prio
+from prio import libprio
+
+
+@pytest.fixture(autouse=True)
+def init():
+    # Note: PrioContext breaks with the fixtures
+    libprio.Prio_init()
+    yield
+    libprio.Prio_clear()
 
 
 @pytest.fixture
 def seed():
     return prio.PRGSeed()
 
+
 @pytest.fixture
 def serverA_keypair():
     return prio.create_keypair()
 
+
 @pytest.fixture
 def serverB_keypair():
     return prio.create_keypair()
+
 
 @pytest.fixture
 def config(serverA_keypair, serverB_keypair):
@@ -25,15 +37,18 @@ def config(serverA_keypair, serverB_keypair):
     _, pkB = serverB_keypair
     return prio.Config(133, pkA, pkB, b"test_batch")
 
+
 @pytest.fixture
 def serverA(seed, config, serverA_keypair):
     sk, _ = serverA_keypair
     return prio.Server(config, prio.PRIO_SERVER_A, sk, seed)
 
+
 @pytest.fixture
 def serverB(seed, config, serverB_keypair):
     sk, _ = serverB_keypair
     return prio.Server(config, prio.PRIO_SERVER_B, sk, seed)
+
 
 @pytest.fixture
 def client(config):

@@ -4,7 +4,7 @@ from io import BytesIO
 
 import pytest
 from click.testing import CliRunner
-from prio_processor import origins
+from prio_processor.origin import origins
 
 # First five origins from mozilla-central
 # https://hg.mozilla.org/mozilla-central/raw-file/tip/toolkit/components/telemetry/core/TelemetryOriginData.inc

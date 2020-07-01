@@ -1,8 +1,7 @@
-.PHONY: all shell
+.PHONY: build
 
-all:
-	docker build --target development -t prio:dev .
-	docker build --target production -t prio:latest .
+build:
+	docker-compose build
 
-shell:
-	docker run -v $(shell pwd):/app -it prio:dev bash -c "make && bash"
+test:
+	bin/integrate

@@ -1,9 +1,12 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+"""NOTE: the interface for this module is not stable and may change or be
+removed in its entirety."""
 
-from . import libprio
+from prio import libprio
 from array import array
+import logging
 
 # re-export enums
 PRIO_SERVER_A = libprio.PRIO_SERVER_A

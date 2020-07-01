@@ -4,7 +4,7 @@ import json
 import os
 import pytest
 from click.testing import CliRunner
-from prio.cli import commands
+from prio_processor.prio import commands
 
 
 @pytest.fixture

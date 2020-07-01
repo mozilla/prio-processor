@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from uuid import uuid4
 from click.testing import CliRunner
-from prio_processor import staging
+from prio_processor.origin import staging
 from pyspark.sql import Row
 from base64 import b64encode
 

@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import pytest
 from click.testing import CliRunner
-from prio_processor import indexing
+from prio_processor.origin import indexing
 from pyspark.sql import Row
 
 
