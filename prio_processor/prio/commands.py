@@ -46,7 +46,7 @@ def entry_point():
 def shared_seed():
     """Generate a shared server secret in base64."""
     seed = libprio.PrioPRGSeed_randomize()
-    click.echo(b64encode(seed))
+    click.echo(json.dumps({"shared_seed": b64encode(seed).decode()}))
 
 
 @entry_point.command()
@@ -90,7 +90,9 @@ def encode_shares(
     path_b = os.path.join(output_b, name)
     with open(path_a, "w") as fp_a, open(path_b, "w") as fp_b:
         for datum in data:
-            share_a, share_b = libprio.PrioClient_encode(config, bytes(datum))
+            share_a, share_b = libprio.PrioClient_encode(
+                config, bytes(datum["payload"])
+            )
             uid = str(uuid4())
             json.dump({"id": uid, "payload": b64encode(share_a).decode()}, fp_a)
             fp_a.write("\n")

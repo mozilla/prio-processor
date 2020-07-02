@@ -52,9 +52,12 @@ function config_get() {
 
 function generate_data() {
     local n_data=$1
-    python -c "print([int(x % 3 == 0 or x % 5 == 0) for x in range(${n_data})])"
+    python -c "import json; print(
+        json.dumps({
+            'payload': [int(x % 3 == 0 or x % 5 == 0) for x in range(${n_data})]
+        })
+    )"
 }
-
 
 function generate_dataset() {
     local batch_id=$1
@@ -76,8 +79,8 @@ function generate_dataset() {
     for i in {1..5}; do
         filename="${batch_id}-part-$i.json"
         set +x
-        for ((j=0; j < i; j++)); do
-            generate_data "${n_data} ">> "${filename}"
+        for ((j = 0; j < i; j++)); do
+            generate_data "${n_data} " >>"${filename}"
         done
         set -x
         prio encode-shares \
@@ -89,8 +92,8 @@ function generate_dataset() {
 
         # test for robustness by inserting an invalid entry into the shares
         set +x
-        echo '{"id": "asdf", "payload": "asdf"}' >> "${out_a}/${filename}"
-        echo '{"id": "asdf", "payload": "asdf"}' >> "${out_b}/${filename}"
+        echo '{"id": "asdf", "payload": "asdf"}' >>"${out_a}/${filename}"
+        echo '{"id": "asdf", "payload": "asdf"}' >>"${out_b}/${filename}"
         set -x
     done
 }
@@ -99,9 +102,9 @@ function main() {
     cd /tmp
     authenticate
 
-    export DATA_CONFIG          # used by config_get
-    export -f config_get        # used by generate_dataset
-    export -f generate_data     # used by generate_dataset
+    export DATA_CONFIG      # used by config_get
+    export -f config_get    # used by generate_dataset
+    export -f generate_data # used by generate_dataset
     export -f generate_dataset
     parallel generate_dataset ::: "$(config_keys)"
 
