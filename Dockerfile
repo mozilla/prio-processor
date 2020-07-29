@@ -26,13 +26,13 @@ RUN yum install -y epel-release \
 RUN ln -s /usr/include/nspr4 /usr/include/nspr \
         && ln -s /usr/include/nss3 /usr/include/nss
 
+COPY ./google-cloud-sdk.repo /etc/yum.repos.d/
+RUN yum install -y google-cloud-sdk
+RUN gcloud config set disable_usage_reporting true
+
 # prepare the environment for testing in development
 ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && pip3 install setuptools wheel black
-
-RUN curl https://sdk.cloud.google.com | bash
-ENV PATH="$PATH:~/google-cloud-sdk/bin"
-RUN gcloud config set disable_usage_reporting true
 
 # install the app
 WORKDIR /app
@@ -60,6 +60,10 @@ RUN yum install -y epel-release \
         && yum clean all \
         && rm -rf /var/cache/yum
 
+COPY ./google-cloud-sdk.repo /etc/yum.repos.d/
+RUN yum install -y google-cloud-sdk
+RUN gcloud config set disable_usage_reporting true
+
 RUN groupadd --gid 10001 app && \
         useradd -g app --uid 10001 --shell /usr/sbin/nologin --create-home \
         --home-dir /app app
@@ -78,10 +82,6 @@ ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
 USER app
-RUN curl https://sdk.cloud.google.com | bash
-ENV PATH="$PATH:~/google-cloud-sdk/bin"
-RUN gcloud config set disable_usage_reporting true
-
 CMD pytest -v tests && \
         prio/scripts/test-cli-integration && \
         prio --help && \
