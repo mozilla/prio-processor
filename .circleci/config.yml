@@ -55,14 +55,11 @@ jobs:
           command: |
             docker load -i /tmp/dev.tar
       - run:
-          name: Test Prio wrapper library
-          command: docker run prio:dev bash -c "cd prio && tox"
-      - run:
           name: Test CLI integration with the local filesystem
-          command: docker run prio:dev prio/scripts/test-cli-integration
+          command: docker run prio:dev scripts/test-cli-integration
       - run:
           name: Run unit-tests for Prio Processor
-          command: docker run prio:dev bash -c "cd processor && tox"
+          command: docker run prio:dev bash -c "pytest tests"
 
   test-batch-example:
     machine: true
