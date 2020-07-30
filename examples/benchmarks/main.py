@@ -3,10 +3,12 @@ import timeit
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from prio import prio
+from prio_processor.prio import wrapper as prio
+from prio import PrioContext
 from tqdm import tqdm
 
 
+@PrioContext()
 def bench_encrypted_sizes(path):
     _, pubkey = prio.create_keypair()
 
@@ -35,6 +37,7 @@ def bench_encrypted_sizes(path):
     plt.savefig(path)
 
 
+@PrioContext()
 def bench_client_encoding(path):
     runs = 10 ** 2
     timings = []

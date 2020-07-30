@@ -7,7 +7,8 @@ import pickle
 from functools import partial
 
 import click
-from prio import prio
+from prio_processor.prio import wrapper as prio
+from prio import PrioContext
 
 logging.basicConfig()
 logger = logging.getLogger()
@@ -107,6 +108,7 @@ async def run_server(
 @click.option("--server-id", type=click.Choice(["a", "b"]), required=True)
 @click.option("--n-fields", type=int, required=True)
 @click.option("--batch-id", type=str, default="test_batch")
+@PrioContext()
 def main(pubkey, pvtkey, pubkey_other, server_id, n_fields, batch_id):
     loop = asyncio.get_event_loop()
     server_id = prio.PRIO_SERVER_A if server_id == "a" else prio.PRIO_SERVER_B

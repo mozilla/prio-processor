@@ -3,7 +3,8 @@ import aio_pika
 import logging
 import click
 
-from prio import prio
+from prio_processor.prio import wrapper as prio
+from prio import PrioContext
 
 logging.basicConfig()
 logger = logging.getLogger()
@@ -50,6 +51,7 @@ async def run_client(pubkey_a, pubkey_b, n_clients, n_fields, batch_id):
 @click.option("--n-clients", type=int, default=10)
 @click.option("--n-fields", type=int, required=True)
 @click.option("--batch-id", type=str, default="test_batch")
+@PrioContext()
 def main(pubkey_a, pubkey_b, n_clients, n_fields, batch_id):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
