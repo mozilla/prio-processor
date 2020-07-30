@@ -51,10 +51,21 @@ def test_verify1(tmp_path, root, server_a_args):
     )
     assert result.exit_code == 0, result.stdout_bytes
     expect = (
-        root / "server_a" / "intermediate" / "internal" / "verify1" / "data.ndjson"
-    ).read_text()
-    actual = (output / "data.ndjson").read_text()
-    assert actual == expect
+        (root / "server_a" / "intermediate" / "internal" / "verify1" / "data.ndjson")
+        .read_text()
+        .strip()
+    )
+    actual = (output / "data.ndjson").read_text().strip()
+    # NOTE: due to the non-determinstic behavior of generating the verification
+    # circuit, we can only compare the relative size of the packets (or
+    # otherwise go through the rest of the protocol run). On macOS, the packets
+    # are the same, but on linux the packets are different. There is some
+    # behavior difference in NSS that occurs between platforms.
+    index = {
+        item["id"]: item["payload"] for item in map(json.loads, expect.split("\n"))
+    }
+    for item in map(json.loads, actual.split("\n")):
+        assert len(index[item["id"]]) == len(item["payload"])
 
 
 def test_verify2(tmp_path, root, server_a_args):
@@ -89,10 +100,16 @@ def test_verify2(tmp_path, root, server_a_args):
     )
     assert result.exit_code == 0, result.stdout_bytes
     expect = (
-        root / "server_a" / "intermediate" / "internal" / "verify2" / "data.ndjson"
-    ).read_text()
-    actual = (output / "data.ndjson").read_text()
-    assert actual == expect
+        (root / "server_a" / "intermediate" / "internal" / "verify2" / "data.ndjson")
+        .read_text()
+        .strip()
+    )
+    actual = (output / "data.ndjson").read_text().strip()
+    index = {
+        item["id"]: item["payload"] for item in map(json.loads, expect.split("\n"))
+    }
+    for item in map(json.loads, actual.split("\n")):
+        assert len(index[item["id"]]) == len(item["payload"])
 
 
 def test_aggregate(tmp_path, root, server_a_args):
