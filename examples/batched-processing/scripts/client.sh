@@ -25,20 +25,20 @@ output_b=$BUCKET_SERVER_B/raw
 mkdir -p $output_a
 mkdir -p $output_b
 
-cat << EOF > part-0.ndjson
+jq -c '{payload: .}' <<EOF >part-0.ndjson
 [1, 0, 0]
 [1, 1, 0]
 [1, 1, 1]
 EOF
 
-cat << EOF > part-1.ndjson
+jq -c '{payload: .}' <<EOF >part-1.ndjson
 [1, 0, 1]
 [1, 1, 1]
 [1, 0, 1]
 [1, 1, 1]
 EOF
 
-cat << EOF > part-2.ndjson
+jq -c '{payload: .}' <<EOF >part-2.ndjson
 [1, 0, 0]
 [1, 0, 0]
 [1, 0, 0]
