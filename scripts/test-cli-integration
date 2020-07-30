@@ -9,11 +9,10 @@ scripts/create-folder
 key_a=$(prio keygen)
 key_b=$(prio keygen)
 shared=$(prio shared-seed)
-SHARED_SECRET=$shared
 
 SHARED_SECRET=${SHARED_SECRET:-$(jq -r ".shared_seed" <<<$shared)}
 FILENAME=${FILENAME:-"data.ndjson"}
-N_DATA=${N_DATA:-3}
+N_DATA=${N_DATA:-5}
 BATCH_ID=${BATCH_ID:-"test"}
 
 SERVER_A_PUBLIC_KEY=${SERVER_A_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_a)}
@@ -64,7 +63,7 @@ prio verify1 \
     --batch-id ${BATCH_ID} \
     --server-id A \
     --private-key-hex ${SERVER_A_PRIVATE_KEY} \
-    --shared-secret $SHARED_SECRET \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
@@ -81,7 +80,7 @@ prio verify1 \
     --batch-id ${BATCH_ID} \
     --server-id B \
     --private-key-hex ${SERVER_B_PRIVATE_KEY} \
-    --shared-secret $shared \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
@@ -102,7 +101,7 @@ prio verify2 \
     --batch-id ${BATCH_ID} \
     --server-id A \
     --private-key-hex ${SERVER_A_PRIVATE_KEY} \
-    --shared-secret $SHARED_SECRET \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
@@ -121,7 +120,7 @@ prio verify2 \
     --batch-id ${BATCH_ID} \
     --server-id B \
     --private-key-hex ${SERVER_B_PRIVATE_KEY} \
-    --shared-secret $SHARED_SECRET \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
@@ -144,7 +143,7 @@ prio aggregate \
     --batch-id ${BATCH_ID} \
     --server-id A \
     --private-key-hex ${SERVER_A_PRIVATE_KEY} \
-    --shared-secret $SHARED_SECRET \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
@@ -163,7 +162,7 @@ prio aggregate \
     --batch-id ${BATCH_ID} \
     --server-id B \
     --private-key-hex ${SERVER_B_PRIVATE_KEY} \
-    --shared-secret $SHARED_SECRET \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
@@ -186,7 +185,7 @@ prio publish \
     --batch-id ${BATCH_ID} \
     --server-id A \
     --private-key-hex ${SERVER_A_PRIVATE_KEY} \
-    --shared-secret $SHARED_SECRET \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
     --input-internal ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
@@ -200,7 +199,7 @@ prio publish \
     --batch-id ${BATCH_ID} \
     --server-id B \
     --private-key-hex ${SERVER_B_PRIVATE_KEY} \
-    --shared-secret $SHARED_SECRET \
+    --shared-secret ${SHARED_SECRET} \
     --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
     --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
     --input-internal ${SERVER_B_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
