@@ -59,7 +59,7 @@ jobs:
           command: docker run prio:dev scripts/test-cli-integration
       - run:
           name: Run unit-tests for Prio Processor
-          command: docker run prio:dev bash -c "pytest tests"
+          command: docker run prio:dev bash -c "pytest tests/ -v"
 
   test-batch-example:
     machine: true
