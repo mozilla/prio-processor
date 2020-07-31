@@ -1,10 +1,15 @@
 version: "3.4"
 
 services:
+  # This service runs the tests and shuts down. This can also be used as
+  # entrypoint into the container by running `docker-compose run prio_processor
+  # bash`.
+  prio_processor:
+    build:
+      context: .
   server_a:
     build:
       context: .
-      target: development
     working_dir: /app
     command: "true"
     volumes:
@@ -24,7 +29,6 @@ services:
   server_b:
     build:
       context: .
-      target: development
     working_dir: /app
     command: "true"
     volumes:
@@ -44,7 +48,6 @@ services:
   admin:
     build:
       context: .
-      target: development
     working_dir: /app
     command: "true"
     volumes:
