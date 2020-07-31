@@ -68,7 +68,7 @@ jobs:
           name: Build the compose container
           command: |
             # examples expect a prio:dev image
-            docker tag latest dev
+            docker tag prio:latest prio:dev
             docker-compose build
       - run:
           name: Test batched-processing integration with MinIO
