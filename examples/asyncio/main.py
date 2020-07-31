@@ -8,7 +8,8 @@ import random
 import sys
 from collections import namedtuple
 
-from prio import prio
+from prio_processor.prio import wrapper as prio
+from prio.libprio import Prio_init, Prio_clear
 
 logging.basicConfig()
 logger = logging.getLogger()
@@ -78,6 +79,7 @@ async def client_produce(client, data_items, queue_a, queue_b, n_clients):
 
 
 async def main():
+    Prio_init()
     n_clients = 4
     n_data = 133
     server_secret = prio.PRGSeed()
@@ -114,6 +116,7 @@ async def main():
     assert list(output) == expected
 
     consumers.cancel()
+    Prio_clear()
     logger.info("Done!")
 
 

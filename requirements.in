@@ -1,3 +1,4 @@
--e file:./prio
--e file:./processor
+-e file:.
 pytest
+pyyaml
+python-dotenv

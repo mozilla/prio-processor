@@ -1,0 +1,209 @@
+#!/bin/bash
+
+set -eou pipefail
+set -x
+
+cd "$(dirname "$0")/.."
+scripts/create-folder
+
+key_a=$(prio keygen)
+key_b=$(prio keygen)
+shared=$(prio shared-seed)
+
+SHARED_SECRET=${SHARED_SECRET:-$(jq -r ".shared_seed" <<<$shared)}
+FILENAME=${FILENAME:-"data.ndjson"}
+N_DATA=${N_DATA:-5}
+BATCH_ID=${BATCH_ID:-"test"}
+
+SERVER_A_PUBLIC_KEY=${SERVER_A_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_a)}
+SERVER_B_PUBLIC_KEY=${SERVER_B_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_b)}
+
+SERVER_A_PRIVATE_KEY=${SERVER_A_PRIVATE_KEY:-$(jq -r ".private_key" <<<$key_a)}
+SERVER_B_PRIVATE_KEY=${SERVER_B_PRIVATE_KEY:-$(jq -r ".private_key" <<<$key_b)}
+
+CLIENT_BUCKET=${CLIENT_BUCKET:-"working/client"}
+SERVER_A_BUCKET=${SERVER_A_BUCKET:-"working/server_a"}
+SERVER_B_BUCKET=${SERVER_B_BUCKET:-"working/server_b"}
+
+###########################################################
+# encode-shares
+###########################################################
+
+if [[ "$FILENAME" == "data.ndjson" ]]; then
+
+    jq -c '{payload: .}' <<EOF >${CLIENT_BUCKET}/${FILENAME}
+[1, 0, 0, 0, 0]
+[1, 1, 0, 0, 0]
+[1, 1, 1, 0, 0]
+[1, 1, 1, 1, 0]
+[1, 1, 1, 1, 1]
+EOF
+
+    jq -c '.' ${CLIENT_BUCKET}/${FILENAME}
+
+    prio encode-shares \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+        --input working/client/${FILENAME} \
+        --output-A ${SERVER_A_BUCKET}/raw/ \
+        --output-B ${SERVER_B_BUCKET}/raw/
+
+    jq -c '.' ${SERVER_A_BUCKET}/raw/${FILENAME}
+    jq -c '.' ${SERVER_B_BUCKET}/raw/${FILENAME}
+fi
+
+###########################################################
+# verify1
+###########################################################
+
+prio verify1 \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id A \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+    --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
+    --output ${SERVER_A_BUCKET}/intermediate/internal/verify1
+
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify1/${FILENAME}
+
+cp \
+    ${SERVER_A_BUCKET}/intermediate/internal/verify1/${FILENAME} \
+    ${SERVER_B_BUCKET}/intermediate/external/verify1/
+
+prio verify1 \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id B \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+    --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
+    --output ${SERVER_B_BUCKET}/intermediate/internal/verify1
+
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify1/${FILENAME}
+
+cp \
+    ${SERVER_B_BUCKET}/intermediate/internal/verify1/${FILENAME} \
+    ${SERVER_A_BUCKET}/intermediate/external/verify1/
+
+###########################################################
+# verify2
+###########################################################
+
+prio verify2 \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id A \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+    --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify1/${FILENAME} \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify1/${FILENAME} \
+    --output ${SERVER_A_BUCKET}/intermediate/internal/verify2/
+
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/verify2/${FILENAME}
+
+cp \
+    ${SERVER_A_BUCKET}/intermediate/internal/verify2/${FILENAME} \
+    ${SERVER_B_BUCKET}/intermediate/external/verify2/
+
+prio verify2 \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id B \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+    --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify1/${FILENAME} \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify1/${FILENAME} \
+    --output ${SERVER_B_BUCKET}/intermediate/internal/verify2/
+
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME}
+
+cp \
+    ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME} \
+    ${SERVER_A_BUCKET}/intermediate/external/verify2/
+
+###########################################################
+# aggregate
+###########################################################
+
+prio aggregate \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id A \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+    --input ${SERVER_A_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify2/${FILENAME} \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/verify2/${FILENAME} \
+    --output ${SERVER_A_BUCKET}/intermediate/internal/aggregate/
+
+jq -c '.' ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME}
+
+cp \
+    ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
+    ${SERVER_B_BUCKET}/intermediate/external/aggregate/
+
+prio aggregate \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id B \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+    --input ${SERVER_B_BUCKET}/raw/${FILENAME} \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME} \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2/${FILENAME} \
+    --output ${SERVER_B_BUCKET}/intermediate/internal/aggregate/
+
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME}
+
+cp \
+    ${SERVER_B_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
+    ${SERVER_A_BUCKET}/intermediate/external/aggregate/
+
+###########################################################
+# publish
+###########################################################
+
+prio publish \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id A \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/aggregate/${FILENAME} \
+    --output ${SERVER_A_BUCKET}/processed/
+
+jq -c '.' ${SERVER_A_BUCKET}/processed/${FILENAME}
+
+prio publish \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id B \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+    --shared-secret ${SHARED_SECRET} \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/aggregate/${FILENAME} \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/aggregate/${FILENAME} \
+    --output ${SERVER_B_BUCKET}/processed/
+
+jq -c '.' ${SERVER_B_BUCKET}/processed/${FILENAME}

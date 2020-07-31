@@ -1,6 +1,9 @@
 # Validate Browser Data
 
-This example validates the results from a pilot experiment.
+This example validates the results from a pilot experiment. The API has changed
+and the original data source does not exist in this form any longer due to a
+transition to GCP. This code is deprecated, but may be run in it's most recent
+working state in the v1.6.1 tag of the container.
 
 ## Usage
 
@@ -25,6 +28,7 @@ $ python generate.py --path test.batch.json | bash
 ```
 
 To run against a real browser ping, you can run a command in the following form:
+
 ```
 $ python main.py \
     --pings sample.batch.json \
@@ -37,6 +41,7 @@ $ python main.py \
 The `--pings` argument generally takes a set of json documents; one per line and delimited by a new line.
 
 The ping should be compacted before being presented to the program.
+
 ```
 # use `jq -c` to compact a json document
 $ cat my-ping.json | jq -c . > my-ping.batch.json
@@ -60,6 +65,7 @@ $ python main.py \
 ```
 
 ### Docker
+
 This image may also be run via docker. Pass the appropriate environment variables as follows:
 
 ```bash
