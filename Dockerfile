@@ -38,7 +38,6 @@ RUN python3 -m ensurepip && pip3 install setuptools wheel black
 WORKDIR /app
 ADD . /app
 
-# NOTE: force reinstall is temporary until the package is published on pypi
 RUN pip3 install --upgrade pip && \
         pip3 install -r requirements.txt
 
@@ -73,7 +72,6 @@ COPY --from=development /app .
 RUN chown -R 10001:10001 /app
 
 ENV PATH="$PATH:~/.local/bin"
-# NOTE: force reinstall is temporary until the package is published on pypi
 RUN python3 -m ensurepip && \
         pip3 install --upgrade pip && \
         pip3 install -r requirements.txt
