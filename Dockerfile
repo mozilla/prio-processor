@@ -38,6 +38,9 @@ ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
 ADD . /app
+# build the binary egg for distribution on Spark clusters
+RUN python3 setup.py bdist_egg && pip3 install -e .
+
 USER app
 CMD pytest -v tests && \
         scripts/test-cli-integration && \
