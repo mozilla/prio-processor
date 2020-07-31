@@ -1,4 +1,0 @@
--e file:.
-pytest
-pyyaml
-python-dotenv
