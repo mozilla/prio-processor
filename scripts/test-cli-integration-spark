@@ -1,0 +1,216 @@
+#!/bin/bash
+
+set -eou pipefail
+set -x
+
+cd "$(dirname "$0")/.."
+scripts/create-folder
+
+export SPARK_DRIVER_MEMORY=24g
+export SPARK_WORKER_CORES=4
+
+START_STAGE=${START_STAGE:-0}
+SKIP_GENERATE=${SKIP_GENERATE:-"false"}
+if ((START_STAGE > 0)); then
+    SKIP_GENERATE="true"
+fi
+
+if [[ "$SKIP_GENERATE" == "false" ]]; then
+    # generate some configuration
+    key_a=$(prio keygen)
+    key_b=$(prio keygen)
+    shared=$(prio shared-seed)
+    N_DATA=${N_DATA:-128}
+    N_ROWS=${N_ROWS:-1000}
+    SCALE=${SCALE:-1}
+    BATCH_ID=${BATCH_ID:-"test"}
+
+    echo $key_a | jq >"working/server_a_keys.json"
+    echo $key_b | jq >"working/server_b_keys.json"
+    echo $shared | jq >"working/shared_seed.json"
+    cat <<EOF >working/config.json
+{
+    "n_data": $N_DATA,
+    "batch_id": "$BATCH_ID"
+}
+EOF
+else
+    key_a=$(jq '.' working/server_a_keys.json)
+    key_b=$(jq '.' working/server_b_keys.json)
+    shared=$(jq '.' working/shared_seed.json)
+fi
+
+N_DATA=$(jq -r ".n_data" working/config.json)
+BATCH_ID=$(jq -r ".batch_id" working/config.json)
+SHARED_SECRET=${SHARED_SECRET:-$(jq -r ".shared_seed" <<<$shared)}
+
+SERVER_A_PUBLIC_KEY=${SERVER_A_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_a)}
+SERVER_B_PUBLIC_KEY=${SERVER_B_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_b)}
+
+SERVER_A_PRIVATE_KEY=${SERVER_A_PRIVATE_KEY:-$(jq -r ".private_key" <<<$key_a)}
+SERVER_B_PRIVATE_KEY=${SERVER_B_PRIVATE_KEY:-$(jq -r ".private_key" <<<$key_b)}
+
+CLIENT_BUCKET=${CLIENT_BUCKET:-"working/client"}
+SERVER_A_BUCKET=${SERVER_A_BUCKET:-"working/server_a"}
+SERVER_B_BUCKET=${SERVER_B_BUCKET:-"working/server_b"}
+
+if [[ "$SKIP_GENERATE" == "false" ]]; then
+    time prio-spark generate \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+        --output-A ${SERVER_A_BUCKET}/raw/ \
+        --output-B ${SERVER_B_BUCKET}/raw/ \
+        --n-rows ${N_ROWS} \
+        --scale ${SCALE}
+fi
+
+###########################################################
+# verify1
+###########################################################
+
+if ((START_STAGE < 2)); then
+    time prio-spark verify1 \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --server-id A \
+        --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+        --shared-secret $SHARED_SECRET \
+        --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+        --input ${SERVER_A_BUCKET}/raw \
+        --output ${SERVER_A_BUCKET}/intermediate/internal/verify1
+
+    rsync -r --delete \
+        ${SERVER_A_BUCKET}/intermediate/internal/verify1/ \
+        ${SERVER_B_BUCKET}/intermediate/external/verify1/
+
+    time prio-spark verify1 \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --server-id B \
+        --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+        --shared-secret $SHARED_SECRET \
+        --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+        --input ${SERVER_B_BUCKET}/raw \
+        --output ${SERVER_B_BUCKET}/intermediate/internal/verify1
+
+    rsync -r --delete \
+        ${SERVER_B_BUCKET}/intermediate/internal/verify1/ \
+        ${SERVER_A_BUCKET}/intermediate/external/verify1/
+fi
+
+###########################################################
+# verify2
+###########################################################
+
+if ((START_STAGE < 3)); then
+    time prio-spark verify2 \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --server-id A \
+        --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+        --shared-secret $SHARED_SECRET \
+        --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+        --input ${SERVER_A_BUCKET}/raw \
+        --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify1 \
+        --input-external ${SERVER_A_BUCKET}/intermediate/external/verify1 \
+        --output ${SERVER_A_BUCKET}/intermediate/internal/verify2/
+
+    rsync -r --delete \
+        ${SERVER_A_BUCKET}/intermediate/internal/verify2/ \
+        ${SERVER_B_BUCKET}/intermediate/external/verify2/
+
+    time prio-spark verify2 \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --server-id B \
+        --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+        --shared-secret $SHARED_SECRET \
+        --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+        --input ${SERVER_B_BUCKET}/raw \
+        --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify1/ \
+        --input-external ${SERVER_B_BUCKET}/intermediate/external/verify1/ \
+        --output ${SERVER_B_BUCKET}/intermediate/internal/verify2/
+
+    rsync -r --delete \
+        ${SERVER_B_BUCKET}/intermediate/internal/verify2/ \
+        ${SERVER_A_BUCKET}/intermediate/external/verify2/
+fi
+###########################################################
+# aggregate
+###########################################################
+
+if ((START_STAGE < 4)); then
+    time prio-spark aggregate \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --server-id A \
+        --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+        --shared-secret $SHARED_SECRET \
+        --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+        --input ${SERVER_A_BUCKET}/raw \
+        --input-internal ${SERVER_A_BUCKET}/intermediate/internal/verify2 \
+        --input-external ${SERVER_A_BUCKET}/intermediate/external/verify2 \
+        --output ${SERVER_A_BUCKET}/intermediate/internal/aggregate
+
+    jq '.' ${SERVER_A_BUCKET}/intermediate/internal/aggregate/*.json
+    rsync -r --delete \
+        ${SERVER_A_BUCKET}/intermediate/internal/aggregate/ \
+        ${SERVER_B_BUCKET}/intermediate/external/aggregate/
+
+    time prio-spark aggregate \
+        --n-data ${N_DATA} \
+        --batch-id ${BATCH_ID} \
+        --server-id B \
+        --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+        --shared-secret $SHARED_SECRET \
+        --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+        --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+        --input ${SERVER_B_BUCKET}/raw \
+        --input-internal ${SERVER_B_BUCKET}/intermediate/internal/verify2 \
+        --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2 \
+        --output ${SERVER_B_BUCKET}/intermediate/internal/aggregate
+
+    jq '.' ${SERVER_A_BUCKET}/intermediate/internal/aggregate/*.json
+    rsync -r --delete \
+        ${SERVER_B_BUCKET}/intermediate/internal/aggregate/ \
+        ${SERVER_A_BUCKET}/intermediate/external/aggregate/
+fi
+
+###########################################################
+# publish
+###########################################################
+
+time prio-spark publish \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id A \
+    --private-key-hex ${SERVER_A_PRIVATE_KEY} \
+    --shared-secret $SHARED_SECRET \
+    --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
+    --input-internal ${SERVER_A_BUCKET}/intermediate/internal/aggregate/*.json \
+    --input-external ${SERVER_A_BUCKET}/intermediate/external/aggregate/*.json \
+    --output ${SERVER_A_BUCKET}/processed
+
+jq '.' ${SERVER_A_BUCKET}/processed/*.json
+
+time prio-spark publish \
+    --n-data ${N_DATA} \
+    --batch-id ${BATCH_ID} \
+    --server-id B \
+    --private-key-hex ${SERVER_B_PRIVATE_KEY} \
+    --shared-secret $SHARED_SECRET \
+    --public-key-hex-internal ${SERVER_B_PUBLIC_KEY} \
+    --public-key-hex-external ${SERVER_A_PUBLIC_KEY} \
+    --input-internal ${SERVER_B_BUCKET}/intermediate/internal/aggregate/*.json \
+    --input-external ${SERVER_B_BUCKET}/intermediate/external/aggregate/*.json \
+    --output ${SERVER_B_BUCKET}/processed
+
+jq '.' ${SERVER_B_BUCKET}/processed/*.json
