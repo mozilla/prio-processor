@@ -17,9 +17,10 @@ setup(
     install_requires=[
         "click",
         "gcsfs == 0.2.3",
-        "pyspark >= 2.4.0",
+        "pyspark[sql] >= 3.0.0",
         "jsonschema",
         "prio >= 1.1",
+        "pandas",
     ],
     packages=["prio_processor"],
 )
