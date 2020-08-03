@@ -12,6 +12,7 @@ setup(
         "console_scripts": [
             "prio-processor=prio_processor.origin.commands:entry_point",
             "prio=prio_processor.prio.commands:entry_point",
+            "prio-spark=prio_processor.spark.commands:entry_point",
         ]
     },
     install_requires=[
