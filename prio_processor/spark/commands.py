@@ -83,14 +83,14 @@ def generate(
     # we can make an estimate with just a single row, since the configuration
     # is the same here.
     row = shares.first()
-    num_partitions = math.ceil(
+    dataset_estimate_mb = (
         (len(b64encode(row.shares.a)) + len(str(uuid4())))
         * n_rows
         * scale
         * 1.0
         / 10 ** 6
-        / partition_size_mb
     )
+    num_partitions = math.ceil(dataset_estimate_mb / partition_size_mb)
     click.echo(f"writing {num_partitions} partitions")
 
     # caching is required for a stable id, unless we take advantage of partitioned writing
@@ -132,12 +132,21 @@ def encode_shares(
         .withColumn("id", F.udf(lambda: str(uuid4()), returnType="string")())
     )
     shares.cache()
-
-    # should this guarantee valid ranges for each partition?
-    shares.select("id", F.base64("a").alias("payload")).write.json(
+    row = shares.first()
+    dataset_estimate_mb = (
+        (len(b64encode(row.shares.a)) + len(str(uuid4())))
+        * n_rows
+        * scale
+        * 1.0
+        / 10 ** 6
+    )
+    num_partitions = math.ceil(dataset_estimate_mb / partition_size_mb)
+    click.echo(f"writing {num_partitions} partitions")
+    repartitioned = shares.repartitionByRange(num_partitions, "id").cache()
+    repartitioned.select("id", F.base64("a").alias("payload")).write.json(
         output_a, mode="overwrite"
     )
-    shares.select("id", F.base64("b").alias("payload")).write.json(
+    repartitioned.select("id", F.base64("b").alias("payload")).write.json(
         output_b, mode="overwrite"
     )
 
