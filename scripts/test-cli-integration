@@ -6,14 +6,35 @@ set -x
 cd "$(dirname "$0")/.."
 scripts/create-folder
 
-key_a=$(prio keygen)
-key_b=$(prio keygen)
-shared=$(prio shared-seed)
+SKIP_GENERATE=${SKIP_GENERATE:-"false"}
 
+if [[ "$SKIP_GENERATE" == "false" ]]; then
+    # generate some configuration
+    key_a=$(prio keygen)
+    key_b=$(prio keygen)
+    shared=$(prio shared-seed)
+    N_DATA=${N_DATA:-5}
+    BATCH_ID=${BATCH_ID:-"test"}
+
+    echo $key_a | jq >"working/server_a_keys.json"
+    echo $key_b | jq >"working/server_b_keys.json"
+    echo $shared | jq >"working/shared_seed.json"
+    cat <<EOF >working/config.json
+{
+    "n_data": $N_DATA,
+    "batch_id": "$BATCH_ID"
+}
+EOF
+else
+    key_a=$(jq '.' working/server_a_keys.json)
+    key_b=$(jq '.' working/server_b_keys.json)
+    shared=$(jq '.' working/shared_seed.json)
+fi
+
+N_DATA=$(jq -r ".n_data" working/config.json)
+BATCH_ID=$(jq -r ".batch_id" working/config.json)
 SHARED_SECRET=${SHARED_SECRET:-$(jq -r ".shared_seed" <<<$shared)}
-FILENAME=${FILENAME:-"data.ndjson"}
-N_DATA=${N_DATA:-5}
-BATCH_ID=${BATCH_ID:-"test"}
+FILENAME=${FILENAME:-data.ndjson}
 
 SERVER_A_PUBLIC_KEY=${SERVER_A_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_a)}
 SERVER_B_PUBLIC_KEY=${SERVER_B_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_b)}
@@ -25,12 +46,7 @@ CLIENT_BUCKET=${CLIENT_BUCKET:-"working/client"}
 SERVER_A_BUCKET=${SERVER_A_BUCKET:-"working/server_a"}
 SERVER_B_BUCKET=${SERVER_B_BUCKET:-"working/server_b"}
 
-###########################################################
-# encode-shares
-###########################################################
-
 if [[ "$FILENAME" == "data.ndjson" ]]; then
-
     jq -c '{payload: .}' <<EOF >${CLIENT_BUCKET}/${FILENAME}
 [1, 0, 0, 0, 0]
 [1, 1, 0, 0, 0]
@@ -38,7 +54,9 @@ if [[ "$FILENAME" == "data.ndjson" ]]; then
 [1, 1, 1, 1, 0]
 [1, 1, 1, 1, 1]
 EOF
+fi
 
+if [[ "$SKIP_GENERATE" == "false" ]]; then
     jq -c '.' ${CLIENT_BUCKET}/${FILENAME}
 
     prio encode-shares \
