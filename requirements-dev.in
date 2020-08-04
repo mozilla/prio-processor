@@ -1,4 +1,4 @@
--e file:.
+-c requirements.txt
 pytest
 pyyaml
 python-dotenv

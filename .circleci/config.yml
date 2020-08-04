@@ -14,11 +14,6 @@ jobs:
       - image: docker:stable-git
     steps:
       - checkout
-      - run:
-          name: "Pull Submodules"
-          command: |
-            git submodule init
-            git submodule update
       - setup_remote_docker
       - run:
           name: Create a version.json
@@ -33,15 +28,15 @@ jobs:
       - run:
           name: Build development image
           command: |
-            docker build --target development -t prio:dev .
+            docker build -t prio:latest .
       - run:
           name: Save image into cache
           command: |
-            docker save -o /tmp/dev.tar "prio:dev"
+            docker save -o /tmp/latest.tar "prio:latest"
       - save_cache:
           key: v1-{{ .Branch }}-{{ epoch }}
           paths:
-            - /tmp/dev.tar
+            - /tmp/latest.tar
 
   test:
     docker:
@@ -53,13 +48,10 @@ jobs:
       - run:
           name: Restore cache
           command: |
-            docker load -i /tmp/dev.tar
+            docker load -i /tmp/latest.tar
       - run:
-          name: Test CLI integration with the local filesystem
-          command: docker run prio:dev scripts/test-cli-integration
-      - run:
-          name: Run unit-tests for Prio Processor
-          command: docker run prio:dev bash -c "pytest tests/ -v"
+          name: Run the default tests
+          command: docker run prio:latest
 
   test-batch-example:
     machine: true
@@ -71,10 +63,13 @@ jobs:
           key: v1-{{.Branch}}
       - run:
           name: Restore Docker image cache
-          command: docker load -i /tmp/dev.tar
+          command: docker load -i /tmp/latest.tar
       - run:
           name: Build the compose container
-          command: docker-compose build
+          command: |
+            # examples expect a prio:dev image
+            docker tag prio:latest prio:dev
+            docker-compose build
       - run:
           name: Test batched-processing integration with MinIO
           command: make test
@@ -84,11 +79,6 @@ jobs:
       - image: docker:stable-git
     steps:
       - checkout
-      - run:
-          name: "Pull Submodules"
-          command: |
-            git submodule init
-            git submodule update
       - setup_remote_docker
       - run:
           name: Create a version.json
@@ -100,25 +90,26 @@ jobs:
             "$CIRCLE_PROJECT_USERNAME" \
             "$CIRCLE_PROJECT_REPONAME" \
             "$CIRCLE_BUILD_URL" > version.json
+      - restore_cache:
+          key: v1-{{.Branch}}
       - run:
-          name: Build production image
-          command: |
-            docker build --target production -t prio:prod .
+          name: Restore Docker image cache
+          command: docker load -i /tmp/latest.tar
       - run:
-          name: Run sanity checks in production image
-          command: docker run prio:prod
+          name: Rerun sanity checks before deploy
+          command: docker run prio:latest
       - run:
           name: Deploy to Dockerhub
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             # deploy master
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              docker tag prio:prod ${DOCKERHUB_REPO}:latest
+              docker tag prio:latest ${DOCKERHUB_REPO}:latest
               docker push ${DOCKERHUB_REPO}:latest
             elif  [ ! -z "${CIRCLE_TAG}" ]; then
             # deploy a release tag...
               echo "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
-              docker tag prio:prod "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+              docker tag prio:latest "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
               docker images
               docker push "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
             fi
