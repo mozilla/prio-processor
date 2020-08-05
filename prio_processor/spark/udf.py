@@ -67,6 +67,7 @@ def verify1(
         return libprio.PrioPacketVerify1_write(packet)
 
     results = [_process(share) for share in shares]
+    libprio.Prio_clear()
     return pd.Series(results, name="payload")
 
 
@@ -110,6 +111,7 @@ def verify2(
         return libprio.PrioPacketVerify2_write(packet)
 
     results = [_process(share, x, y) for share, x, y in zip(shares, internal, external)]
+    libprio.Prio_clear()
     return pd.Series(results, name="payload")
 
 
@@ -224,30 +226,30 @@ def publish(
 ) -> pd.Series:
     libprio.Prio_init()
 
-    _, public_key_internal, public_key_external = import_keys(
-        private_key_hex, public_key_hex_internal, public_key_hex_external
-    )
-    config = libprio.PrioConfig_new(
-        n_data, public_key_internal, public_key_external, batch_id
-    )
-    share_internal = libprio.PrioTotalShare_new()
-    share_external = libprio.PrioTotalShare_new()
-
-    results = []
-    for internal, external in zip(data_internal, data_external):
+    def _process(internal, external):
+        _, public_key_internal, public_key_external = import_keys(
+            private_key_hex, public_key_hex_internal, public_key_hex_external
+        )
+        config = libprio.PrioConfig_new(
+            n_data, public_key_internal, public_key_external, batch_id
+        )
+        share_internal = libprio.PrioTotalShare_new()
+        share_external = libprio.PrioTotalShare_new()
         libprio.PrioTotalShare_read(share_internal, internal, config)
         libprio.PrioTotalShare_read(share_external, external, config)
+
         # ordering matters
         if match_server(server_id) == libprio.PRIO_SERVER_B:
             share_internal, share_external = share_external, share_internal
-        results.append(
-            list(
-                array.array(
-                    "L",
-                    libprio.PrioTotalShare_final(
-                        config, share_internal, share_external
-                    ),
-                )
-            )
+
+        total_share = libprio.PrioTotalShare_final(
+            config, share_internal, share_external
         )
+        return list(array.array("L", total_share))
+
+    results = [
+        _process(internal, external)
+        for internal, external in zip(data_internal, data_external)
+    ]
+    libprio.Prio_clear()
     return pd.Series(results, name="payload")
