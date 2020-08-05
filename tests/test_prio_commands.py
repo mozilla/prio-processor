@@ -152,32 +152,30 @@ def test_aggregate(tmp_path, root, server_a_args):
 
 def test_publish(tmp_path, root, server_a_args):
     output = tmp_path
-    result = CliRunner().invoke(
-        commands.publish,
-        server_a_args
-        + [
-            "--input-internal",
-            str(
-                root
-                / "server_a"
-                / "intermediate"
-                / "internal"
-                / "aggregate"
-                / "data.ndjson"
-            ),
-            "--input-external",
-            str(
-                root
-                / "server_b"
-                / "intermediate"
-                / "internal"
-                / "aggregate"
-                / "data.ndjson"
-            ),
-            "--output",
-            str(output),
-        ],
-    )
+    args = server_a_args + [
+        "--input-internal",
+        str(
+            root
+            / "server_a"
+            / "intermediate"
+            / "internal"
+            / "aggregate"
+            / "data.ndjson"
+        ),
+        "--input-external",
+        str(
+            root
+            / "server_a"
+            / "intermediate"
+            / "external"
+            / "aggregate"
+            / "data.ndjson"
+        ),
+        "--output",
+        str(output),
+    ]
+    print(" ".join(map(str, args)))
+    result = CliRunner().invoke(commands.publish, args)
     assert result.exit_code == 0, result.stdout_bytes
     expect = json.loads((root / "server_a" / "processed" / "data.ndjson").read_text())
     actual = json.loads((output / "data.ndjson").read_text())

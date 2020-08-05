@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="prio_processor",
-    version="2.0.1",
+    version="2.1.0",
     description="A processing engine for prio data",
     long_description_content_type="text/markdown",
     author="Anthony Miyaguchi",
@@ -12,14 +12,16 @@ setup(
         "console_scripts": [
             "prio-processor=prio_processor.origin.commands:entry_point",
             "prio=prio_processor.prio.commands:entry_point",
+            "prio-spark=prio_processor.spark.commands:entry_point",
         ]
     },
     install_requires=[
         "click",
         "gcsfs == 0.2.3",
-        "pyspark >= 2.4.0",
+        "pyspark[sql] >= 3.0.0",
         "jsonschema",
         "prio >= 1.1",
+        "pandas",
     ],
     packages=["prio_processor"],
 )
