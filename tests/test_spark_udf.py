@@ -250,32 +250,9 @@ def test_total_share(spark, root, args):
 
 
 def test_publish(spark, tmp_path, root, args):
-    def mock_resources(path):
-        path.mkdir(parents=True)
-        (path / "data.json").open("w").write(
-            json.dumps(
-                dict(
-                    payload=json.loads(
-                        next(
-                            (
-                                root
-                                / "server_a"
-                                / "intermediate"
-                                / path.name
-                                / "aggregate"
-                            ).glob("*")
-                        ).read_text()
-                    ),
-                    error=0,
-                    total=5,
-                )
-            )
-        )
-        return path
-
     expect = json.loads(next((root / "server_a" / "processed").glob("*")).read_text())
-    internal = mock_resources(tmp_path / "internal")
-    external = mock_resources(tmp_path / "external")
+    internal = root / "server_a" / "intermediate" / "internal" / "aggregate"
+    external = root / "server_a" / "intermediate" / "external" / "aggregate"
     df = (
         spark.read.json(str(internal))
         .withColumn("server", F.lit("internal"))

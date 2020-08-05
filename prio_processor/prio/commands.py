@@ -312,7 +312,7 @@ def aggregate(
         shares = libprio.PrioTotalShare_new()
         libprio.PrioTotalShare_set_data(shares, server)
         data = libprio.PrioTotalShare_write(shares)
-        json.dump(b64encode(data).decode(), f)
+        json.dump(dict(payload=b64encode(data).decode(), error=error, total=total), f)
 
 
 @entry_point.command()
@@ -346,15 +346,17 @@ def publish(
     )
 
     with open(input_internal) as f:
-        data_internal = b64decode(json.load(f))
+        data_internal = json.load(f)
+        payload_internal = b64decode(data_internal["payload"])
     with open(input_external) as f:
-        data_external = b64decode(json.load(f))
+        data_external = json.load(f)
+        payload_external = b64decode(data_external["payload"])
 
     share_internal = libprio.PrioTotalShare_new()
     share_external = libprio.PrioTotalShare_new()
 
-    libprio.PrioTotalShare_read(share_internal, data_internal, config)
-    libprio.PrioTotalShare_read(share_external, data_external, config)
+    libprio.PrioTotalShare_read(share_internal, payload_internal, config)
+    libprio.PrioTotalShare_read(share_external, payload_external, config)
 
     # ordering matters
     if match_server(server_id) == libprio.PRIO_SERVER_B:

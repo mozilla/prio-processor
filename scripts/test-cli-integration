@@ -188,7 +188,7 @@ prio aggregate \
     --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2/${FILENAME} \
     --output ${SERVER_B_BUCKET}/intermediate/internal/aggregate/
 
-jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/verify2/${FILENAME}
+jq -c '.' ${SERVER_B_BUCKET}/intermediate/internal/aggregate/${FILENAME}
 
 cp \
     ${SERVER_B_BUCKET}/intermediate/internal/aggregate/${FILENAME} \

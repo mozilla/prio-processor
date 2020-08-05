@@ -130,59 +130,32 @@ def test_aggregate(tmp_path, root, server_a_args):
     assert data["total"] == 5
 
 
-# TODO: this is required because the new command-line interface deviates from
-# the original in a few ways. This should be resolved by revisiting the original
-# API so it returns the expected payload format.
-@pytest.fixture()
-def aggregate(tmp_path, root, server_a_args, server_b_args):
-    output = tmp_path
-    result = CliRunner().invoke(
-        commands.aggregate,
-        server_a_args
-        + [
-            "--input",
-            str(root / "server_a" / "raw"),
-            "--input-internal",
-            str(root / "server_a" / "intermediate" / "internal" / "verify2"),
-            "--input-external",
-            str(root / "server_b" / "intermediate" / "internal" / "verify2"),
-            "--output",
-            str(output / "a"),
-        ],
-    )
-    result = CliRunner().invoke(
-        commands.aggregate,
-        server_b_args
-        + [
-            "--input",
-            str(root / "server_b" / "raw"),
-            "--input-internal",
-            str(root / "server_b" / "intermediate" / "internal" / "verify2"),
-            "--input-external",
-            str(root / "server_a" / "intermediate" / "internal" / "verify2"),
-            "--output",
-            str(output / "b"),
-        ],
-    )
-    return output
-
-
-def test_publish(tmp_path, root, server_a_args, aggregate):
+def test_publish(tmp_path, root, server_a_args):
     output = tmp_path / "output"
-    config = json.loads((root / "config.json").read_text())
-    batch_id = config["batch_id"]
-    result = CliRunner().invoke(
-        commands.publish,
-        server_a_args
-        + [
-            "--input-internal",
-            str(next(aggregate.glob("a/*.json"))),
-            "--input-external",
-            str(next(aggregate.glob("b/*.json"))),
-            "--output",
-            str(output),
-        ],
-    )
+    args = server_a_args + [
+        "--input-internal",
+        str(
+            root
+            / "server_a"
+            / "intermediate"
+            / "internal"
+            / "aggregate"
+            / "data.ndjson"
+        ),
+        "--input-external",
+        str(
+            root
+            / "server_a"
+            / "intermediate"
+            / "external"
+            / "aggregate"
+            / "data.ndjson"
+        ),
+        "--output",
+        str(output),
+    ]
+    print(" ".join(map(str, args)))
+    result = CliRunner().invoke(commands.publish, args)
     assert result.exit_code == 0, result
     expect = json.loads((root / "server_a" / "processed" / "data.ndjson").read_text())
     actual = json.loads(next(output.glob("*.json")).read_text())
