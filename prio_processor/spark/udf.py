@@ -16,19 +16,20 @@ def encode(
     public_key_hex_external: bytes,
     payload: pd.Series,
 ) -> pd.DataFrame:
-    with PrioContext():
-        public_key_internal, public_key_external = import_public_keys(
-            public_key_hex_internal, public_key_hex_external
-        )
-        config = libprio.PrioConfig_new(
-            n_data, public_key_internal, public_key_external, batch_id
-        )
-        results = []
-        for data in payload:
-            # trying to encode the integer into a bit array
-            a, b = libprio.PrioClient_encode(config, bytes(list(map(int, data))))
-            results.append(dict(a=a, b=b))
-        return pd.DataFrame(results)
+    libprio.Prio_init()
+    public_key_internal, public_key_external = import_public_keys(
+        public_key_hex_internal, public_key_hex_external
+    )
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+    results = []
+    for data in payload:
+        # trying to encode the integer into a bit array
+        a, b = libprio.PrioClient_encode(config, bytes(list(map(int, data))))
+        results.append(dict(a=a, b=b))
+    libprio.Prio_clear()
+    return pd.DataFrame(results)
 
 
 def verify1(
@@ -131,42 +132,40 @@ def aggregate(
 
     schema: payload binary, error int, total int
     """
-    with PrioContext():
-        private_key, public_key_internal, public_key_external = import_keys(
-            private_key_hex, public_key_hex_internal, public_key_hex_external
-        )
+    libprio.Prio_init()
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
+    )
 
-        config = libprio.PrioConfig_new(
-            n_data, public_key_internal, public_key_external, batch_id
-        )
-        server = libprio.PrioServer_new(
-            config, match_server(server_id), private_key, shared_secret
-        )
-        verifier = libprio.PrioVerifier_new(server)
-        packet2_internal = libprio.PrioPacketVerify2_new()
-        packet2_external = libprio.PrioPacketVerify2_new()
-        # assumes each row in the iterator contains the literal information
-        # necessary for processing the data. It should have a input, input_internal,
-        # and input_external row
-        total, error = 0, 0
-        error_counter = Counter()
-        for share, internal, external in zip(pdf.shares, pdf.internal, pdf.external):
-            total += 1
-            try:
-                libprio.PrioVerifier_set_data(verifier, share)
-                libprio.PrioPacketVerify2_read(packet2_internal, internal, config)
-                libprio.PrioPacketVerify2_read(packet2_external, external, config)
-                libprio.PrioVerifier_isValid(
-                    verifier, packet2_internal, packet2_external
-                )
-                libprio.PrioServer_aggregate(server, verifier)
-            except RuntimeError as e:
-                error += 1
-                error_counter.update([f"server {server_id}: {e}"])
-        logger.warning(error_counter)
-        return pd.DataFrame(
-            [dict(payload=libprio.PrioServer_write(server), error=error, total=total)]
-        )
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+    server = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, shared_secret
+    )
+    verifier = libprio.PrioVerifier_new(server)
+    packet2_internal = libprio.PrioPacketVerify2_new()
+    packet2_external = libprio.PrioPacketVerify2_new()
+    # assumes each row in the iterator contains the literal information
+    # necessary for processing the data. It should have a input, input_internal,
+    # and input_external row
+    total, error = 0, 0
+    error_counter = Counter()
+    for share, internal, external in zip(pdf.shares, pdf.internal, pdf.external):
+        total += 1
+        try:
+            libprio.PrioVerifier_set_data(verifier, share)
+            libprio.PrioPacketVerify2_read(packet2_internal, internal, config)
+            libprio.PrioPacketVerify2_read(packet2_external, external, config)
+            libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
+            libprio.PrioServer_aggregate(server, verifier)
+        except RuntimeError as e:
+            error += 1
+            error_counter.update([f"server {server_id}: {e}"])
+    logger.warning(error_counter)
+    result = [dict(payload=libprio.PrioServer_write(server), error=error, total=total)]
+    libprio.Prio_clear()
+    return pd.DataFrame(result)
 
 
 def total_share(
@@ -180,47 +179,46 @@ def total_share(
     pdf: pd.DataFrame,
 ) -> pd.DataFrame:
     """schema: payload binary, error int, total int"""
-    with PrioContext():
-        private_key, public_key_internal, public_key_external = import_keys(
-            private_key_hex, public_key_hex_internal, public_key_hex_external
-        )
-        config = libprio.PrioConfig_new(
-            n_data, public_key_internal, public_key_external, batch_id
-        )
-        server = libprio.PrioServer_new(
-            config, match_server(server_id), private_key, shared_secret
-        )
-        server_i = libprio.PrioServer_new(
-            config, match_server(server_id), private_key, shared_secret
-        )
-        # NOTE: this breaks expectations from other udfs, which expects shares,
-        # internal, external etc.
-        for aggregates in pdf["payload"]:
-            libprio.PrioServer_read(server_i, aggregates, config)
-            libprio.PrioServer_merge(server, server_i)
+    libprio.Prio_init()
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
+    )
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+    server = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, shared_secret
+    )
+    server_i = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, shared_secret
+    )
+    # NOTE: this breaks expectations from other udfs, which expects shares,
+    # internal, external etc.
+    for aggregates in pdf["payload"]:
+        libprio.PrioServer_read(server_i, aggregates, config)
+        libprio.PrioServer_merge(server, server_i)
 
-        total_share = libprio.PrioTotalShare_new()
-        libprio.PrioTotalShare_set_data(total_share, server)
-
-        return pd.DataFrame(
-            [
-                dict(
-                    payload=libprio.PrioTotalShare_write(total_share),
-                    error=pdf.error.sum(),
-                    total=pdf.total.sum(),
-                )
-            ]
+    total_share = libprio.PrioTotalShare_new()
+    libprio.PrioTotalShare_set_data(total_share, server)
+    result = [
+        dict(
+            payload=libprio.PrioTotalShare_write(total_share),
+            error=pdf.error.sum(),
+            total=pdf.total.sum(),
         )
+    ]
+    libprio.Prio_clear()
+    return pd.DataFrame(result)
 
 
 def publish(
-    batch_id,
-    n_data,
-    server_id,
-    private_key_hex,
-    shared_secret,
-    public_key_hex_internal,
-    public_key_hex_external,
+    batch_id: bytes,
+    n_data: int,
+    server_id: str,
+    private_key_hex: bytes,
+    shared_secret: bytes,
+    public_key_hex_internal: bytes,
+    public_key_hex_external: bytes,
     data_internal: pd.Series,
     data_external: pd.Series,
 ) -> pd.Series:
