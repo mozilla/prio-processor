@@ -74,6 +74,24 @@ jobs:
           name: Test batched-processing integration with MinIO
           command: make test
 
+  test-cli-integration-spark:
+    docker:
+      - image: docker:stable-git
+    steps:
+      - setup_remote_docker
+      - restore_cache:
+          key: v1-{{ .Branch }}
+      - run:
+          name: Restore cache
+          command: |
+            docker load -i /tmp/latest.tar
+      - run:
+          name: Run the default tests
+          command: |
+            docker run prio:latest bash -c "
+              scripts/test-cli-integration-spark && \
+              [[ $(jq '.error' working/server_a/processed/*.json) -eq 0 ]]"
+
   deploy:
     docker:
       - image: docker:stable-git
@@ -128,6 +146,12 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - test-cli-integration-spark:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
       - test-batch-example:
           requires:
             - build
@@ -138,6 +162,7 @@ workflows:
           requires:
             - build
             - test
+            - test-cli-integration-spark
           filters:
             tags:
               only: /.*/
