@@ -87,10 +87,7 @@ jobs:
             docker load -i /tmp/latest.tar
       - run:
           name: Run the default tests
-          command: |
-            docker run prio:latest bash -c "
-              scripts/test-cli-integration-spark && \
-              [[ $(jq '.error' working/server_a/processed/*.json) -eq 0 ]]"
+          command: docker run prio:latest scripts/test-cli-integration-spark
 
   deploy:
     docker:
