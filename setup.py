@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="prio_processor",
@@ -23,5 +23,5 @@ setup(
         "prio >= 1.1",
         "pandas",
     ],
-    packages=["prio_processor"],
+    packages=find_packages(),
 )
