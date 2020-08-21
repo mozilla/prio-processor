@@ -5,40 +5,8 @@ import array
 import pandas as pd
 from prio import PrioContext, libprio
 from prio_processor.prio.commands import import_keys, import_public_keys, match_server
-from collections import namedtuple
 
 logger = logging.getLogger(__name__)
-
-ServerNamespace = namedtuple(
-    "ServerNamespace",
-    ["private_key", "public_key_internal", "public_key_external", "config", "server"],
-)
-
-
-def configure_server(
-    batch_id: bytes,
-    n_data: int,
-    server_id: str,
-    private_key_hex: bytes,
-    shared_secret: bytes,
-    public_key_hex_internal: bytes,
-    public_key_hex_external: bytes,
-) -> ServerNamespace:
-    private_key, public_key_internal, public_key_external = import_keys(
-        private_key_hex, public_key_hex_internal, public_key_hex_external
-    )
-    config = libprio.PrioConfig_new(
-        n_data, public_key_internal, public_key_external, batch_id
-    )
-    if shared_secret:
-        server = libprio.PrioServer_new(
-            config, match_server(server_id), private_key, shared_secret
-        )
-    else:
-        server = None
-    return ServerNamespace(
-        private_key, public_key_internal, public_key_external, config, server
-    )
 
 
 def encode(
@@ -82,19 +50,16 @@ def verify1(
     # functions.
     libprio.Prio_init()
 
-    ns = configure_server(
-        batch_id,
-        n_data,
-        server_id,
-        private_key_hex,
-        shared_secret,
-        public_key_hex_internal,
-        public_key_hex_external,
-    )
-
     def _process(share):
-        config = ns.config
-        server = ns.server
+        private_key, public_key_internal, public_key_external = import_keys(
+            private_key_hex, public_key_hex_internal, public_key_hex_external
+        )
+        config = libprio.PrioConfig_new(
+            n_data, public_key_internal, public_key_external, batch_id
+        )
+        server = libprio.PrioServer_new(
+            config, match_server(server_id), private_key, shared_secret
+        )
         verifier = libprio.PrioVerifier_new(server)
         packet = libprio.PrioPacketVerify1_new()
         # share is actually a bytearray, so convert it into bytes
@@ -121,19 +86,17 @@ def verify2(
 ) -> pd.Series:
     libprio.Prio_init()
 
-    ns = configure_server(
-        batch_id,
-        n_data,
-        server_id,
-        private_key_hex,
-        shared_secret,
-        public_key_hex_internal,
-        public_key_hex_external,
-    )
-
     def _process(share, internal, external):
-        config = ns.config
-        server = ns.server
+        private_key, public_key_internal, public_key_external = import_keys(
+            private_key_hex, public_key_hex_internal, public_key_hex_external
+        )
+
+        config = libprio.PrioConfig_new(
+            n_data, public_key_internal, public_key_external, batch_id
+        )
+        server = libprio.PrioServer_new(
+            config, match_server(server_id), private_key, shared_secret
+        )
         verifier = libprio.PrioVerifier_new(server)
 
         packet1_internal = libprio.PrioPacketVerify1_new()
@@ -170,17 +133,16 @@ def aggregate(
     schema: payload binary, error int, total int
     """
     libprio.Prio_init()
-    ns = configure_server(
-        batch_id,
-        n_data,
-        server_id,
-        private_key_hex,
-        shared_secret,
-        public_key_hex_internal,
-        public_key_hex_external,
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
     )
-    config = ns.config
-    server = ns.server
+
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+    server = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, shared_secret
+    )
     verifier = libprio.PrioVerifier_new(server)
     packet2_internal = libprio.PrioPacketVerify2_new()
     packet2_external = libprio.PrioPacketVerify2_new()
@@ -218,19 +180,17 @@ def total_share(
 ) -> pd.DataFrame:
     """schema: payload binary, error int, total int"""
     libprio.Prio_init()
-    ns = configure_server(
-        batch_id,
-        n_data,
-        server_id,
-        private_key_hex,
-        shared_secret,
-        public_key_hex_internal,
-        public_key_hex_external,
+    private_key, public_key_internal, public_key_external = import_keys(
+        private_key_hex, public_key_hex_internal, public_key_hex_external
     )
-    config = ns.config
-    server = ns.server
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id
+    )
+    server = libprio.PrioServer_new(
+        config, match_server(server_id), private_key, shared_secret
+    )
     server_i = libprio.PrioServer_new(
-        config, match_server(server_id), ns.private_key, shared_secret
+        config, match_server(server_id), private_key, shared_secret
     )
     # NOTE: this breaks expectations from other udfs, which expects shares,
     # internal, external etc.
@@ -265,8 +225,8 @@ def publish(
     libprio.Prio_init()
 
     def _process(internal, external):
-        public_key_internal, public_key_external = import_public_keys(
-            public_key_hex_internal, public_key_hex_external
+        _, public_key_internal, public_key_external = import_keys(
+            private_key_hex, public_key_hex_internal, public_key_hex_external
         )
         config = libprio.PrioConfig_new(
             n_data, public_key_internal, public_key_external, batch_id

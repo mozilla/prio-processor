@@ -200,6 +200,7 @@ time prio-spark publish \
     --output ${SERVER_A_BUCKET}/processed
 
 jq '.' ${SERVER_A_BUCKET}/processed/*.json
+[[ $(jq ".error" ${SERVER_A_BUCKET}/processed/*.json) -eq 0 ]]
 
 time prio-spark publish \
     --n-data ${N_DATA} \
@@ -214,3 +215,4 @@ time prio-spark publish \
     --output ${SERVER_B_BUCKET}/processed
 
 jq '.' ${SERVER_B_BUCKET}/processed/*.json
+[[ $(jq ".error" ${SERVER_B_BUCKET}/processed/*.json) -eq 0 ]]
