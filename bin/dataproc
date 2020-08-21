@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# A testing script for verifying the spark-bigquery connector with the existing
+# mozaggregator code. This requires `gcloud` to be configured to point at a
+# sandbox project for reading data from `payload_bytes_decoded`.
+
+set -e
+
+REGION=us-west1
+MODULE="prio_processor"
+NUM_WORKERS=${NUM_WORKERS:-1}
+
+function bootstrap() {
+    local bucket=$1
+
+    # create the initialization script and runner
+    mkdir -p bootstrap
+
+    # create the package artifacts
+    rm -rf dist build
+    python3 setup.py bdist_egg
+    cp dist/${MODULE}*.egg bootstrap/${MODULE}.egg
+    cp requirements.txt bootstrap/
+    tee bootstrap/install-python-requirements.sh >/dev/null <<EOF
+#!/bin/bash
+apt install --yes python-dev libmsgpackc2 libnss3
+gsutil cp gs://${bucket}/bootstrap/requirements.txt .
+pip install -r requirements.txt
+EOF
+    tee bootstrap/processor.py >/dev/null <<EOF
+from prio_processor.spark import commands
+commands.entry_point()
+EOF
+
+    # upload the bootstrap files
+    gsutil rsync -r bootstrap/ "gs://${bucket}/bootstrap/"
+}
+
+function delete_cluster() {
+    local cluster_id=$1
+    gcloud dataproc clusters delete ${cluster_id} --region=${REGION}
+}
+
+function create_cluster() {
+    local cluster_id=$1
+    local bucket=$2
+
+    gcloud beta dataproc clusters create ${cluster_id} \
+        --image-version 1.4 \
+        --enable-component-gateway \
+        --worker-machine-type=n1-standard-8 \
+        --num-secondary-workers ${NUM_WORKERS} \
+        --properties ^#^spark:spark.jars=gs://spark-lib/bigquery/spark-bigquery-latest.jar#spark:spark.hadoop.fs.s3a.access.key=${AWS_ACCESS_KEY_ID} \
+        --initialization-actions gs://${bucket}/bootstrap/install-python-requirements.sh \
+        --region=${REGION} \
+        --max-idle 10m
+}
+
+function submit() {
+    cluster_id=$1
+    bucket=$2
+    # pass the rest of the parameters from the main function
+    shift 2
+    gcloud dataproc jobs submit pyspark \
+        gs://${bucket}/bootstrap/processor.py \
+        --cluster ${cluster_id} \
+        --region ${REGION} \
+        --py-files=gs://${bucket}/bootstrap/${MODULE}.egg \
+        -- "$@"
+}
+
+function main() {
+    cd "$(dirname "$0")/.."
+    bucket=$(gcloud config get-value project)
+    cluster_id="test-prio-processor-${RANDOM}"
+    bootstrap $bucket
+    create_cluster $cluster_id $bucket
+    # does not handle issues where the cluster fails on startup
+    function cleanup() {
+        delete_cluster ${cluster_id}
+    }
+    trap cleanup EXIT
+    submit $cluster_id $bucket "$@"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
