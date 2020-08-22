@@ -6,9 +6,10 @@
 
 set -e
 
-REGION=us-west1
+REGION=${REGION:-us-west1}
+MACHINE_TYPE=${MACHINE_TYPE:-"n1-standard-4"}
+NUM_WORKERS=${NUM_WORKERS:-0}
 MODULE="prio_processor"
-NUM_WORKERS=${NUM_WORKERS:-1}
 
 function bootstrap() {
     local bucket=$1
@@ -52,8 +53,9 @@ function create_cluster() {
     gcloud beta dataproc clusters create ${cluster_id} \
         --image-version preview-ubuntu18 \
         --enable-component-gateway \
-        --worker-machine-type=n1-standard-4 \
-        --num-secondary-workers ${NUM_WORKERS} \
+        --master-machine-type=$MACHINE_TYPE \
+        --worker-machine-type=$MACHINE_TYPE \
+        --num-workers ${NUM_WORKERS} \
         --properties ^#^spark:spark.jars=gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar#spark:spark.hadoop.fs.s3a.access.key=${AWS_ACCESS_KEY_ID:-""} \
         --initialization-actions ${bucket}/bootstrap/install-python-requirements.sh \
         --region=${REGION} \
