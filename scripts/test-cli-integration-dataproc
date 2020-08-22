@@ -5,19 +5,24 @@ set -x
 cd "$(dirname "$0")/.."
 scripts/create-folder
 
-# shellcheck source=bin/dataproc
-source bin/dataproc
-
+export NUM_WORKERS=${NUM_WORKERS:-0}
 BUCKET=${BUCKET?"must include a valid bucket"}
 PREFIX=${PREFIX:-"test-integration-dataproc"}
-DATAPROC_CLUSTER_ID=${DATAPROC_CLUSTER_ID:-""}
 WORKING_BUCKET="$BUCKET/$PREFIX"
+ARTIFACT_BUCKET=${ARTIFACT_BUCKET:-$BUCKET/prio-processor-benchmarks}
 SERVER_A_BUCKET=${SERVER_A_BUCKET:-"$WORKING_BUCKET/server_a"}
 SERVER_B_BUCKET=${SERVER_B_BUCKET:-"$WORKING_BUCKET/server_b"}
+DATAPROC_CLUSTER_ID=${DATAPROC_CLUSTER_ID:-""}
+
+export REGION=${REGION:-us-west1}
+export CLOUDSDK_DATAPROC_REGION=$REGION
 
 [[ $BUCKET == "gs://"* ]]
 # check for appropriate access
 gsutil ls $BUCKET
+
+# shellcheck source=bin/dataproc
+source bin/dataproc
 
 # start a dataproc cluster if one doesn't already exist
 if [[ -z "$DATAPROC_CLUSTER_ID" ]]; then
@@ -33,6 +38,27 @@ fi
 
 function run_spark_submit() {
     submit $DATAPROC_CLUSTER_ID $WORKING_BUCKET "$@"
+}
+
+function collect_history() {
+    # collect some history for benchmarking analysis and performance debugging
+    local artifact_bucket=$ARTIFACT_BUCKET
+    local cluster_id=$DATAPROC_CLUSTER_ID
+    local workdir="working"
+
+    mkdir -p $workdir/logs
+    gsutil ls -rl "$WORKING_BUCKET/**" >$workdir/logs/bucket-listing.txt
+    gcloud beta dataproc clusters describe $cluster_id --format json >$workdir/logs/dataproc-clusters-describe.json
+    gcloud beta dataproc jobs list --cluster $cluster_id --format json >$workdir/logs/dataproc-jobs-list.json
+    gsutil -m rsync -r $workdir/ $artifact_bucket/$cluster_id/
+    # copy spark history and yarn logs
+    cluster_uuid=$(jq -r '.clusterUuid' working/logs/dataproc-clusters-describe.json)
+    gsutil -m rsync -r "gs://dataproc-temp*/${cluster_uuid}" $artifact_bucket/$cluster_id/logs
+
+    # copy the raw and processed data for potential analysis
+    gsutil -m rsync -r $WORKING_BUCKET/client/ $artifact_bucket/$cluster_id/client/
+    gsutil -m rsync -r $SERVER_A_BUCKET/processed/ $artifact_bucket/$cluster_id/server_a/processed/
+    gsutil -m rsync -r $SERVER_B_BUCKET/processed/ $artifact_bucket/$cluster_id/server_b/processed/
 }
 
 START_STAGE=${START_STAGE:-0}
@@ -102,7 +128,9 @@ if ((START_STAGE < 2)); then
         --input ${SERVER_A_BUCKET}/raw \
         --output ${SERVER_A_BUCKET}/intermediate/internal/verify1
 
-    gsutil rsync -r \
+    # NOTE: we ensure these buckets are completely synchronized, otherwise it is
+    # possible to for the job to fail during the publishing step.
+    gsutil -m rsync -r -d \
         ${SERVER_A_BUCKET}/intermediate/internal/verify1/ \
         ${SERVER_B_BUCKET}/intermediate/external/verify1/
 
@@ -117,7 +145,7 @@ if ((START_STAGE < 2)); then
         --input ${SERVER_B_BUCKET}/raw \
         --output ${SERVER_B_BUCKET}/intermediate/internal/verify1
 
-    gsutil rsync -r \
+    gsutil -m rsync -r -d \
         ${SERVER_B_BUCKET}/intermediate/internal/verify1/ \
         ${SERVER_A_BUCKET}/intermediate/external/verify1/
 fi
@@ -140,7 +168,7 @@ if ((START_STAGE < 3)); then
         --input-external ${SERVER_A_BUCKET}/intermediate/external/verify1 \
         --output ${SERVER_A_BUCKET}/intermediate/internal/verify2/
 
-    gsutil rsync -r \
+    gsutil -m rsync -r -d \
         ${SERVER_A_BUCKET}/intermediate/internal/verify2/ \
         ${SERVER_B_BUCKET}/intermediate/external/verify2/
 
@@ -157,7 +185,7 @@ if ((START_STAGE < 3)); then
         --input-external ${SERVER_B_BUCKET}/intermediate/external/verify1/ \
         --output ${SERVER_B_BUCKET}/intermediate/internal/verify2/
 
-    gsutil rsync -r \
+    gsutil -m rsync -r -d \
         ${SERVER_B_BUCKET}/intermediate/internal/verify2/ \
         ${SERVER_A_BUCKET}/intermediate/external/verify2/
 fi
@@ -179,7 +207,7 @@ if ((START_STAGE < 4)); then
         --input-external ${SERVER_A_BUCKET}/intermediate/external/verify2 \
         --output ${SERVER_A_BUCKET}/intermediate/internal/aggregate
 
-    gsutil rsync -r \
+    gsutil -m rsync -r -d \
         ${SERVER_A_BUCKET}/intermediate/internal/aggregate/ \
         ${SERVER_B_BUCKET}/intermediate/external/aggregate/
 
@@ -196,7 +224,7 @@ if ((START_STAGE < 4)); then
         --input-external ${SERVER_B_BUCKET}/intermediate/external/verify2 \
         --output ${SERVER_B_BUCKET}/intermediate/internal/aggregate
 
-    gsutil rsync -r \
+    gsutil -m rsync -r -d \
         ${SERVER_B_BUCKET}/intermediate/internal/aggregate/ \
         ${SERVER_A_BUCKET}/intermediate/external/aggregate/
 fi
@@ -217,7 +245,7 @@ time run_spark_submit publish \
     --input-external ${SERVER_A_BUCKET}/intermediate/external/aggregate/*.json \
     --output ${SERVER_A_BUCKET}/processed
 
-gsutil rsync -r -d ${SERVER_A_BUCKET}/processed/ working/server_a/processed/
+gsutil -m rsync -r -d ${SERVER_A_BUCKET}/processed/ working/server_a/processed/
 jq '.' working/server_a/processed/*.json
 [[ $(jq ".error" working/server_a/processed/*.json) -eq 0 ]]
 
@@ -233,6 +261,8 @@ time run_spark_submit publish \
     --input-external ${SERVER_B_BUCKET}/intermediate/external/aggregate/*.json \
     --output ${SERVER_B_BUCKET}/processed
 
-gsutil rsync -r -d ${SERVER_B_BUCKET}/processed/ working/server_b/processed/
+gsutil -m rsync -r -d ${SERVER_B_BUCKET}/processed/ working/server_b/processed/
 jq '.' working/server_b/processed/*.json
 [[ $(jq ".error" working/server_b/processed/*.json) -eq 0 ]]
+
+collect_history
