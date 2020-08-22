@@ -6,10 +6,12 @@ cd "$(dirname "$0")/.."
 scripts/create-folder
 
 export NUM_WORKERS=${NUM_WORKERS:-0}
+export MACHINE_TYPE=${MACHINE_TYPE:-"n1-standard-4"}
 BUCKET=${BUCKET?"must include a valid bucket"}
 PREFIX=${PREFIX:-"test-integration-dataproc"}
 WORKING_BUCKET="$BUCKET/$PREFIX"
 ARTIFACT_BUCKET=${ARTIFACT_BUCKET:-$BUCKET/prio-processor-benchmarks}
+CLIENT_BUCKET=${CLIENT_BUCKET:-"$WORKING_BUCKET/client"}
 SERVER_A_BUCKET=${SERVER_A_BUCKET:-"$WORKING_BUCKET/server_a"}
 SERVER_B_BUCKET=${SERVER_B_BUCKET:-"$WORKING_BUCKET/server_b"}
 DATAPROC_CLUSTER_ID=${DATAPROC_CLUSTER_ID:-""}
@@ -106,10 +108,12 @@ if [[ "$SKIP_GENERATE" == "false" ]]; then
         --batch-id ${BATCH_ID} \
         --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
         --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
-        --output-A ${SERVER_A_BUCKET}/raw/ \
-        --output-B ${SERVER_B_BUCKET}/raw/ \
+        --output ${CLIENT_BUCKET} \
         --n-rows ${N_ROWS} \
         --scale ${SCALE}
+
+    gsutil -m rsync -r -d ${CLIENT_BUCKET}/server_id=a/ ${SERVER_A_BUCKET}/raw/
+    gsutil -m rsync -r -d ${CLIENT_BUCKET}/server_id=b/ ${SERVER_B_BUCKET}/raw/
 fi
 
 ###########################################################

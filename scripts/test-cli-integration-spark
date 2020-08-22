@@ -60,10 +60,12 @@ if [[ "$SKIP_GENERATE" == "false" ]]; then
         --batch-id ${BATCH_ID} \
         --public-key-hex-internal ${SERVER_A_PUBLIC_KEY} \
         --public-key-hex-external ${SERVER_B_PUBLIC_KEY} \
-        --output-A ${SERVER_A_BUCKET}/raw/ \
-        --output-B ${SERVER_B_BUCKET}/raw/ \
+        --output $CLIENT_BUCKET \
         --n-rows ${N_ROWS} \
         --scale ${SCALE}
+
+    rsync -r --delete $CLIENT_BUCKET/server_id=a/ $SERVER_A_BUCKET/raw/
+    rsync -r --delete $CLIENT_BUCKET/server_id=b/ $SERVER_B_BUCKET/raw/
 fi
 
 ###########################################################
