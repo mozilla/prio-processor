@@ -5,63 +5,72 @@ set -x
 cd "$(dirname "$0")/.."
 scripts/create-folder
 
+# test parameters for data size
+N_DATA=${N_DATA:-128}
+N_ROWS=${N_ROWS:-1000}
+SCALE=${SCALE:-1}
+BATCH_ID=${BATCH_ID:-"test"}
+
+# parameters for computational performance, exported for dataproc script
 export NUM_WORKERS=${NUM_WORKERS:-0}
 export MACHINE_TYPE=${MACHINE_TYPE:-"n1-standard-4"}
+
+timestamp=$(python3 -c "import datetime as dt, re; print(re.sub('[^\d+]', '', str(dt.datetime.now()))[:14])")
+BENCHMARK_NAME="${BATCH_ID}-${N_DATA}-$((N_ROWS * SCALE))-${MACHINE_TYPE}-${NUM_WORKERS}-${timestamp}"
+echo "running benchmark $BENCHMARK_NAME"
+
+# set up the storage locations for working and artifact
 BUCKET=${BUCKET?"must include a valid bucket"}
-PREFIX=${PREFIX:-"test-integration-dataproc"}
-WORKING_BUCKET="$BUCKET/$PREFIX"
-ARTIFACT_BUCKET=${ARTIFACT_BUCKET:-$BUCKET/prio-processor-benchmarks}
+PREFIX=${PREFIX:-"data"}
+
+ARTIFACT_BUCKET="$BUCKET/$PREFIX/benchmark/$BENCHMARK_NAME"
+# relative to the current working directory
+WORKING_FOLDER=${WORKING_FOLDER:-$PREFIX/$BENCHMARK_NAME}
+WORKING_BUCKET="$BUCKET/$PREFIX/working/$BENCHMARK_NAME"
 CLIENT_BUCKET=${CLIENT_BUCKET:-"$WORKING_BUCKET/client"}
 SERVER_A_BUCKET=${SERVER_A_BUCKET:-"$WORKING_BUCKET/server_a"}
 SERVER_B_BUCKET=${SERVER_B_BUCKET:-"$WORKING_BUCKET/server_b"}
-DATAPROC_CLUSTER_ID=${DATAPROC_CLUSTER_ID:-""}
 
+# set up so `gcloud dataproc` commands don't require `--region` option
 export REGION=${REGION:-us-west1}
 export CLOUDSDK_DATAPROC_REGION=$REGION
 
-[[ $BUCKET == "gs://"* ]]
-# check for appropriate access
-gsutil ls $BUCKET
-
-# shellcheck source=bin/dataproc
-source bin/dataproc
-
-# start a dataproc cluster if one doesn't already exist
-if [[ -z "$DATAPROC_CLUSTER_ID" ]]; then
-    timestamp=$(python3 -c "import datetime as dt, re; print(re.sub('[^\d+]', '', str(dt.datetime.now())))")
-    DATAPROC_CLUSTER_ID="test-prio-processor-${timestamp}"
-    bootstrap $WORKING_BUCKET
-    create_cluster $DATAPROC_CLUSTER_ID $WORKING_BUCKET
-    function cleanup() {
-        delete_cluster ${DATAPROC_CLUSTER_ID}
-    }
-    trap cleanup EXIT
-fi
-
 function run_spark_submit() {
-    submit $DATAPROC_CLUSTER_ID $WORKING_BUCKET "$@"
+    submit $BENCHMARK_NAME $WORKING_BUCKET "$@"
 }
 
 function collect_history() {
     # collect some history for benchmarking analysis and performance debugging
     local artifact_bucket=$ARTIFACT_BUCKET
-    local cluster_id=$DATAPROC_CLUSTER_ID
-    local workdir="working"
+    local cluster_id=$BENCHMARK_NAME
+    local working_folder=$WORKING_FOLDER
 
-    mkdir -p $workdir/logs
-    gsutil ls -rl "$WORKING_BUCKET/**" >$workdir/logs/bucket-listing.txt
-    gcloud beta dataproc clusters describe $cluster_id --format json >$workdir/logs/dataproc-clusters-describe.json
-    gcloud beta dataproc jobs list --cluster $cluster_id --format json >$workdir/logs/dataproc-jobs-list.json
-    gsutil -m rsync -r $workdir/ $artifact_bucket/$cluster_id/
+    mkdir -p $working_folder/logs
+    gsutil ls -rl "$WORKING_BUCKET/**" >$working_folder/logs/bucket-listing.txt
+    gcloud beta dataproc clusters describe $cluster_id --format json >$working_folder/logs/dataproc-clusters-describe.json
+    gcloud beta dataproc jobs list --cluster $cluster_id --format json >$working_folder/logs/dataproc-jobs-list.json
+    gsutil -m rsync -r $working_folder/ $artifact_bucket/
+
     # copy spark history and yarn logs
-    cluster_uuid=$(jq -r '.clusterUuid' working/logs/dataproc-clusters-describe.json)
-    gsutil -m rsync -r "gs://dataproc-temp*/${cluster_uuid}" $artifact_bucket/$cluster_id/logs
+    cluster_uuid=$(jq -r '.clusterUuid' $working_folder/logs/dataproc-clusters-describe.json)
+    gsutil -m rsync -r "gs://dataproc-temp*/${cluster_uuid}" $artifact_bucket/logs
 
     # copy the raw and processed data for potential analysis
-    gsutil -m rsync -r $WORKING_BUCKET/client/ $artifact_bucket/$cluster_id/client/
-    gsutil -m rsync -r $SERVER_A_BUCKET/processed/ $artifact_bucket/$cluster_id/server_a/processed/
-    gsutil -m rsync -r $SERVER_B_BUCKET/processed/ $artifact_bucket/$cluster_id/server_b/processed/
+    gsutil -m rsync -r $WORKING_BUCKET/client/ $artifact_bucket/client/
+    gsutil -m rsync -r $SERVER_A_BUCKET/processed/ $artifact_bucket/server_a/processed/
+    gsutil -m rsync -r $SERVER_B_BUCKET/processed/ $artifact_bucket/server_b/processed/
 }
+
+# check local installion of prio commandline
+prio --help
+
+[[ $BUCKET == "gs://"* ]]
+
+# check for appropriate access
+gsutil ls $BUCKET
+
+# make the working folder
+mkdir -p $WORKING_FOLDER
 
 START_STAGE=${START_STAGE:-0}
 SKIP_GENERATE=${SKIP_GENERATE:-"false"}
@@ -74,33 +83,46 @@ if [[ "$SKIP_GENERATE" == "false" ]]; then
     key_a=$(prio keygen)
     key_b=$(prio keygen)
     shared=$(prio shared-seed)
-    N_DATA=${N_DATA:-128}
-    N_ROWS=${N_ROWS:-1000}
-    SCALE=${SCALE:-1}
-    BATCH_ID=${BATCH_ID:-"test"}
 
-    echo $key_a | jq >"working/server_a_keys.json"
-    echo $key_b | jq >"working/server_b_keys.json"
-    echo $shared | jq >"working/shared_seed.json"
-    cat <<EOF >working/config.json
+    echo $key_a >"$WORKING_FOLDER/server_a_keys.json"
+    echo $key_b >"$WORKING_FOLDER/server_b_keys.json"
+    echo $shared >"$WORKING_FOLDER/shared_seed.json"
+    cat <<EOF >"$WORKING_FOLDER/config.json"
 {
     "n_data": $N_DATA,
-    "batch_id": "$BATCH_ID"
+    "batch_id": "$BATCH_ID",
+    "n_rows": $N_ROWS,
+    "scale": $SCALE,
+    "machine_type": "$MACHINE_TYPE",
+    "num_workers": $NUM_WORKERS
 }
 EOF
 else
-    key_a=$(jq '.' working/server_a_keys.json)
-    key_b=$(jq '.' working/server_b_keys.json)
-    shared=$(jq '.' working/shared_seed.json)
+    key_a=$(jq '.' $WORKING_FOLDER/server_a_keys.json)
+    key_b=$(jq '.' $WORKING_FOLDER/server_b_keys.json)
+    shared=$(jq '.' $WORKING_FOLDER/shared_seed.json)
 fi
 
-N_DATA=$(jq -r ".n_data" working/config.json)
-BATCH_ID=$(jq -r ".batch_id" working/config.json)
+N_DATA=$(jq -r ".n_data" $WORKING_FOLDER/config.json)
+BATCH_ID=$(jq -r ".batch_id" $WORKING_FOLDER/config.json)
 SHARED_SECRET=${SHARED_SECRET:-$(jq -r ".shared_seed" <<<$shared)}
 SERVER_A_PUBLIC_KEY=${SERVER_A_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_a)}
 SERVER_B_PUBLIC_KEY=${SERVER_B_PUBLIC_KEY:-$(jq -r ".public_key" <<<$key_b)}
 SERVER_A_PRIVATE_KEY=${SERVER_A_PRIVATE_KEY:-$(jq -r ".private_key" <<<$key_a)}
 SERVER_B_PRIVATE_KEY=${SERVER_B_PRIVATE_KEY:-$(jq -r ".private_key" <<<$key_b)}
+
+# shellcheck source=bin/dataproc
+source bin/dataproc
+
+# start a dataproc cluster if one doesn't already exist
+if ! gcloud dataproc clusters describe $BENCHMARK_NAME; then
+    bootstrap $WORKING_BUCKET
+    create_cluster $BENCHMARK_NAME $WORKING_BUCKET
+    function cleanup() {
+        delete_cluster ${BENCHMARK_NAME}
+    }
+    trap cleanup EXIT
+fi
 
 if [[ "$SKIP_GENERATE" == "false" ]]; then
     time run_spark_submit generate \
