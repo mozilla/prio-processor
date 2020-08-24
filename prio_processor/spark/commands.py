@@ -36,7 +36,7 @@ def entry_point():
 @entry_point.command()
 @data_config
 @public_key
-@output_2
+@output_1
 @click.option("--n-rows", type=int, help="Number of rows randomly generate.")
 @click.option(
     "--scale", type=int, default=1, help="Factor to duplicate shares for output."
@@ -47,8 +47,7 @@ def generate(
     n_data,
     public_key_hex_internal,
     public_key_hex_external,
-    output_a,
-    output_b,
+    output,
     n_rows,
     scale,
     partition_size_mb,
@@ -79,7 +78,6 @@ def generate(
         .drop("_repeat")
         .withColumn("id", F.udf(lambda: str(uuid4()), returnType="string")())
     )
-    shares.cache()
     # we can make an estimate with just a single row, since the configuration
     # is the same here.
     row = shares.first()
@@ -93,14 +91,18 @@ def generate(
     num_partitions = math.ceil(dataset_estimate_mb / partition_size_mb)
     click.echo(f"writing {num_partitions} partitions")
 
-    # caching is required for a stable id, unless we take advantage of partitioned writing
-    repartitioned = shares.repartitionByRange(num_partitions, "id").cache()
-    repartitioned.select("id", F.base64("shares.a").alias("payload")).write.json(
-        output_a, mode="overwrite"
+    # try to be efficient without caching by repartitioning
+    repartitioned = (
+        shares.withColumn(
+            "shares",
+            F.map_from_arrays(
+                F.array(F.lit("a"), F.lit("b")), F.array("shares.a", "shares.b")
+            ),
+        )
+        .repartitionByRange(num_partitions, "id")
+        .select("id", F.explode("shares").alias("server_id", "payload"))
     )
-    repartitioned.select("id", F.base64("shares.b").alias("payload")).write.json(
-        output_b, mode="overwrite"
-    )
+    repartitioned.write.partitionBy("server_id").json(output, mode="overwrite")
 
 
 @entry_point.command()

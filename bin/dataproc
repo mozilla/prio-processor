@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# A testing script for verifying the spark-bigquery connector with the existing
+# mozaggregator code. This requires `gcloud` to be configured to point at a
+# sandbox project for reading data from `payload_bytes_decoded`.
+
+set -e
+
+REGION=${REGION:-us-west1}
+MACHINE_TYPE=${MACHINE_TYPE:-"n1-standard-4"}
+NUM_WORKERS=${NUM_WORKERS:-0}
+MODULE="prio_processor"
+
+function bootstrap() {
+    local bucket=$1
+
+    # create the initialization script and runner
+    mkdir -p bootstrap
+
+    # create the package artifacts
+    rm -rf dist build
+    python3 setup.py bdist_egg
+    cp dist/${MODULE}*.egg bootstrap/${MODULE}.egg
+    cp requirements.txt bootstrap/
+    tee bootstrap/install-python-requirements.sh >/dev/null <<EOF
+#!/bin/bash
+apt update && apt install --yes python-dev libmsgpackc2 libnss3
+gsutil cp ${bucket}/bootstrap/requirements.txt .
+pip install -r requirements.txt
+EOF
+    tee bootstrap/processor.py >/dev/null <<EOF
+from prio_processor.spark import commands
+commands.entry_point()
+EOF
+
+    # upload the bootstrap files
+    gsutil rsync -r bootstrap/ "${bucket}/bootstrap/"
+}
+
+function delete_cluster() {
+    local cluster_id=$1
+    gcloud dataproc clusters delete ${cluster_id} --region=${REGION}
+}
+
+function create_cluster() {
+    local cluster_id=$1
+    local bucket=$2
+
+    # note that we're using the beta API to enable the component gateway and to
+    # ensure that we can kill the cluster after some time elapses. We use the
+    # preview version (2.x) for Spark 3.0 support. Finally, we need to use
+    # external jars that support scala 2.12.
+    gcloud beta dataproc clusters create ${cluster_id} \
+        --image-version preview-ubuntu18 \
+        --enable-component-gateway \
+        --master-machine-type=$MACHINE_TYPE \
+        --worker-machine-type=$MACHINE_TYPE \
+        --num-workers ${NUM_WORKERS} \
+        --properties ^#^spark:spark.jars=gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar#spark:spark.hadoop.fs.s3a.access.key=${AWS_ACCESS_KEY_ID:-""} \
+        --initialization-actions ${bucket}/bootstrap/install-python-requirements.sh \
+        --region=${REGION} \
+        --max-idle 10m
+}
+
+function submit() {
+    cluster_id=$1
+    bucket=$2
+    # pass the rest of the parameters from the main function
+    shift 2
+    gcloud dataproc jobs submit pyspark \
+        ${bucket}/bootstrap/processor.py \
+        --cluster ${cluster_id} \
+        --region ${REGION} \
+        --py-files=${bucket}/bootstrap/${MODULE}.egg \
+        -- "$@"
+}
+
+function main() {
+    cd "$(dirname "$0")/.."
+    bucket=gs://$(gcloud config get-value project)
+    cluster_id="test-prio-processor-${RANDOM}"
+    bootstrap $bucket
+    create_cluster $cluster_id $bucket
+    # does not handle issues where the cluster fails on startup
+    function cleanup() {
+        delete_cluster ${cluster_id}
+    }
+    trap cleanup EXIT
+    submit $cluster_id $bucket "$@"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

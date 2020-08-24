@@ -1,8 +1,8 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="prio_processor",
-    version="2.1.1",
+    version="2.2.0",
     description="A processing engine for prio data",
     long_description_content_type="text/markdown",
     author="Anthony Miyaguchi",
@@ -23,5 +23,5 @@ setup(
         "prio >= 1.1",
         "pandas",
     ],
-    packages=["prio_processor"],
+    packages=find_packages(),
 )
