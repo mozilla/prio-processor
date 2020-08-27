@@ -36,7 +36,7 @@ export REGION=${REGION:-us-west1}
 export CLOUDSDK_DATAPROC_REGION=$REGION
 
 function run_spark_submit() {
-    submit $BENCHMARK_NAME $WORKING_BUCKET "$@"
+    submit $BENCHMARK_NAME $WORKING_BUCKET/bootstrap "$@"
 }
 
 function collect_history() {
@@ -116,7 +116,7 @@ source bin/dataproc
 
 # start a dataproc cluster if one doesn't already exist
 if ! gcloud dataproc clusters describe $BENCHMARK_NAME; then
-    bootstrap $WORKING_BUCKET
+    bootstrap $WORKING_BUCKET/bootstrap
     create_cluster $BENCHMARK_NAME $WORKING_BUCKET
     function cleanup() {
         delete_cluster ${BENCHMARK_NAME}

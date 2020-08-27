@@ -26,18 +26,19 @@ function index() {
     local output=$2
 
     resources=$(mktemp -d -t resources-XXX)
-    prio-processor bootstrap --output "${resources}"
+    source "${BASH_SOURCE%/*}/dataproc"
+    SUBMODULE="origin" bootstrap "${resources}"
     gsutil cp gs://spark-lib/bigquery/spark-bigquery-latest.jar "${resources}"
 
     spark-submit \
         --jars "${resources}/spark-bigquery-latest.jar" \
         --py-files "${resources}/prio_processor.egg" \
         "${resources}/runner.py" \
-            index \
-            --input "${input}" \
-            --output "${output}" \
-            --config "${DATA_CONFIG}" \
-            --origins "${ORIGIN_CONFIG}"
+        index \
+        --input "${input}" \
+        --output "${output}" \
+        --config "${DATA_CONFIG}" \
+        --origins "${ORIGIN_CONFIG}"
 }
 
 function insert() {
