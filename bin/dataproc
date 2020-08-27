@@ -13,7 +13,7 @@ MODULE="prio_processor"
 SUBMODULE=${SUBMODULE:-"spark"}
 
 function bootstrap() {
-    local bucket=$1
+    local bucket=${1?"bucket must be provided"}
 
     # create the initialization script and runner
     mkdir -p bootstrap
@@ -26,16 +26,20 @@ function bootstrap() {
     tee bootstrap/install-python-requirements.sh >/dev/null <<EOF
 #!/bin/bash
 apt update && apt install --yes python-dev libmsgpackc2 libnss3
-gsutil cp ${bucket}/bootstrap/requirements.txt .
+gsutil cp ${bucket}/requirements.txt .
 pip install -r requirements.txt
 EOF
-    tee bootstrap/processor.py >/dev/null <<EOF
-from ${MODULE}.${SUBMODULE} import commands
+    tee bootstrap/processor-spark.py >/dev/null <<EOF
+from ${MODULE}.spark import commands
+commands.entry_point()
+EOF
+    tee bootstrap/processor-origin.py >/dev/null <<EOF
+from ${MODULE}.origin import commands
 commands.entry_point()
 EOF
 
     # upload the bootstrap files
-    gsutil rsync -r bootstrap/ "${bucket}"
+    gsutil rsync -r bootstrap/ "${bucket}/"
 }
 
 function delete_cluster() {
@@ -58,7 +62,7 @@ function create_cluster() {
         --worker-machine-type=$MACHINE_TYPE \
         --num-workers ${NUM_WORKERS} \
         --properties ^#^spark:spark.jars=gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar#spark:spark.hadoop.fs.s3a.access.key=${AWS_ACCESS_KEY_ID:-""} \
-        --initialization-actions ${bucket}/bootstrap/install-python-requirements.sh \
+        --initialization-actions ${bucket}/install-python-requirements.sh \
         --region=${REGION} \
         --max-idle 10m
 }
@@ -69,7 +73,7 @@ function submit() {
     # pass the rest of the parameters from the main function
     shift 2
     gcloud dataproc jobs submit pyspark \
-        ${bucket}/processor.py \
+        ${bucket}/processor-${SUBMODULE}.py \
         --cluster ${cluster_id} \
         --region ${REGION} \
         --py-files=${bucket}/${MODULE}.egg \
