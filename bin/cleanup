@@ -8,11 +8,10 @@ set -x
 
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
-: "${GOOGLE_APPLICATION_CREDENTIALS:=}"
 
 echo "Running cleanup..."
 
-source "${BASH_SOURCE%/*}/authenticate"
+"${BASH_SOURCE%/*}/authenticate"
 gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
 gsutil ls "${BUCKET_INTERNAL_SHARED}"
 (gsutil -m rm "${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")

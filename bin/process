@@ -305,7 +305,7 @@ function publish() {
 }
 
 function main() {
-    source "${BASH_SOURCE%/*}/authenticate"
+    "${BASH_SOURCE%/*}/authenticate"
 
     gsutil ls "${BUCKET_INTERNAL_PRIVATE?}"
     gsutil ls "${BUCKET_INTERNAL_SHARED?}"

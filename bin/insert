@@ -66,7 +66,7 @@ function main() {
     data_in=$(mktemp -d -t data-XXX)
     data_out=$(mktemp -d -t data-XXX)
 
-    source "${BASH_SOURCE%/*}/authenticate"
+    "${BASH_SOURCE%/*}/authenticate"
 
     gsutil -m cp -r "${BUCKET_INTERNAL_PRIVATE}/processed/" "${data_in}"
     index "${data_in}" "${data_out}"

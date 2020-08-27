@@ -9,7 +9,7 @@
 set -euo pipefail
 set -x
 
-: "${DATA_CONFIG}"
+: "${DATA_CONFIG?}"
 : "${PUBLIC_KEY_HEX_INTERNAL?}"
 : "${PUBLIC_KEY_HEX_EXTERNAL?}"
 : "${BUCKET_INTERNAL_PRIVATE?}"
@@ -85,7 +85,7 @@ function generate_dataset() {
 }
 
 function main() {
-    source "${BASH_SOURCE%/*}/authenticate"
+    "${BASH_SOURCE%/*}/authenticate"
     gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
     gsutil ls "${BUCKET_EXTERNAL_PRIVATE}"
     cd /tmp
