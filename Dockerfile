@@ -40,6 +40,7 @@ ENV PYSPARK_PYTHON=python3
 ADD . /app
 # build the binary egg for distribution on Spark clusters
 RUN python3 setup.py bdist_egg && pip3 install -e .
+RUN chown -R app:app /app
 
 USER app
 CMD pytest -v tests && \
