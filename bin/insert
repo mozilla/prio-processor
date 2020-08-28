@@ -33,7 +33,7 @@ function index() {
     spark-submit \
         --jars "${resources}/spark-bigquery-latest.jar" \
         --py-files "${resources}/prio_processor.egg" \
-        "${resources}/runner.py" \
+        "${resources}/processor-origin.py" \
         index \
         --input "${input}" \
         --output "${output}" \
