@@ -27,6 +27,7 @@ ARTIFACT_BUCKET="$BUCKET/$PREFIX/benchmark/$BENCHMARK_NAME"
 # relative to the current working directory
 WORKING_FOLDER=${WORKING_FOLDER:-$PREFIX/$BENCHMARK_NAME}
 WORKING_BUCKET="$BUCKET/$PREFIX/working/$BENCHMARK_NAME"
+BOOTSTRAP_BUCKET=${BOOTSTRAP_BUCKET:-"$WORKING_BUCKET/bootstrap"}
 CLIENT_BUCKET=${CLIENT_BUCKET:-"$WORKING_BUCKET/client"}
 SERVER_A_BUCKET=${SERVER_A_BUCKET:-"$WORKING_BUCKET/server_a"}
 SERVER_B_BUCKET=${SERVER_B_BUCKET:-"$WORKING_BUCKET/server_b"}
@@ -36,7 +37,7 @@ export REGION=${REGION:-us-west1}
 export CLOUDSDK_DATAPROC_REGION=$REGION
 
 function run_spark_submit() {
-    submit $BENCHMARK_NAME $WORKING_BUCKET/bootstrap "$@"
+    submit $BENCHMARK_NAME $BOOTSTRAP_BUCKET "$@"
 }
 
 function collect_history() {
@@ -116,8 +117,8 @@ source bin/dataproc
 
 # start a dataproc cluster if one doesn't already exist
 if ! gcloud dataproc clusters describe $BENCHMARK_NAME; then
-    bootstrap $WORKING_BUCKET/bootstrap
-    create_cluster $BENCHMARK_NAME $WORKING_BUCKET
+    bootstrap $BOOTSTRAP_BUCKET
+    create_cluster $BENCHMARK_NAME $BOOTSTRAP_BUCKET
     function cleanup() {
         delete_cluster ${BENCHMARK_NAME}
     }
