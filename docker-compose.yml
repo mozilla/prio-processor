@@ -64,3 +64,5 @@ services:
       - DATASET=telemetry
       - TABLE=content_blocking_dev
       - BQ_REPLACE=true
+      # Set the default project for inserting rows
+      - CLOUDSDK_CORE_PROJECT

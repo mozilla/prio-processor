@@ -41,4 +41,4 @@ server_b_pid=$!
 wait $server_a_pid
 wait $server_b_pid
 
-docker-compose run admin bin/insert
+docker-compose run -e DATA_CONFIG admin bin/insert
