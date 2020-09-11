@@ -28,10 +28,11 @@ function index() {
     resources=$(mktemp -d -t resources-XXX)
     source "${BASH_SOURCE%/*}/dataproc"
     SUBMODULE="origin" bootstrap "${resources}"
-    gsutil cp gs://spark-lib/bigquery/spark-bigquery-latest.jar "${resources}"
+    # Spark 3.0 on the container uses Scala 2.12
+    gsutil cp gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar "${resources}"
 
     spark-submit \
-        --jars "${resources}/spark-bigquery-latest.jar" \
+        --jars "${resources}/gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar " \
         --py-files "${resources}/prio_processor.egg" \
         "${resources}/processor-origin.py" \
         index \
