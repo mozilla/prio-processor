@@ -10,21 +10,10 @@ set -x
 : "${BUCKET_INTERNAL_SHARED?}"
 : "${GOOGLE_APPLICATION_CREDENTIALS:=}"
 
-function authenticate() {
-    local cred=${GOOGLE_APPLICATION_CREDENTIALS}
-
-    if [[ -n "${cred}" ]]; then
-        gcloud auth activate-service-account --key-file "${cred}"
-    else
-        # https://cloud.google.com/kubernetes-engine/docs/tutorials/authenticating-to-cloud-platform
-        echo "No JSON credentials provided, using default scopes."
-    fi
-    gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
-    gsutil ls "${BUCKET_INTERNAL_SHARED}"
-}
-
 echo "Running cleanup..."
 
-authenticate
+source "${BASH_SOURCE%/*}/authenticate"
+gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
+gsutil ls "${BUCKET_INTERNAL_SHARED}"
 (gsutil -m rm "${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
 (gsutil -m rm "${BUCKET_INTERNAL_SHARED}/**" || echo "nothing to delete")

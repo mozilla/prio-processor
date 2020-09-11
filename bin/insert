@@ -19,18 +19,6 @@ set -x
 # set to "true" to overwrite the existing table
 : "${BQ_REPLACE:-false}"
 
-function authenticate() {
-    local cred=${GOOGLE_APPLICATION_CREDENTIALS}
-
-    if [[ -n "${cred}" ]]; then
-        gcloud auth activate-service-account --key-file "${cred}"
-    else
-        # https://cloud.google.com/kubernetes-engine/docs/tutorials/authenticating-to-cloud-platform
-        echo "No JSON credentials provided, using default scopes."
-    fi
-    gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
-}
-
 function index() {
     # Map the resulting aggregates against the list of origins.
 
@@ -78,7 +66,7 @@ function main() {
     data_in=$(mktemp -d -t data-XXX)
     data_out=$(mktemp -d -t data-XXX)
 
-    authenticate
+    source "${BASH_SOURCE%/*}/authenticate"
 
     gsutil -m cp -r "${BUCKET_INTERNAL_PRIVATE}/processed/" "${data_in}"
     index "${data_in}" "${data_out}"
