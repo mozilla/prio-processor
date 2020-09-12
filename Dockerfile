@@ -26,6 +26,21 @@ RUN groupadd --gid 10001 app && \
         useradd -g app --uid 10001 --shell /usr/sbin/nologin --create-home \
         --home-dir /app app
 
+# install spark as the non-root user
+ARG SPARK_VERSION="3.0.1"
+ENV SPARK_DOWNLOAD_MIRROR="http://www.gtlib.gatech.edu/pub"
+ENV SPARK_DOWNLOAD_URL=${SPARK_DOWNLOAD_MIRROR}/apache/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz
+ENV SPARK_HOME="/opt/spark"
+ENV PYSPARK_PYTHON="python3"
+
+WORKDIR /opt
+RUN curl ${SPARK_DOWNLOAD_URL} | tar xz
+RUN ln -s /opt/spark-${SPARK_VERSION}-bin-hadoop2.7 ${SPARK_HOME}
+RUN chown -R app:app /opt
+ENV PATH=${PATH}:${SPARK_HOME}/sbin
+# spark UI
+EXPOSE 8080
+
 WORKDIR /app
 COPY requirements.txt requirements-dev.txt ./
 
@@ -33,9 +48,6 @@ ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && \
         pip3 install --upgrade pip && \
         pip3 install -r requirements.txt -r requirements-dev.txt
-
-ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
-ENV PYSPARK_PYTHON=python3
 
 ADD . /app
 # build the binary egg for distribution on Spark clusters
@@ -47,6 +59,3 @@ CMD pytest -v tests && \
         scripts/test-cli-integration && \
         prio --help && \
         prio-processor --help
-
-# References
-# https://docs.docker.com/develop/develop-images/multistage-build/
