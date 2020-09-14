@@ -6,6 +6,7 @@
 
 set -euo pipefail
 
+export DATA_CONFIG=${DATA_CONFIG:-/app/config/test-small.json}
 docker-compose up -d
 
 function clean_buckets {
@@ -20,16 +21,19 @@ function cleanup {
 }
 trap cleanup EXIT
 
+# Copy data into the appropriate buckets
+docker-compose run -e DATA_CONFIG admin bin/generate
+
 # Start server A
-docker-compose run server_a bin/process &
+docker-compose run -e DATA_CONFIG server_a bin/process &
 server_a_pid=$!
 
-# Start server B
-docker-compose run server_b bin/process &
-server_b_pid=$!
+# offset the start times by a short amount for proper authentication against GCP
+sleep 2
 
-# Copy data into the appropriate buckets
-docker-compose run admin bin/generate
+# Start server B
+docker-compose run -e DATA_CONFIG server_b bin/process &
+server_b_pid=$!
 
 # Return the exit code of the backgrounded docker-compose container. Since
 # `wait` is a blocking function, a failure in server B will not be detected
@@ -37,4 +41,4 @@ docker-compose run admin bin/generate
 wait $server_a_pid
 wait $server_b_pid
 
-docker-compose run admin bin/insert
+docker-compose run -e DATA_CONFIG admin bin/insert

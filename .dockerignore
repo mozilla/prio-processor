@@ -11,8 +11,15 @@ MANIFEST
 .pytest_cache
 .vscode
 .tox
+.config/
+.gsutil/
+.ipynb_checkpoints/
+.parallel
+.vscode
+.env
 
 data/
+working/
 **/build/
 **/dist/
 **/working/

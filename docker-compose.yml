@@ -13,7 +13,6 @@ services:
     working_dir: /app
     command: "true"
     volumes:
-      - .:/app
       - ${GOOGLE_APPLICATION_CREDENTIALS_A?"missing credentials"}:/tmp/.credentials
     environment:
       - DATA_CONFIG=/app/config/content.json
@@ -32,7 +31,6 @@ services:
     working_dir: /app
     command: "true"
     volumes:
-      - .:/app
       - ${GOOGLE_APPLICATION_CREDENTIALS_B?"missing credentials"}:/tmp/.credentials
     environment:
       - DATA_CONFIG=/app/config/content.json
@@ -51,7 +49,6 @@ services:
     working_dir: /app
     command: "true"
     volumes:
-      - .:/app
       - ${GOOGLE_APPLICATION_CREDENTIALS_ADMIN?"missing credentials"}:/tmp/.credentials
     environment:
       - DATA_CONFIG=/app/config/content.json
@@ -64,3 +61,5 @@ services:
       - DATASET=telemetry
       - TABLE=content_blocking_dev
       - BQ_REPLACE=true
+      # Set the default project for inserting rows
+      - CLOUDSDK_CORE_PROJECT

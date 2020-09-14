@@ -304,22 +304,13 @@ function publish() {
     send_output_internal ${output}
 }
 
-function authenticate() {
-    local cred=${GOOGLE_APPLICATION_CREDENTIALS}
+function main() {
+    "${BASH_SOURCE%/*}/authenticate"
 
-    if [[ -n "${cred}" ]]; then
-        gcloud auth activate-service-account --key-file "${cred}"
-    else
-        # https://cloud.google.com/kubernetes-engine/docs/tutorials/authenticating-to-cloud-platform
-        echo "No JSON credentials provided, using default scopes."
-    fi
     gsutil ls "${BUCKET_INTERNAL_PRIVATE?}"
     gsutil ls "${BUCKET_INTERNAL_SHARED?}"
     gsutil ls "${BUCKET_EXTERNAL_SHARED?}"
-}
 
-function main() {
-    authenticate
     cd /tmp && create_folders
 
     # export functions necessary for parallel
