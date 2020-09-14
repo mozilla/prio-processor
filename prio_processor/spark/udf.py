@@ -9,6 +9,25 @@ from prio_processor.prio.commands import import_keys, import_public_keys, match_
 logger = logging.getLogger(__name__)
 
 
+def encode_single(
+    batch_id: str,
+    n_data: int,
+    public_key_hex_internal: bytearray,
+    public_key_hex_external: bytearray,
+    payload: list,
+):
+    libprio.Prio_init()
+    public_key_internal, public_key_external = import_public_keys(
+        bytes(public_key_hex_internal), bytes(public_key_hex_external)
+    )
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id.encode()
+    )
+    a, b = libprio.PrioClient_encode(config, bytes(list(map(int, payload))))
+    libprio.Prio_clear()
+    return dict(a=a, b=b)
+
+
 def encode(
     batch_id: bytes,
     n_data: int,

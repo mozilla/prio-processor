@@ -20,6 +20,8 @@ from prio_processor.spark import udf
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
+ROOT = Path(__file__).parent.parent.parent
+
 
 def spark_session():
     spark = SparkSession.builder.getOrCreate()
@@ -103,6 +105,85 @@ def generate(
         .select("id", F.explode("shares").alias("server_id", "payload"))
     )
     repartitioned.write.partitionBy("server_id").json(output, mode="overwrite")
+
+
+@entry_point.command()
+@click.option("--submission-date", default=datetime.now().isoformat()[:10])
+@click.option(
+    "--config",
+    type=click.Path(dir_okay=False, exists=True),
+    default=str(ROOT / "config" / "test-small.json"),
+)
+@public_key
+@output_1
+@click.option(
+    "--n-rows", type=int, default=5, help="Number of rows to generate per batch."
+)
+def generate_integration(
+    submission_date,
+    config,
+    public_key_hex_internal,
+    public_key_hex_external,
+    output,
+    n_rows,
+):
+    """Generate test data from a configuration file.
+
+    The data is generated in a deterministic way and fits into memory."""
+    spark = spark_session()
+
+    config_data = spark.read.json(config, multiLine=True)
+
+    def generate_data(batch_id, n_data):
+        return dict(
+            batch_id=batch_id,
+            n_data=n_data,
+            payload=[int(x % 3 == 0 or x % 5 == 0) for x in range(n_data)],
+        )
+
+    test_data = []
+    for conf in config_data.collect():
+        batch_id = conf["batch_id"]
+        n_data = conf["n_data"]
+        test_data += [generate_data(batch_id, n_data) for _ in range(n_rows)]
+        # include invalid data for a batch
+        test_data += [generate_data(batch_id, n_data + 1)]
+    # include unknown batch id
+    test_data += [generate_data("bad-id", 10) for _ in range(n_rows)]
+
+    shares = (
+        spark.createDataFrame(test_data)
+        .select(
+            "batch_id",
+            F.udf(udf.encode_single, returnType="a: binary, b: binary")(
+                "batch_id",
+                "n_data",
+                F.lit(public_key_hex_internal),
+                F.lit(public_key_hex_external),
+                "payload",
+            ).alias("shares"),
+        )
+        .withColumn("id", F.udf(lambda: str(uuid4()), returnType="string")())
+    )
+
+    repartitioned = (
+        shares.withColumn(
+            "shares",
+            F.map_from_arrays(
+                F.array(F.lit("a"), F.lit("b")), F.array("shares.a", "shares.b")
+            ),
+        )
+        .repartitionByRange(2, "batch_id", "id")
+        .select(
+            F.lit(submission_date).alias("submission_date"),
+            "batch_id",
+            "id",
+            F.explode("shares").alias("server_id", "payload"),
+        )
+    )
+    repartitioned.write.partitionBy("submission_date", "server_id", "batch_id").json(
+        output, mode="overwrite"
+    )
 
 
 @entry_point.command()
