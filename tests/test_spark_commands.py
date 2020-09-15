@@ -98,7 +98,7 @@ def test_generate_integration(spark, tmp_path, root):
         [
             "--submission-date",
             test_date,
-            "--config",
+            "--data-config",
             str(config_path),
             "--public-key-hex-internal",
             server_a_keys["public_key"],

@@ -108,9 +108,10 @@ def generate(
 
 
 @entry_point.command()
-@click.option("--submission-date", default=datetime.now().isoformat()[:10])
+@click.option("--submission-date", default=datetime.utcnow().isoformat()[:10])
 @click.option(
-    "--config",
+    "--data-config",
+    envvar="DATA_CONFIG",
     type=click.Path(dir_okay=False, exists=True),
     default=str(ROOT / "config" / "test-small.json"),
 )
@@ -124,7 +125,7 @@ def generate(
 )
 def generate_integration(
     submission_date,
-    config,
+    data_config,
     public_key_hex_internal,
     public_key_hex_external,
     output,
@@ -137,7 +138,7 @@ def generate_integration(
     spark = spark_session()
 
     assert n_rows > 0
-    config_data = spark.read.json(config, multiLine=True)
+    config_data = spark.read.json(data_config, multiLine=True)
 
     def generate_data(batch_id, n_data):
         return dict(
