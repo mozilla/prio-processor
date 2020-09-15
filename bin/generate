@@ -4,103 +4,68 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 # This scripts generates data for testing the pipeline. The data is generated
-# based on the data configuration file.
+# based on the data configuration file. Note that data under each of the buckets
+# may be deleted due to rsync removing any file does not match.
 
 set -euo pipefail
 set -x
 
+today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isoformat()[:10])")
+: "${SUBMISSION_DATE:=${today}}"
 : "${DATA_CONFIG?}"
 : "${PUBLIC_KEY_HEX_INTERNAL?}"
 : "${PUBLIC_KEY_HEX_EXTERNAL?}"
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_EXTERNAL_PRIVATE?}"
 
-function rsync() {
-    local server_id=$1
-    local bucket=$2
-    local dest=${bucket}/raw/
+function rsync_to_servers() {
+    local src=$1
+    local dest=$2
 
-    gsutil -m rsync -r "server_${server_id}/raw/" "${dest}"
+    # If we are working with the local filesystem, we need to create all parent
+    # folders. Copying a temporary object will create recursively create all
+    # parent folders on a file-system, and otherwise materialize the prefix in
+    # an object store.
+    touch _TEMP
+    gsutil cp _TEMP "${dest}/_TEMP"
+
+    # NOTE: this deletes files on the recieving end
+    gsutil -m rsync -d -r "${src}/" "${dest}/"
     touch _SUCCESS
     gsutil cp _SUCCESS "${dest}"
 }
 
-function config_keys() {
-    : "${DATA_CONFIG?}"
-    jq -r 'keys | join("\n")' "${DATA_CONFIG}"
-}
-
-function config_get() {
-    : "${DATA_CONFIG?}"
-    local key=$1
-    jq -r ".\"${key}\"" "${DATA_CONFIG}"
-}
-
-function generate_data() {
-    local n_data=$1
-    python -c "import json; print(
-        json.dumps({
-            'payload': [int(x % 3 == 0 or x % 5 == 0) for x in range(${n_data})]
-        })
-    )"
-}
-
 function generate_dataset() {
-    local batch_id=$1
-    local n_data
-    n_data=$(config_get "$batch_id")
-    if [[ $n_data == "null" ]]; then
-        echo "unknown dimensions for ${batch_id}"
-        n_data=10
-    fi
-
-    local date
-    date=$(date +%Y-%m-%d)
-
-    local out_a="server_a/raw/submission_date=${date}/batch_id=${batch_id}"
-    local out_b="server_b/raw/submission_date=${date}/batch_id=${batch_id}"
-    mkdir -p "${out_a}"
-    mkdir -p "${out_b}"
-
-    for i in {1..5}; do
-        filename="${batch_id}-part-$i.json"
-        set +x
-        for ((j = 0; j < i; j++)); do
-            generate_data "${n_data} " >>"${filename}"
-        done
-        set -x
-        prio encode-shares \
-            --input "${filename}" \
-            --batch-id "${batch_id}" \
-            --n-data "${n_data}" \
-            --output-A "${out_a}" \
-            --output-B "${out_b}"
-
-        # test for robustness by inserting an invalid entry into the shares
-        set +x
-        echo '{"id": "asdf", "payload": "asdf"}' >>"${out_a}/${filename}"
-        echo '{"id": "asdf", "payload": "asdf"}' >>"${out_b}/${filename}"
-        set -x
-    done
+    local submission_date=$1
+    local output=$2
+    local bootstrap
+    bootstrap=$(mktemp -d -t bootstrap-XXX)
+    source "${BASH_SOURCE%/*}/dataproc"
+    SUBMODULE="spark" bootstrap "${bootstrap}"
+    spark-submit \
+        --py-files "${bootstrap}/prio_processor.egg" \
+        "${bootstrap}/processor-spark.py" \
+        generate-integration \
+        --submission-date "${submission_date}" \
+        --output "${output}"
 }
 
 function main() {
     "${BASH_SOURCE%/*}/authenticate"
-    gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
-    gsutil ls "${BUCKET_EXTERNAL_PRIVATE}"
-    cd /tmp
 
-    export DATA_CONFIG      # used by config_get
-    export -f config_get    # used by generate_dataset
-    export -f generate_data # used by generate_dataset
-    export -f generate_dataset
-    parallel generate_dataset ::: "$(config_keys)"
+    output="$(mktemp -d -t generate-XXX)"
+    generate_dataset "${SUBMISSION_DATE}" "${output}"
 
-    # also generate a batch-id with unknown dimensions
-    generate_dataset "bad-id"
+    local generate_prefix="submission_date=${SUBMISSION_DATE}"
+    local output_prefix="raw"
 
-    rsync a "${BUCKET_INTERNAL_PRIVATE}"
-    rsync b "${BUCKET_EXTERNAL_PRIVATE}"
+    rsync_to_servers \
+        "${output}/${generate_prefix}/server_id=a" \
+        "${BUCKET_INTERNAL_PRIVATE}/${output_prefix}"
+
+    rsync_to_servers \
+        "${output}/${generate_prefix}/server_id=b" \
+        "${BUCKET_EXTERNAL_PRIVATE}/${output_prefix}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
