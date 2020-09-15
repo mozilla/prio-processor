@@ -61,6 +61,77 @@ def server_b_args(root):
     ]
 
 
+def test_generate_integration(spark, tmp_path, root):
+    """Reference of the directory structure.
+
+        /tmp/pytest-of-machine/pytest-0/test_generate_integration0
+    ├── [   0]  _SUCCESS
+    └── [4.0K]  submission_date=2020-0-15
+        ├── [4.0K]  server_id=a
+        │   ├── [4.0K]  batch_id=bad-id
+        │   │   └── [ 65K]  part-00000-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+        │   ├── [4.0K]  batch_id=test-0
+        │   │   ├── [ 30K]  part-00000-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+        │   │   └── [ 36K]  part-00001-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+        │   └── [4.0K]  batch_id=test-1
+        │       └── [107K]  part-00001-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+        └── [4.0K]  server_id=b
+            ├── [4.0K]  batch_id=bad-id
+            │   └── [ 26K]  part-00000-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+            ├── [4.0K]  batch_id=test-0
+            │   ├── [ 12K]  part-00000-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+            │   └── [ 15K]  part-00001-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+            └── [4.0K]  batch_id=test-1
+                └── [ 27K]  part-00001-1c0d52c3-6866-4c5a-b118-ad79b0f20852.c000.json
+    """
+
+    server_a_keys = json.loads((root / "server_a_keys.json").read_text())
+    server_b_keys = json.loads((root / "server_b_keys.json").read_text())
+    output = tmp_path
+
+    project_root = Path(__file__).parent.parent
+    config_path = project_root / "config" / "test-small.json"
+    test_date = "2020-0-15"
+    n_rows = 100
+    result = CliRunner().invoke(
+        commands.generate_integration,
+        [
+            "--submission-date",
+            test_date,
+            "--config",
+            str(config_path),
+            "--public-key-hex-internal",
+            server_a_keys["public_key"],
+            "--public-key-hex-external",
+            server_a_keys["public_key"],
+            "--output",
+            str(output),
+            "--n-rows",
+            n_rows,
+            "--n-partitions",
+            2,
+        ],
+    )
+    assert result.exit_code == 0, result.stdout_bytes
+
+    # assert the directory structure
+    date_dir = output / f"submission_date={test_date}"
+    server_a_dir = date_dir / "server_id=a"
+    server_b_dir = date_dir / "server_id=b"
+    assert date_dir.exists()
+    assert server_a_dir.exists()
+    assert server_b_dir.exists()
+    assert (server_a_dir / "batch_id=bad-id").exists() and (
+        server_b_dir / "batch_id=bad-id"
+    ).exists()
+
+    # assert that there are 100 rows
+    spark.read.json(str(server_a_dir / "batch_id=bad-id")).count() == n_rows
+    spark.read.json(str(server_b_dir / "batch_id=bad-id")).count() == n_rows
+    # assert size of normal batch
+    spark.read.json(str(server_a_dir / "batch_id=test-0")).count() == n_rows
+
+
 def test_verify1(spark, tmp_path, root, server_a_args):
     output = tmp_path / "output"
     result = CliRunner().invoke(

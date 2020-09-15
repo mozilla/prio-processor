@@ -117,7 +117,10 @@ def generate(
 @public_key
 @output_1
 @click.option(
-    "--n-rows", type=int, default=5, help="Number of rows to generate per batch."
+    "--n-rows", type=int, default=100, help="Number of rows to generate per batch."
+)
+@click.option(
+    "--n-partitions", type=int, default=2, help="Number of partitions for each batch."
 )
 def generate_integration(
     submission_date,
@@ -126,12 +129,14 @@ def generate_integration(
     public_key_hex_external,
     output,
     n_rows,
+    n_partitions,
 ):
     """Generate test data from a configuration file.
 
     The data is generated in a deterministic way and fits into memory."""
     spark = spark_session()
 
+    assert n_rows > 0
     config_data = spark.read.json(config, multiLine=True)
 
     def generate_data(batch_id, n_data):
@@ -145,7 +150,7 @@ def generate_integration(
     for conf in config_data.collect():
         batch_id = conf["batch_id"]
         n_data = conf["n_data"]
-        test_data += [generate_data(batch_id, n_data) for _ in range(n_rows)]
+        test_data += [generate_data(batch_id, n_data) for _ in range(n_rows - 1)]
         # include invalid data for a batch
         test_data += [generate_data(batch_id, n_data + 1)]
     # include unknown batch id
@@ -173,7 +178,7 @@ def generate_integration(
                 F.array(F.lit("a"), F.lit("b")), F.array("shares.a", "shares.b")
             ),
         )
-        .repartitionByRange(2, "batch_id", "id")
+        .repartitionByRange(n_partitions, "batch_id", "id")
         .select(
             F.lit(submission_date).alias("submission_date"),
             "batch_id",
