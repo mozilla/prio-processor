@@ -37,6 +37,14 @@ RUN python3 -m ensurepip && \
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
+# Install libraries for interacting with cloud storage.
+# NOTE: this is only necessary when running outside of dataproc to use GCS
+# directly. A similar approach would need to be done to acommodate s3a. This
+# may be more appropriate to add to the image build instead of fetching at
+# runtime.
+# https://cloud.google.com/dataproc/docs/concepts/connectors/cloud-storage
+RUN gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop2-latest.jar "${SPARK_HOME}/jars"
+
 ADD . /app
 # build the binary egg for distribution on Spark clusters
 RUN python3 setup.py bdist_egg && pip3 install -e .
@@ -47,6 +55,3 @@ CMD pytest -v tests && \
         scripts/test-cli-integration && \
         prio --help && \
         prio-processor --help
-
-# References
-# https://docs.docker.com/develop/develop-images/multistage-build/
