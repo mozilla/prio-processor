@@ -153,7 +153,7 @@ def generate_integration(
         n_data = conf["n_data"]
         test_data += [generate_data(batch_id, n_data) for _ in range(n_rows - 1)]
         # include invalid data for a batch
-        test_data += [generate_data(batch_id, n_data + 1)]
+        # test_data += [generate_data(batch_id, n_data + 1)]
     # include unknown batch id
     test_data += [generate_data("bad-id", 10) for _ in range(n_rows)]
 
