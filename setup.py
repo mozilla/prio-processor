@@ -17,7 +17,6 @@ setup(
     },
     install_requires=[
         "click",
-        "gcsfs == 0.2.3",
         "pyspark[sql] >= 3.0.0",
         "jsonschema",
         "prio >= 1.1",
