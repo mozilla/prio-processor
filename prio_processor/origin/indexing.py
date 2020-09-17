@@ -52,7 +52,7 @@ def transform(aggregates, config, origins):
         list of structures containing the aggregate value and its metadata."""
 
         # assumption: hyphens are used to define a partition of origins
-        if batch_id not in config:
+        if batch_id not in [d["batch_id"] for d in config]:
             return []
 
         # currently all batch-ids contain a single hyphen with 2 parts
@@ -66,7 +66,8 @@ def transform(aggregates, config, origins):
             offset = 0
         elif part_num == 1:
             # pick up where the last part left off
-            offset = config[f"{batch_id}-0"]
+            d = [d for d in config if d["batch_id"] == f"{batch_id}-0"][0]
+            offset = d["n_data"]
         else:
             # Hard-fail, this code path should not occur if the config file is
             # being properly maintained.
@@ -80,7 +81,7 @@ def transform(aggregates, config, origins):
 
     return aggregates.withColumn(
         "indexed", explode(_apply_structure("batch_id", "payload"))
-    ).select("submission_date", "id", "timestamp", "indexed.*")
+    ).select("id", "timestamp", "indexed.*")
 
 
 def load(df, output):
