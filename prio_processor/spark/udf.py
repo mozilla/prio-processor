@@ -23,7 +23,10 @@ def encode_single(
     config = libprio.PrioConfig_new(
         n_data, public_key_internal, public_key_external, batch_id.encode()
     )
-    a, b = libprio.PrioClient_encode(config, bytes(list(map(int, payload))))
+    try:
+        a, b = libprio.PrioClient_encode(config, bytes(list(map(int, payload))))
+    except:
+        a, b = None, None
     libprio.Prio_clear()
     return dict(a=a, b=b)
 
@@ -45,7 +48,10 @@ def encode(
     results = []
     for data in payload:
         # trying to encode the integer into a bit array
-        a, b = libprio.PrioClient_encode(config, bytes(list(map(int, data))))
+        try:
+            a, b = libprio.PrioClient_encode(config, bytes(list(map(int, data))))
+        except:
+            a, b = None, None
         results.append(dict(a=a, b=b))
     libprio.Prio_clear()
     return pd.DataFrame(results)
@@ -79,12 +85,16 @@ def verify1(
         server = libprio.PrioServer_new(
             config, match_server(server_id), private_key, shared_secret
         )
-        verifier = libprio.PrioVerifier_new(server)
-        packet = libprio.PrioPacketVerify1_new()
-        # share is actually a bytearray, so convert it into bytes
-        libprio.PrioVerifier_set_data(verifier, bytes(share))
-        libprio.PrioPacketVerify1_set_data(packet, verifier)
-        return libprio.PrioPacketVerify1_write(packet)
+        try:
+            verifier = libprio.PrioVerifier_new(server)
+            packet = libprio.PrioPacketVerify1_new()
+            # share is actually a bytearray, so convert it into bytes
+            libprio.PrioVerifier_set_data(verifier, bytes(share))
+            libprio.PrioPacketVerify1_set_data(packet, verifier)
+            data = libprio.PrioPacketVerify1_write(packet)
+        except:
+            data = None
+        return data
 
     results = [_process(share) for share in shares]
     libprio.Prio_clear()
@@ -116,19 +126,23 @@ def verify2(
         server = libprio.PrioServer_new(
             config, match_server(server_id), private_key, shared_secret
         )
-        verifier = libprio.PrioVerifier_new(server)
+        try:
+            verifier = libprio.PrioVerifier_new(server)
 
-        packet1_internal = libprio.PrioPacketVerify1_new()
-        packet1_external = libprio.PrioPacketVerify1_new()
-        packet = libprio.PrioPacketVerify2_new()
+            packet1_internal = libprio.PrioPacketVerify1_new()
+            packet1_external = libprio.PrioPacketVerify1_new()
+            packet = libprio.PrioPacketVerify2_new()
 
-        libprio.PrioVerifier_set_data(verifier, bytes(share))
-        libprio.PrioPacketVerify1_read(packet1_internal, bytes(internal), config)
-        libprio.PrioPacketVerify1_read(packet1_external, bytes(external), config)
-        libprio.PrioPacketVerify2_set_data(
-            packet, verifier, packet1_internal, packet1_external
-        )
-        return libprio.PrioPacketVerify2_write(packet)
+            libprio.PrioVerifier_set_data(verifier, bytes(share))
+            libprio.PrioPacketVerify1_read(packet1_internal, bytes(internal), config)
+            libprio.PrioPacketVerify1_read(packet1_external, bytes(external), config)
+            libprio.PrioPacketVerify2_set_data(
+                packet, verifier, packet1_internal, packet1_external
+            )
+            data = libprio.PrioPacketVerify2_write(packet)
+        except:
+            data = None
+        return data
 
     results = [_process(share, x, y) for share, x, y in zip(shares, internal, external)]
     libprio.Prio_clear()
