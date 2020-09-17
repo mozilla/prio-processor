@@ -46,6 +46,10 @@ ENV PYSPARK_PYTHON=python3
 RUN gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop2-latest.jar "${SPARK_HOME}/jars"
 
 ADD . /app
+
+# Symlink the spark config into SPARK_HOME so it can be updated via volume mounts
+RUN ln -s /app/config/spark ${SPARK_HOME}/conf
+
 # build the binary egg for distribution on Spark clusters
 RUN python3 setup.py bdist_egg && pip3 install -e .
 RUN chown -R app:app /app

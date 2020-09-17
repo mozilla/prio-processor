@@ -1,0 +1,2 @@
+Configuration under config/spark is derived from the Apache Spark project
+(https://github.com/apache/spark/tree/v3.0.1/conf).

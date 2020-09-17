@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Install the Spark configuration from this repository into the Spark home
+# directory of the active pyspark installation. It's strongly encouraged that
+# Spark is installed via pip in a virtual environment if this script is used
+# on a local machine.
+set -e
+
+# Find the directory of spark from the active python packages
+SPARK_HOME=$(python -c "import pyspark; print(pyspark.__path__[0])")
+cp -r config/spark "${SPARK_HOME}/conf"
