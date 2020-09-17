@@ -24,7 +24,9 @@ services:
       - BUCKET_INTERNAL_PRIVATE=gs://moz-fx-prio-dev-a-private
       - BUCKET_INTERNAL_SHARED=gs://moz-fx-prio-dev-a-shared
       - BUCKET_EXTERNAL_SHARED=gs://moz-fx-prio-dev-b-shared
+      - BUCKET_PREFIX=test-data/v1
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
+      - SUBMISSION_DATE
   server_b:
     build:
       context: .
@@ -42,7 +44,9 @@ services:
       - BUCKET_INTERNAL_PRIVATE=gs://moz-fx-prio-dev-b-private
       - BUCKET_INTERNAL_SHARED=gs://moz-fx-prio-dev-b-shared
       - BUCKET_EXTERNAL_SHARED=gs://moz-fx-prio-dev-a-shared
+      - BUCKET_PREFIX=test-data/v1
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
+      - SUBMISSION_DATE
   admin:
     build:
       context: .
@@ -57,9 +61,11 @@ services:
       - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
       - BUCKET_INTERNAL_PRIVATE=gs://moz-fx-prio-dev-a-private
       - BUCKET_EXTERNAL_PRIVATE=gs://moz-fx-prio-dev-b-private
+      - BUCKET_PREFIX=test-data/v1
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
       - DATASET=telemetry
       - TABLE=content_blocking_dev
       - BQ_REPLACE=true
       # Set the default project for inserting rows
       - CLOUDSDK_CORE_PROJECT
+      - SUBMISSION_DATE

@@ -12,6 +12,7 @@ set -x
 
 today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isoformat()[:10])")
 : "${SUBMISSION_DATE:=${today}}"
+: "${BUCKET_PREFIX:=test-data/v1}"
 : "${DATA_CONFIG?}"
 : "${PUBLIC_KEY_HEX_INTERNAL?}"
 : "${PUBLIC_KEY_HEX_EXTERNAL?}"
@@ -36,8 +37,7 @@ function rsync_delete() {
 }
 
 function generate_dataset() {
-    local submission_date=$1
-    local output=$2
+    local output=$1
     local bootstrap
     bootstrap=$(mktemp -d -t bootstrap-XXX)
     source "${BASH_SOURCE%/*}/dataproc"
@@ -46,7 +46,6 @@ function generate_dataset() {
         --py-files "${bootstrap}/prio_processor.egg" \
         "${bootstrap}/processor-spark.py" \
         generate-integration \
-        --submission-date "${submission_date}" \
         --output "${output}"
 }
 
@@ -54,18 +53,16 @@ function main() {
     "${BASH_SOURCE%/*}/authenticate"
 
     output="$(mktemp -d -t generate-XXX)"
-    generate_dataset "${SUBMISSION_DATE}" "${output}"
+    generate_dataset "${output}"
 
-    local generate_prefix="submission_date=${SUBMISSION_DATE}"
-    local output_prefix="raw"
+    # The public key of the partner server is used as a prefix
+    rsync_delete \
+        "${output}/server_id=a" \
+        "${BUCKET_INTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${SUBMISSION_DATE}/raw/shares"
 
     rsync_delete \
-        "${output}/${generate_prefix}/server_id=a" \
-        "${BUCKET_INTERNAL_PRIVATE}/${output_prefix}"
-
-    rsync_delete \
-        "${output}/${generate_prefix}/server_id=b" \
-        "${BUCKET_EXTERNAL_PRIVATE}/${output_prefix}"
+        "${output}/server_id=b" \
+        "${BUCKET_EXTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${SUBMISSION_DATE}/raw/shares"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

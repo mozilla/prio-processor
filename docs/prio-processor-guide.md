@@ -151,6 +151,8 @@ docker pull mozilla/prio-processor:latest
 | `BUCKET_INTERNAL_PRIVATE`        | The bucket containing data that is viewable by the processor alone.              |
 | `BUCKET_INTERNAL_SHARED`         | The bucket containing data from the processor's previous stage.                  |
 | `BUCKET_EXTERNAL_SHARED`         | The bucket containing incoming data from the co-processor's previous stage.      |
+| `BUCKET_PREFIX`                  | The bucket prefix for storing data. Defaults to `data/v1`                        |
+| `SUBMISSION_DATE`                | The date of data being processed. Defaults to today's date in ISO8601.           |
 | `GOOGLE_APPLICATION_CREDENTIALS` | The path on the container filesystem containing GCP service account credentials. |
 | `RETRY_LIMIT`                    | The number of retry attempts for fetching shared data.                           |
 | `RETRY_DELAY`                    | The number of seconds to wait before retrying.                                   |

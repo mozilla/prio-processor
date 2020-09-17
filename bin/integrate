@@ -6,21 +6,23 @@
 
 set -euo pipefail
 
+today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isoformat()[:10])")
+export SUBMISSION_DATE=$today
 export DATA_CONFIG=${DATA_CONFIG:-/app/config/test-small.json}
 docker-compose up -d
 
 # Copy data into the appropriate buckets
-docker-compose run -e DATA_CONFIG admin bin/generate
+docker-compose run -e DATA_CONFIG -e SUBMISSION_DATE admin bin/generate
 
 # Start server A
-docker-compose run -e DATA_CONFIG server_a bin/process &
+docker-compose run -e DATA_CONFIG -e SUBMISSION_DATE server_a bin/process &
 server_a_pid=$!
 
 # offset the start times by a short amount for proper authentication against GCP
 sleep 2
 
 # Start server B
-docker-compose run -e DATA_CONFIG server_b bin/process &
+docker-compose run -e DATA_CONFIG -e SUBMISSION_DATE server_b bin/process &
 server_b_pid=$!
 
 # Return the exit code of the backgrounded docker-compose container. Since
@@ -29,4 +31,4 @@ server_b_pid=$!
 wait $server_a_pid
 wait $server_b_pid
 
-docker-compose run -e DATA_CONFIG admin bin/insert
+docker-compose run -e DATA_CONFIG -e SUBMISSION_DATE admin bin/insert
