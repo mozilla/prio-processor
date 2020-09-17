@@ -108,7 +108,6 @@ def generate(
 
 
 @entry_point.command()
-@click.option("--submission-date", default=datetime.utcnow().isoformat()[:10])
 @click.option(
     "--data-config",
     envvar="DATA_CONFIG",
@@ -124,7 +123,6 @@ def generate(
     "--n-partitions", type=int, default=2, help="Number of partitions for each batch."
 )
 def generate_integration(
-    submission_date,
     data_config,
     public_key_hex_internal,
     public_key_hex_external,
@@ -181,13 +179,12 @@ def generate_integration(
         )
         .repartitionByRange(n_partitions, "batch_id", "id")
         .select(
-            F.lit(submission_date).alias("submission_date"),
             "batch_id",
             "id",
             F.explode("shares").alias("server_id", "payload"),
         )
     )
-    repartitioned.write.partitionBy("submission_date", "server_id", "batch_id").json(
+    repartitioned.write.partitionBy("server_id", "batch_id").json(
         output, mode="overwrite"
     )
 
