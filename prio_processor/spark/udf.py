@@ -85,9 +85,9 @@ def verify1(
         server = libprio.PrioServer_new(
             config, match_server(server_id), private_key, shared_secret
         )
+        verifier = libprio.PrioVerifier_new(server)
+        packet = libprio.PrioPacketVerify1_new()
         try:
-            verifier = libprio.PrioVerifier_new(server)
-            packet = libprio.PrioPacketVerify1_new()
             # share is actually a bytearray, so convert it into bytes
             libprio.PrioVerifier_set_data(verifier, bytes(share))
             libprio.PrioPacketVerify1_set_data(packet, verifier)
@@ -126,13 +126,12 @@ def verify2(
         server = libprio.PrioServer_new(
             config, match_server(server_id), private_key, shared_secret
         )
+        verifier = libprio.PrioVerifier_new(server)
+
+        packet1_internal = libprio.PrioPacketVerify1_new()
+        packet1_external = libprio.PrioPacketVerify1_new()
+        packet = libprio.PrioPacketVerify2_new()
         try:
-            verifier = libprio.PrioVerifier_new(server)
-
-            packet1_internal = libprio.PrioPacketVerify1_new()
-            packet1_external = libprio.PrioPacketVerify1_new()
-            packet = libprio.PrioPacketVerify2_new()
-
             libprio.PrioVerifier_set_data(verifier, bytes(share))
             libprio.PrioPacketVerify1_read(packet1_internal, bytes(internal), config)
             libprio.PrioPacketVerify1_read(packet1_external, bytes(external), config)
@@ -192,7 +191,7 @@ def aggregate(
             libprio.PrioPacketVerify2_read(packet2_external, external, config)
             libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
             libprio.PrioServer_aggregate(server, verifier)
-        except RuntimeError as e:
+        except Exception as e:
             error += 1
             error_counter.update([f"server {server_id}: {e}"])
     logger.warning(error_counter)

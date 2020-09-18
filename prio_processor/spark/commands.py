@@ -151,7 +151,7 @@ def generate_integration(
         n_data = conf["n_data"]
         test_data += [generate_data(batch_id, n_data) for _ in range(n_rows - 1)]
         # include invalid data for a batch
-        # test_data += [generate_data(batch_id, n_data + 1)]
+        test_data += [generate_data(batch_id, n_data + 1)]
     # include unknown batch id
     test_data += [generate_data("bad-id", 10) for _ in range(n_rows)]
 
@@ -258,28 +258,25 @@ def verify1(
     click.echo("Running verify1")
     spark = spark_session()
 
-    (
-        spark.read.json(input)
-        .select(
-            "id",
-            F.base64(
-                F.pandas_udf(
-                    partial(
-                        udf.verify1,
-                        batch_id,
-                        n_data,
-                        server_id,
-                        private_key_hex,
-                        b64decode(shared_secret),
-                        public_key_hex_internal,
-                        public_key_hex_external,
-                    ),
-                    returnType="binary",
-                )(F.unbase64("payload"))
-            ).alias("payload"),
-        )
-        .write.json(output, mode="overwrite")
+    df = spark.read.json(input).select(
+        "id",
+        F.pandas_udf(
+            partial(
+                udf.verify1,
+                batch_id,
+                n_data,
+                server_id,
+                private_key_hex,
+                b64decode(shared_secret),
+                public_key_hex_internal,
+                public_key_hex_external,
+            ),
+            returnType="binary",
+        )(F.unbase64("payload")).alias("payload"),
     )
+    valid = df.where("payload is not null")
+    # NOTE: invalid set can be written out, but maybe require work to be done twice
+    valid.write.json(output, mode="overwrite")
 
 
 @entry_point.command()
@@ -308,30 +305,29 @@ def verify2(
     shares = spark.read.json(input)
     internal = spark.read.json(input_internal)
     external = spark.read.json(input_external)
-    (
+    df = (
         shares.select("id", F.unbase64("payload").alias("shares"))
         .join(internal.select("id", F.unbase64("payload").alias("internal")), on="id")
         .join(external.select("id", F.unbase64("payload").alias("external")), on="id")
         .select(
             "id",
-            F.base64(
-                F.pandas_udf(
-                    partial(
-                        udf.verify2,
-                        batch_id,
-                        n_data,
-                        server_id,
-                        private_key_hex,
-                        b64decode(shared_secret),
-                        public_key_hex_internal,
-                        public_key_hex_external,
-                    ),
-                    returnType="binary",
-                )("shares", "internal", "external")
-            ).alias("payload"),
+            F.pandas_udf(
+                partial(
+                    udf.verify2,
+                    batch_id,
+                    n_data,
+                    server_id,
+                    private_key_hex,
+                    b64decode(shared_secret),
+                    public_key_hex_internal,
+                    public_key_hex_external,
+                ),
+                returnType="binary",
+            )("shares", "internal", "external").alias("payload"),
         )
-        .write.json(output, mode="overwrite")
     )
+    valid = df.where("payload is not null")
+    valid.write.json(output, mode="overwrite")
 
 
 @entry_point.command()
