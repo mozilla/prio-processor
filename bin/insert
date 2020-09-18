@@ -9,6 +9,7 @@ set -euo pipefail
 set -x
 
 today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isoformat()[:10])")
+: "${APP_NAME?}"
 : "${SUBMISSION_DATE:=${today}}"
 : "${BUCKET_PREFIX:=data/v1}"
 # assumes that data is stored according to convention set in process
@@ -72,7 +73,7 @@ function main() {
 
     "${BASH_SOURCE%/*}/authenticate"
 
-    prefix=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${SUBMISSION_DATE}
+    prefix=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}
     gsutil -m cp -r "${BUCKET_INTERNAL_PRIVATE}/${prefix}/processed/publish" "${data_in}"
     index "${data_in}" "${data_out}"
 

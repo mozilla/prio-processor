@@ -15,6 +15,7 @@ services:
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS_A?"missing credentials"}:/tmp/.credentials
     environment:
+      - APP_NAME=test-app
       - DATA_CONFIG=/app/config/content.json
       - SERVER_ID=A
       - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
@@ -35,6 +36,7 @@ services:
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS_B?"missing credentials"}:/tmp/.credentials
     environment:
+      - APP_NAME=test-app
       - DATA_CONFIG=/app/config/content.json
       - SERVER_ID=B
       - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
@@ -55,6 +57,7 @@ services:
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS_ADMIN?"missing credentials"}:/tmp/.credentials
     environment:
+      - APP_NAME=test-app
       - DATA_CONFIG=/app/config/content.json
       - ORIGIN_CONFIG=/app/config/telemetry_origin_data_inc.json
       - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628

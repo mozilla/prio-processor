@@ -11,6 +11,7 @@ set -euo pipefail
 set -x
 
 today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isoformat()[:10])")
+: "${APP_NAME?}"
 : "${SUBMISSION_DATE:=${today}}"
 : "${BUCKET_PREFIX:=test-data/v1}"
 : "${DATA_CONFIG?}"
@@ -58,11 +59,11 @@ function main() {
     # The public key of the partner server is used as a prefix
     rsync_delete \
         "${output}/server_id=a" \
-        "${BUCKET_INTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${SUBMISSION_DATE}/raw/shares"
+        "${BUCKET_INTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
 
     rsync_delete \
         "${output}/server_id=b" \
-        "${BUCKET_EXTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${SUBMISSION_DATE}/raw/shares"
+        "${BUCKET_EXTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

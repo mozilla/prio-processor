@@ -23,6 +23,7 @@ export DATA_CONFIG=${DATA_CONFIG?}
 # Variables in the following block do not need to be re-exported.
 
 # Error if variables are unset.
+: "${APP_NAME?}"
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
 : "${BUCKET_EXTERNAL_SHARED?}"
@@ -37,14 +38,15 @@ today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isofo
 : "${RETRY_BACKOFF_EXPONENT:=2}"
 
 # Derived prefix for convenience
-INTERNAL_PREFIX=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${SUBMISSION_DATE}
-EXTERNAL_PREFIX=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${SUBMISSION_DATE}
+INTERNAL_PREFIX=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}
+EXTERNAL_PREFIX=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${APP_NAME}/${SUBMISSION_DATE}
 
 # Global variables pointing for managing Spark
 BOOTSTRAP_BUCKET=${BOOTSTRAP_BUCKET:-$(mktemp -d -t bootstrap-XXX)}
 
 function spark_submit() {
     spark-submit \
+        --name "${APP_NAME}" \
         --py-files "${BOOTSTRAP_BUCKET}/prio_processor.egg" \
         "${BOOTSTRAP_BUCKET}/processor-spark.py" \
         "$@"
