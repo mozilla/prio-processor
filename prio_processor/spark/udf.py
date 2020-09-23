@@ -91,10 +91,10 @@ def verify1(
             # share is actually a bytearray, so convert it into bytes
             libprio.PrioVerifier_set_data(verifier, bytes(share))
             libprio.PrioPacketVerify1_set_data(packet, verifier)
-            data = libprio.PrioPacketVerify1_write(packet)
+            return libprio.PrioPacketVerify1_write(packet)
         except:
-            data = None
-        return data
+            pass
+        return None
 
     results = [_process(share) for share in shares]
     libprio.Prio_clear()
@@ -138,10 +138,10 @@ def verify2(
             libprio.PrioPacketVerify2_set_data(
                 packet, verifier, packet1_internal, packet1_external
             )
-            data = libprio.PrioPacketVerify2_write(packet)
+            return libprio.PrioPacketVerify2_write(packet)
         except:
-            data = None
-        return data
+            pass
+        return None
 
     results = [_process(share, x, y) for share, x, y in zip(shares, internal, external)]
     libprio.Prio_clear()

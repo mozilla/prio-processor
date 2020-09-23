@@ -36,12 +36,7 @@ def test_origins_dict(origins_dict):
 
 def test_config(config):
     batch_id = "content.blocking_blocked-{index}"
-    part_0 = [d["n_data"] for d in config if d["batch_id"] == batch_id.format(index=0)][
-        0
-    ]
-    part_1 = [d["n_data"] for d in config if d["batch_id"] == batch_id.format(index=1)][
-        0
-    ]
+    (part_0, part_1) = [[d["n_data"] for d in config if d["batch_id"] == batch_id.format(index=i)][i] for i in (1, 2)]
     assert part_0 == 2046
     assert part_1 == 441
 
