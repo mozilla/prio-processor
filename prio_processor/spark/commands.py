@@ -20,6 +20,8 @@ from prio_processor.spark import udf
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
+ROOT = Path(__file__).parent.parent.parent
+
 
 def spark_session():
     spark = SparkSession.builder.getOrCreate()
@@ -106,6 +108,88 @@ def generate(
 
 
 @entry_point.command()
+@click.option(
+    "--data-config",
+    envvar="DATA_CONFIG",
+    type=click.Path(dir_okay=False, exists=True),
+    default=str(ROOT / "config" / "test-small.json"),
+)
+@public_key
+@output_1
+@click.option(
+    "--n-rows", type=int, default=100, help="Number of rows to generate per batch."
+)
+@click.option(
+    "--n-partitions", type=int, default=2, help="Number of partitions for each batch."
+)
+def generate_integration(
+    data_config,
+    public_key_hex_internal,
+    public_key_hex_external,
+    output,
+    n_rows,
+    n_partitions,
+):
+    """Generate test data from a configuration file.
+
+    The data is generated in a deterministic way and fits into memory."""
+    spark = spark_session()
+
+    assert n_rows > 0
+    config_data = spark.read.json(data_config, multiLine=True)
+
+    def generate_data(batch_id, n_data):
+        return dict(
+            batch_id=batch_id,
+            n_data=n_data,
+            payload=[int(x % 3 == 0 or x % 5 == 0) for x in range(n_data)],
+        )
+
+    test_data = []
+    for conf in config_data.collect():
+        batch_id = conf["batch_id"]
+        n_data = conf["n_data"]
+        test_data += [generate_data(batch_id, n_data) for _ in range(n_rows - 1)]
+        # include invalid data for a batch
+        test_data += [generate_data(batch_id, n_data + 1)]
+    # include unknown batch id
+    test_data += [generate_data("bad-id", 10) for _ in range(n_rows)]
+
+    shares = (
+        spark.createDataFrame(test_data)
+        .select(
+            "batch_id",
+            F.udf(udf.encode_single, returnType="a: binary, b: binary")(
+                "batch_id",
+                "n_data",
+                F.lit(public_key_hex_internal),
+                F.lit(public_key_hex_external),
+                "payload",
+            ).alias("shares"),
+        )
+        .withColumn("id", F.udf(lambda: str(uuid4()), returnType="string")())
+    )
+
+    repartitioned = (
+        shares.withColumn(
+            "shares",
+            F.map_from_arrays(
+                F.array(F.lit("a"), F.lit("b")), F.array("shares.a", "shares.b")
+            ),
+        )
+        .repartitionByRange(n_partitions, "batch_id", "id")
+        .select(
+            "batch_id",
+            "id",
+            F.explode("shares").alias("server_id", "payload"),
+        )
+    )
+    repartitioned.write.partitionBy("server_id", "batch_id").json(
+        output, mode="overwrite"
+    )
+
+
+@entry_point.command()
 @data_config
 @public_key
 @input_1
@@ -174,28 +258,25 @@ def verify1(
     click.echo("Running verify1")
     spark = spark_session()
 
-    (
-        spark.read.json(input)
-        .select(
-            "id",
-            F.base64(
-                F.pandas_udf(
-                    partial(
-                        udf.verify1,
-                        batch_id,
-                        n_data,
-                        server_id,
-                        private_key_hex,
-                        b64decode(shared_secret),
-                        public_key_hex_internal,
-                        public_key_hex_external,
-                    ),
-                    returnType="binary",
-                )(F.unbase64("payload"))
-            ).alias("payload"),
-        )
-        .write.json(output, mode="overwrite")
+    df = spark.read.json(input).select(
+        "id",
+        F.pandas_udf(
+            partial(
+                udf.verify1,
+                batch_id,
+                n_data,
+                server_id,
+                private_key_hex,
+                b64decode(shared_secret),
+                public_key_hex_internal,
+                public_key_hex_external,
+            ),
+            returnType="binary",
+        )(F.unbase64("payload")).alias("payload"),
     )
+    valid = df.where("payload is not null")
+    # NOTE: invalid set can be written out, but maybe require work to be done twice
+    valid.write.json(output, mode="overwrite")
 
 
 @entry_point.command()
@@ -224,30 +305,29 @@ def verify2(
     shares = spark.read.json(input)
     internal = spark.read.json(input_internal)
     external = spark.read.json(input_external)
-    (
+    df = (
         shares.select("id", F.unbase64("payload").alias("shares"))
         .join(internal.select("id", F.unbase64("payload").alias("internal")), on="id")
         .join(external.select("id", F.unbase64("payload").alias("external")), on="id")
         .select(
             "id",
-            F.base64(
-                F.pandas_udf(
-                    partial(
-                        udf.verify2,
-                        batch_id,
-                        n_data,
-                        server_id,
-                        private_key_hex,
-                        b64decode(shared_secret),
-                        public_key_hex_internal,
-                        public_key_hex_external,
-                    ),
-                    returnType="binary",
-                )("shares", "internal", "external")
-            ).alias("payload"),
+            F.pandas_udf(
+                partial(
+                    udf.verify2,
+                    batch_id,
+                    n_data,
+                    server_id,
+                    private_key_hex,
+                    b64decode(shared_secret),
+                    public_key_hex_internal,
+                    public_key_hex_external,
+                ),
+                returnType="binary",
+            )("shares", "internal", "external").alias("payload"),
         )
-        .write.json(output, mode="overwrite")
     )
+    valid = df.where("payload is not null")
+    valid.write.json(output, mode="overwrite")
 
 
 @entry_point.command()

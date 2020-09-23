@@ -77,6 +77,30 @@ def test_encode(spark, root, args):
     )
 
 
+def test_encode_bad_data(spark, root, args):
+    # 2 good fields and 1 bad field
+    data = [{"payload": [1 for _ in range(args.n_data)]} for _ in range(2)] + [
+        {"payload": [-1 for _ in range(args.n_data + 1)]}
+    ]
+    df = spark.createDataFrame(data)
+    df.show()
+    transformed = df.select(
+        F.pandas_udf(
+            partial(
+                udf.encode,
+                args.batch_id,
+                args.n_data,
+                args.public_key_hex_internal,
+                args.public_key_hex_external,
+            ),
+            returnType="a: binary, b: binary",
+        )("payload").alias("shares")
+    ).select(F.base64("shares.a").alias("a"), F.base64("shares.b").alias("b"))
+    transformed.show()
+    assert transformed.where("a IS NOT NULL").count() == 2
+    assert transformed.where("a IS NULL").count() == 1
+
+
 def test_verify1(spark, root, args):
     df = spark.read.json(str(root / "server_a" / "raw"))
     df.show(vertical=True, truncate=100)
@@ -113,6 +137,34 @@ def test_verify1(spark, root, args):
     # partition. However, the UDF approach will generate a new server context
     # for every row.
     assert joined.where("length(expected_payload) <> length(payload)").count() == 0
+
+
+def test_verify1_bad_data(spark, root, args):
+    # we can use server b's data
+    a = spark.read.json(str(root / "server_a" / "raw"))
+    b = spark.read.json(str(root / "server_b" / "raw"))
+    df = spark.createDataFrame(a.union(b).collect() + [Row(id=None, payload=None)])
+
+    actual = df.select(
+        "id",
+        F.pandas_udf(
+            partial(
+                udf.verify1,
+                args.batch_id,
+                args.n_data,
+                args.server_id,
+                args.private_key_hex,
+                args.shared_secret,
+                args.public_key_hex_internal,
+                args.public_key_hex_external,
+            ),
+            returnType="binary",
+        )(F.unbase64("payload")).alias("expected_payload"),
+    )
+    actual.show()
+
+    assert actual.where("expected_payload IS NOT NULL").count() == a.count()
+    assert actual.where("expected_payload IS NULL").count() == b.count() + 1
 
 
 def test_verify2(spark, root, args):
@@ -156,6 +208,54 @@ def test_verify2(spark, root, args):
     assert joined.where("length(expected_payload) <> length(payload)").count() == 0
 
 
+def test_verify2_bad_data(spark, root, args):
+    def read_df(uid):
+        server_root = root / f"server_{uid}"
+        raw = spark.read.json(str(server_root / "raw"))
+        internal = spark.read.json(
+            str(server_root / "intermediate" / "internal" / "verify1")
+        )
+        external = spark.read.json(
+            str(server_root / "intermediate" / "external" / "verify1")
+        )
+        return (
+            raw.select("id", F.unbase64("payload").alias("shares"))
+            .join(
+                internal.select("id", F.unbase64("payload").alias("internal")), on="id"
+            )
+            .join(
+                external.select("id", F.unbase64("payload").alias("external")), on="id"
+            )
+        )
+
+    a = read_df("a")
+    b = read_df("b")
+    df = spark.createDataFrame(
+        a.union(b).collect() + [Row(id=None, shares=None, internal=None, external=None)]
+    )
+
+    actual = df.select(
+        "id",
+        F.pandas_udf(
+            partial(
+                udf.verify2,
+                args.batch_id,
+                args.n_data,
+                args.server_id,
+                args.private_key_hex,
+                args.shared_secret,
+                args.public_key_hex_internal,
+                args.public_key_hex_external,
+            ),
+            returnType="binary",
+        )("shares", "internal", "external").alias("expected_payload"),
+    )
+    actual.show()
+
+    assert actual.where("expected_payload IS NOT NULL").count() == a.count()
+    assert actual.where("expected_payload IS NULL").count() == b.count() + 1
+
+
 def test_aggregate(spark, root, args):
     raw = spark.read.json(str(root / "server_a" / "raw"))
     internal = spark.read.json(
@@ -189,6 +289,55 @@ def test_aggregate(spark, root, args):
     assert len(rows) == 1
     assert rows[0].total == 5
     assert rows[0].error == 0
+
+
+def test_aggregate_bad_data(spark, root, args):
+    def read_df(uid):
+        server_root = root / f"server_{uid}"
+        raw = spark.read.json(str(server_root / "raw"))
+        internal = spark.read.json(
+            str(server_root / "intermediate" / "internal" / "verify2")
+        )
+        external = spark.read.json(
+            str(server_root / "intermediate" / "external" / "verify2")
+        )
+        return (
+            raw.select("id", F.unbase64("payload").alias("shares"))
+            .join(
+                internal.select("id", F.unbase64("payload").alias("internal")), on="id"
+            )
+            .join(
+                external.select("id", F.unbase64("payload").alias("external")), on="id"
+            )
+        )
+
+    a = read_df("a")
+    b = read_df("b")
+
+    # Serialize and deserialize to infer schema for null row
+    df = spark.createDataFrame(
+        a.union(b).collect() + [Row(id=None, shares=None, internal=None, external=None)]
+    )
+    assert df.where("internal is null").count() == 1
+
+    aggregates = df.groupBy().applyInPandas(
+        lambda pdf: udf.aggregate(
+            args.batch_id,
+            args.n_data,
+            args.server_id,
+            args.private_key_hex,
+            args.shared_secret,
+            args.public_key_hex_internal,
+            args.public_key_hex_external,
+            pdf,
+        ),
+        schema="payload binary, error int, total int",
+    )
+    aggregates.show()
+    rows = aggregates.collect()
+    assert len(rows) == 1
+    assert rows[0].total == a.count() + b.count() + 1
+    assert rows[0].error == b.count() + 1
 
 
 def test_total_share(spark, root, args):

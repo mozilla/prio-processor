@@ -22,7 +22,7 @@ def origins_dict(config_path):
 
 
 @pytest.fixture()
-def content_dict(config_path):
+def config(config_path):
     path = config_path / "content.json"
     with open(path) as f:
         return json.load(f)
@@ -34,28 +34,33 @@ def test_origins_dict(origins_dict):
     assert len(origins_dict) == origins_dict[-1]["index"] + 1
 
 
-def test_content_dict(content_dict):
+def test_config(config):
     batch_id = "content.blocking_blocked-{index}"
-    assert content_dict[batch_id.format(index=0)] == 2046
-    assert content_dict[batch_id.format(index=1)] == 441
+    (part_0, part_1) = [
+        [d["n_data"] for d in config if d["batch_id"] == batch_id.format(index=i)][0]
+        for i in (0, 1)
+    ]
+    assert part_0 == 2046
+    assert part_1 == 441
 
 
 @pytest.fixture()
-def prio_aggregated_data(tmp_path, spark, content_dict):
+def prio_aggregated_data(tmp_path, spark, config):
     """
     ├── _SUCCESS
-    └── submission_date=2019-08-22
-        ├── batch_id=content.blocking_blocked-0
-        │   └── part-00000-45945db7-4b6d-4eef-9e6f-76f98a3aefd4.c000.json
-        ├── batch_id=content.blocking_blocked-1
-        │   └── part-00001-45945db7-4b6d-4eef-9e6f-76f98a3aefd4.c000.json
-        ...
-        └── batch_id=content.blocking_storage_access_api_exempt_TESTONLY-1
-            └── part-00011-45945db7-4b6d-4eef-9e6f-76f98a3aefd4.c000.json
+    ├── batch_id=content.blocking_blocked-0
+    │   └── part-00000-45945db7-4b6d-4eef-9e6f-76f98a3aefd4.c000.json
+    ├── batch_id=content.blocking_blocked-1
+    │   └── part-00001-45945db7-4b6d-4eef-9e6f-76f98a3aefd4.c000.json
+    ...
+    └── batch_id=content.blocking_storage_access_api_exempt_TESTONLY-1
+        └── part-00011-45945db7-4b6d-4eef-9e6f-76f98a3aefd4.c000.json
     """
     output = str(tmp_path / "data")
     rows = []
-    for batch_id, n_data in content_dict.items():
+    for d in config:
+        batch_id = d["batch_id"]
+        n_data = d["n_data"]
         # write data in such a way where each aggregate value matches to the
         # index value
         if int(batch_id.split("-")[1]) == 1:
@@ -64,7 +69,6 @@ def prio_aggregated_data(tmp_path, spark, content_dict):
             offset = 0
         datum = [offset + i for i in range(n_data)]
         row = Row(
-            submission_date="2019-08-22",
             batch_id=batch_id,
             id=str(uuid4()),
             timestamp=datetime.utcnow().isoformat(),
@@ -72,24 +76,26 @@ def prio_aggregated_data(tmp_path, spark, content_dict):
         )
         rows.append(row)
     df = spark.createDataFrame(rows)
-    df.write.partitionBy("submission_date", "batch_id").json(output)
+    df.write.partitionBy("batch_id").json(output)
     return output
 
 
-def test_prio_aggregated_data_fixture(spark, prio_aggregated_data, content_dict):
+def test_prio_aggregated_data_fixture(spark, prio_aggregated_data, config):
     df = spark.read.json(prio_aggregated_data)
-    assert df.count() == len(content_dict)
+    assert df.count() == len(config)
 
 
 def test_indexing_transform_unit(spark):
-    whitelist = {"test-0": 3, "test-1": 2}
+    whitelist = [
+        {"batch_id": "test-0", "n_data": 3},
+        {"batch_id": "test-1", "n_data": 2},
+    ]
     origins = []
     for i, ch in enumerate("abcde"):
         origins.append({"name": ch, "hash": ch, "index": i})
 
     def build_row(batch_id, payload):
         return Row(
-            submission_date="2019-08-22",
             batch_id=batch_id,
             id=str(uuid4()),
             timestamp=datetime.utcnow().isoformat(),
@@ -109,12 +115,14 @@ def test_indexing_transform_unit(spark):
         indexing.transform(spark.createDataFrame(data), whitelist, origins).count()
 
 
-def test_indexing_transform(spark, prio_aggregated_data, content_dict, origins_dict):
+def test_indexing_transform(spark, prio_aggregated_data, config, origins_dict):
     df = spark.read.json(prio_aggregated_data)
-    transformed = indexing.transform(df, content_dict, origins_dict)
+    transformed = indexing.transform(df, config, origins_dict)
 
     merged_batches = {}
-    for batch_id, n_data in content_dict.items():
+    for d in config:
+        batch_id = d["batch_id"]
+        n_data = d["n_data"]
         key = batch_id.split("-")[0]
         merged_batches[key] = merged_batches.get(key, 0) + n_data
 

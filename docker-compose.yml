@@ -15,6 +15,7 @@ services:
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS_A?"missing credentials"}:/tmp/.credentials
     environment:
+      - APP_NAME=test-app
       - DATA_CONFIG=/app/config/content.json
       - SERVER_ID=A
       - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
@@ -24,7 +25,9 @@ services:
       - BUCKET_INTERNAL_PRIVATE=gs://moz-fx-prio-dev-a-private
       - BUCKET_INTERNAL_SHARED=gs://moz-fx-prio-dev-a-shared
       - BUCKET_EXTERNAL_SHARED=gs://moz-fx-prio-dev-b-shared
+      - BUCKET_PREFIX=test-data/v1
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
+      - SUBMISSION_DATE
   server_b:
     build:
       context: .
@@ -33,6 +36,7 @@ services:
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS_B?"missing credentials"}:/tmp/.credentials
     environment:
+      - APP_NAME=test-app
       - DATA_CONFIG=/app/config/content.json
       - SERVER_ID=B
       - SHARED_SECRET=m/AqDal/ZSA9597GwMM+VA==
@@ -42,7 +46,9 @@ services:
       - BUCKET_INTERNAL_PRIVATE=gs://moz-fx-prio-dev-b-private
       - BUCKET_INTERNAL_SHARED=gs://moz-fx-prio-dev-b-shared
       - BUCKET_EXTERNAL_SHARED=gs://moz-fx-prio-dev-a-shared
+      - BUCKET_PREFIX=test-data/v1
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
+      - SUBMISSION_DATE
   admin:
     build:
       context: .
@@ -51,15 +57,18 @@ services:
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS_ADMIN?"missing credentials"}:/tmp/.credentials
     environment:
+      - APP_NAME=test-app
       - DATA_CONFIG=/app/config/content.json
       - ORIGIN_CONFIG=/app/config/telemetry_origin_data_inc.json
       - PUBLIC_KEY_HEX_INTERNAL=AB0008BDE17581D3C45CA8CEACB3F7CE6FB48FEF98AA78597A6955633F54D628
       - PUBLIC_KEY_HEX_EXTERNAL=68499CBDCAE6B06CAC0C86D255A609B6AFF66A56087803CFE4BD998C7E20220C
       - BUCKET_INTERNAL_PRIVATE=gs://moz-fx-prio-dev-a-private
       - BUCKET_EXTERNAL_PRIVATE=gs://moz-fx-prio-dev-b-private
+      - BUCKET_PREFIX=test-data/v1
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
       - DATASET=telemetry
       - TABLE=content_blocking_dev
       - BQ_REPLACE=true
       # Set the default project for inserting rows
       - CLOUDSDK_CORE_PROJECT
+      - SUBMISSION_DATE

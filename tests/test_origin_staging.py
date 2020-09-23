@@ -47,7 +47,7 @@ def prio_ping():
 
 @pytest.fixture()
 def moz_fx_data_stage_data(tmp_path, prio_ping):
-    """ Create a bucket that mirrors the google cloud storage sink in the
+    """Create a bucket that mirrors the google cloud storage sink in the
     ingestion service.
     """
 

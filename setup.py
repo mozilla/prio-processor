@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="prio_processor",
-    version="2.3.0",
+    version="3.0.0",
     description="A processing engine for prio data",
     long_description_content_type="text/markdown",
     author="Anthony Miyaguchi",
@@ -17,7 +17,6 @@ setup(
     },
     install_requires=[
         "click",
-        "gcsfs == 0.2.3",
         "pyspark[sql] >= 3.0.0",
         "jsonschema",
         "prio >= 1.1",

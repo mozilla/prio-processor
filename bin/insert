@@ -8,9 +8,15 @@
 set -euo pipefail
 set -x
 
-: "${BUCKET_INTERNAL_PRIVATE}"
-: "${DATA_CONFIG}"
-: "${ORIGIN_CONFIG}"
+today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isoformat()[:10])")
+: "${APP_NAME?}"
+: "${SUBMISSION_DATE:=${today}}"
+: "${BUCKET_PREFIX:=data/v1}"
+# assumes that data is stored according to convention set in process
+: "${BUCKET_INTERNAL_PRIVATE?}"
+: "${PUBLIC_KEY_HEX_EXTERNAL?}"
+: "${DATA_CONFIG?}"
+: "${ORIGIN_CONFIG?}"
 : "${GOOGLE_APPLICATION_CREDENTIALS?:=}"
 
 : "${DATASET:-telemetry}"
@@ -28,11 +34,8 @@ function index() {
     resources=$(mktemp -d -t resources-XXX)
     source "${BASH_SOURCE%/*}/dataproc"
     SUBMODULE="origin" bootstrap "${resources}"
-    # Spark 3.0 on the container uses Scala 2.12
-    gsutil cp gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar "${resources}"
 
     spark-submit \
-        --jars "${resources}/spark-bigquery-latest_2.12.jar" \
         --py-files "${resources}/prio_processor.egg" \
         "${resources}/processor-origin.py" \
         index \
@@ -70,7 +73,8 @@ function main() {
 
     "${BASH_SOURCE%/*}/authenticate"
 
-    gsutil -m cp -r "${BUCKET_INTERNAL_PRIVATE}/processed/" "${data_in}"
+    prefix=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}
+    gsutil -m cp -r "${BUCKET_INTERNAL_PRIVATE}/${prefix}/processed/publish" "${data_in}"
     index "${data_in}" "${data_out}"
 
     insert "${data_out}"/*.json "${DATASET}" "${TABLE}"

@@ -9,6 +9,28 @@ from prio_processor.prio.commands import import_keys, import_public_keys, match_
 logger = logging.getLogger(__name__)
 
 
+def encode_single(
+    batch_id: str,
+    n_data: int,
+    public_key_hex_internal: bytearray,
+    public_key_hex_external: bytearray,
+    payload: list,
+):
+    libprio.Prio_init()
+    public_key_internal, public_key_external = import_public_keys(
+        bytes(public_key_hex_internal), bytes(public_key_hex_external)
+    )
+    config = libprio.PrioConfig_new(
+        n_data, public_key_internal, public_key_external, batch_id.encode()
+    )
+    try:
+        a, b = libprio.PrioClient_encode(config, bytes(list(map(int, payload))))
+    except (RuntimeError, ValueError, TypeError):
+        a, b = None, None
+    libprio.Prio_clear()
+    return dict(a=a, b=b)
+
+
 def encode(
     batch_id: bytes,
     n_data: int,
@@ -26,7 +48,10 @@ def encode(
     results = []
     for data in payload:
         # trying to encode the integer into a bit array
-        a, b = libprio.PrioClient_encode(config, bytes(list(map(int, data))))
+        try:
+            a, b = libprio.PrioClient_encode(config, bytes(list(map(int, data))))
+        except (RuntimeError, ValueError, TypeError):
+            a, b = None, None
         results.append(dict(a=a, b=b))
     libprio.Prio_clear()
     return pd.DataFrame(results)
@@ -62,10 +87,14 @@ def verify1(
         )
         verifier = libprio.PrioVerifier_new(server)
         packet = libprio.PrioPacketVerify1_new()
-        # share is actually a bytearray, so convert it into bytes
-        libprio.PrioVerifier_set_data(verifier, bytes(share))
-        libprio.PrioPacketVerify1_set_data(packet, verifier)
-        return libprio.PrioPacketVerify1_write(packet)
+        try:
+            # share is actually a bytearray, so convert it into bytes
+            libprio.PrioVerifier_set_data(verifier, bytes(share))
+            libprio.PrioPacketVerify1_set_data(packet, verifier)
+            return libprio.PrioPacketVerify1_write(packet)
+        except (RuntimeError, ValueError, TypeError):
+            pass
+        return None
 
     results = [_process(share) for share in shares]
     libprio.Prio_clear()
@@ -102,14 +131,17 @@ def verify2(
         packet1_internal = libprio.PrioPacketVerify1_new()
         packet1_external = libprio.PrioPacketVerify1_new()
         packet = libprio.PrioPacketVerify2_new()
-
-        libprio.PrioVerifier_set_data(verifier, bytes(share))
-        libprio.PrioPacketVerify1_read(packet1_internal, bytes(internal), config)
-        libprio.PrioPacketVerify1_read(packet1_external, bytes(external), config)
-        libprio.PrioPacketVerify2_set_data(
-            packet, verifier, packet1_internal, packet1_external
-        )
-        return libprio.PrioPacketVerify2_write(packet)
+        try:
+            libprio.PrioVerifier_set_data(verifier, bytes(share))
+            libprio.PrioPacketVerify1_read(packet1_internal, bytes(internal), config)
+            libprio.PrioPacketVerify1_read(packet1_external, bytes(external), config)
+            libprio.PrioPacketVerify2_set_data(
+                packet, verifier, packet1_internal, packet1_external
+            )
+            return libprio.PrioPacketVerify2_write(packet)
+        except (RuntimeError, ValueError, TypeError):
+            pass
+        return None
 
     results = [_process(share, x, y) for share, x, y in zip(shares, internal, external)]
     libprio.Prio_clear()
@@ -159,7 +191,7 @@ def aggregate(
             libprio.PrioPacketVerify2_read(packet2_external, external, config)
             libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
             libprio.PrioServer_aggregate(server, verifier)
-        except RuntimeError as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             error += 1
             error_counter.update([f"server {server_id}: {e}"])
     logger.warning(error_counter)
