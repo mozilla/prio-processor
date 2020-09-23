@@ -25,7 +25,7 @@ def encode_single(
     )
     try:
         a, b = libprio.PrioClient_encode(config, bytes(list(map(int, payload))))
-    except:
+    except (RuntimeError, ValueError, TypeError):
         a, b = None, None
     libprio.Prio_clear()
     return dict(a=a, b=b)
@@ -50,7 +50,7 @@ def encode(
         # trying to encode the integer into a bit array
         try:
             a, b = libprio.PrioClient_encode(config, bytes(list(map(int, data))))
-        except:
+        except (RuntimeError, ValueError, TypeError):
             a, b = None, None
         results.append(dict(a=a, b=b))
     libprio.Prio_clear()
@@ -92,7 +92,7 @@ def verify1(
             libprio.PrioVerifier_set_data(verifier, bytes(share))
             libprio.PrioPacketVerify1_set_data(packet, verifier)
             return libprio.PrioPacketVerify1_write(packet)
-        except:
+        except (RuntimeError, ValueError, TypeError):
             pass
         return None
 
@@ -139,7 +139,7 @@ def verify2(
                 packet, verifier, packet1_internal, packet1_external
             )
             return libprio.PrioPacketVerify2_write(packet)
-        except:
+        except (RuntimeError, ValueError, TypeError):
             pass
         return None
 
@@ -191,7 +191,7 @@ def aggregate(
             libprio.PrioPacketVerify2_read(packet2_external, external, config)
             libprio.PrioVerifier_isValid(verifier, packet2_internal, packet2_external)
             libprio.PrioServer_aggregate(server, verifier)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             error += 1
             error_counter.update([f"server {server_id}: {e}"])
     logger.warning(error_counter)
