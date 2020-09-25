@@ -119,6 +119,10 @@ function verify1() {
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
+        if ! gsutil -q stat "${input}/${prefix}/*"; then
+            echo "data for ${batch_id} does not exist, skipping..."
+            continue
+        fi
         spark_submit verify1 \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
@@ -143,6 +147,10 @@ function verify2() {
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
+        if ! gsutil -q stat "${input_external}/${prefix}/*"; then
+            echo "data for ${batch_id} does not exist, skipping..."
+            continue
+        fi
         spark_submit verify2 \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
@@ -169,6 +177,10 @@ function aggregate() {
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
+        if ! gsutil -q stat "${input_external}/${prefix}/*"; then
+            echo "data for ${batch_id} does not exist, skipping..."
+            continue
+        fi
         spark_submit aggregate \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
@@ -193,6 +205,10 @@ function publish() {
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
+        if ! gsutil -q stat "${input_external}/${prefix}/*"; then
+            echo "data for ${batch_id} does not exist, skipping..."
+            continue
+        fi
         spark_submit publish \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
