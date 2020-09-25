@@ -122,6 +122,9 @@ def generate(
 @click.option(
     "--n-partitions", type=int, default=2, help="Number of partitions for each batch."
 )
+@click.option(
+    "--n-drop-batch", type=int, default=0, help="Number of batch_ids to drop."
+)
 def generate_integration(
     data_config,
     public_key_hex_internal,
@@ -129,6 +132,7 @@ def generate_integration(
     output,
     n_rows,
     n_partitions,
+    n_drop_batch,
 ):
     """Generate test data from a configuration file.
 
@@ -136,7 +140,7 @@ def generate_integration(
     spark = spark_session()
 
     assert n_rows > 0
-    config_data = spark.read.json(data_config, multiLine=True)
+    config_data = spark.read.json(data_config, multiLine=True).orderBy("batch_id")
 
     def generate_data(batch_id, n_data):
         return dict(
@@ -146,7 +150,9 @@ def generate_integration(
         )
 
     test_data = []
-    for conf in config_data.collect():
+    # by dropping batch_ids, we can test whether the main processing script is
+    # robust enough when the data doesn't exist.
+    for conf in config_data.collect()[: -n_drop_batch if n_drop_batch else None]:
         batch_id = conf["batch_id"]
         n_data = conf["n_data"]
         test_data += [generate_data(batch_id, n_data) for _ in range(n_rows - 1)]
@@ -178,11 +184,7 @@ def generate_integration(
             ),
         )
         .repartitionByRange(n_partitions, "batch_id", "id")
-        .select(
-            "batch_id",
-            "id",
-            F.explode("shares").alias("server_id", "payload"),
-        )
+        .select("batch_id", "id", F.explode("shares").alias("server_id", "payload"))
     )
     repartitioned.write.partitionBy("server_id", "batch_id").json(
         output, mode="overwrite"

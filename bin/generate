@@ -43,10 +43,12 @@ function generate_dataset() {
     bootstrap=$(mktemp -d -t bootstrap-XXX)
     source "${BASH_SOURCE%/*}/dataproc"
     SUBMODULE="spark" bootstrap "${bootstrap}"
+    # drop a batch id since we may be missing data sometimes
     spark-submit \
         --py-files "${bootstrap}/prio_processor.egg" \
         "${bootstrap}/processor-spark.py" \
         generate-integration \
+        --n-drop-batch 1 \
         --output "${output}"
 }
 
