@@ -140,7 +140,7 @@ def generate_integration(
     spark = spark_session()
 
     assert n_rows > 0
-    config_data = spark.read.json(data_config, multiLine=True).orderBy("batch_id")
+    config_data = spark.read.json(data_config, multiLine=True)
 
     def generate_data(batch_id, n_data):
         return dict(
@@ -152,7 +152,10 @@ def generate_integration(
     test_data = []
     # by dropping batch_ids, we can test whether the main processing script is
     # robust enough when the data doesn't exist.
-    for conf in config_data.collect()[: -n_drop_batch if n_drop_batch else None]:
+    collected_rows = sorted(
+        config_data.collect(), key=lambda x: x["batch_id"], reverse=True
+    )
+    for conf in collected_rows[n_drop_batch:]:
         batch_id = conf["batch_id"]
         n_data = conf["n_data"]
         test_data += [generate_data(batch_id, n_data) for _ in range(n_rows - 1)]
