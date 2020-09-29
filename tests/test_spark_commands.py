@@ -127,6 +127,15 @@ def test_generate_integration(spark, tmp_path, root):
     # assert the number of batch_ids
     assert spark.read.json(str(output)).select("batch_id").distinct().count() == 4
 
+
+def test_generate_integration_drop_column(spark, tmp_path, root):
+    server_a_keys = json.loads((root / "server_a_keys.json").read_text())
+    server_b_keys = json.loads((root / "server_b_keys.json").read_text())
+    output = tmp_path
+
+    project_root = Path(__file__).parent.parent
+    config_path = project_root / "config" / "test-small.json"
+    n_rows = 100
     result = CliRunner().invoke(
         commands.generate_integration,
         [
@@ -139,7 +148,7 @@ def test_generate_integration(spark, tmp_path, root):
             "--output",
             str(output),
             "--n-drop-batch",
-            str(1),
+            1,
         ],
     )
     assert result.exit_code == 0, result.stdout_bytes
