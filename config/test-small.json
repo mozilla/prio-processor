@@ -6,5 +6,9 @@
   {
     "batch_id": "test-1",
     "n_data": 20
+  },
+  {
+    "batch_id": "test-2",
+    "n_data": 3
   }
 ]

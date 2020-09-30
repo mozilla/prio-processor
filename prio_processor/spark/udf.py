@@ -27,7 +27,6 @@ def encode_single(
         a, b = libprio.PrioClient_encode(config, bytes(list(map(int, payload))))
     except (RuntimeError, ValueError, TypeError):
         a, b = None, None
-    libprio.Prio_clear()
     return dict(a=a, b=b)
 
 

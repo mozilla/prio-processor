@@ -120,10 +120,48 @@ def test_generate_integration(spark, tmp_path, root):
     ).exists()
 
     # assert that there are 100 rows
-    spark.read.json(str(server_a_dir / "batch_id=bad-id")).count() == n_rows
-    spark.read.json(str(server_b_dir / "batch_id=bad-id")).count() == n_rows
+    assert spark.read.json(str(server_a_dir / "batch_id=bad-id")).count() == n_rows
+    assert spark.read.json(str(server_b_dir / "batch_id=bad-id")).count() == n_rows
     # assert size of normal batch
-    spark.read.json(str(server_a_dir / "batch_id=test-0")).count() == n_rows
+    assert spark.read.json(str(server_a_dir / "batch_id=test-0")).count() == n_rows
+    # assert the number of batch_ids
+    assert spark.read.json(str(output)).select("batch_id").distinct().count() == 4
+
+
+def test_generate_integration_drop_batch(spark, tmp_path, root):
+    server_a_keys = json.loads((root / "server_a_keys.json").read_text())
+    server_b_keys = json.loads((root / "server_b_keys.json").read_text())
+    output = tmp_path
+
+    project_root = Path(__file__).parent.parent
+    config_path = project_root / "config" / "test-small.json"
+    n_rows = 100
+    result = CliRunner().invoke(
+        commands.generate_integration,
+        [
+            "--data-config",
+            str(config_path),
+            "--public-key-hex-internal",
+            server_a_keys["public_key"],
+            "--public-key-hex-external",
+            server_a_keys["public_key"],
+            "--output",
+            str(output),
+            "--n-drop-batch",
+            1,
+        ],
+    )
+    assert result.exit_code == 0, result.stdout_bytes
+    # assert that one of the ids has been dropped
+    assert set(
+        [
+            r.batch_id
+            for r in spark.read.json(str(output))
+            .select("batch_id")
+            .distinct()
+            .collect()
+        ]
+    ) == {"test-0", "test-1", "bad-id"}
 
 
 def test_verify1(spark, tmp_path, root, server_a_args):
