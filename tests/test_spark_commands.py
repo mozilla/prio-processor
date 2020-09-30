@@ -128,7 +128,7 @@ def test_generate_integration(spark, tmp_path, root):
     assert spark.read.json(str(output)).select("batch_id").distinct().count() == 4
 
 
-def test_generate_integration_drop_column(spark, tmp_path, root):
+def test_generate_integration_drop_batch(spark, tmp_path, root):
     server_a_keys = json.loads((root / "server_a_keys.json").read_text())
     server_b_keys = json.loads((root / "server_b_keys.json").read_text())
     output = tmp_path
