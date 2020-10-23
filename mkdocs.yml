@@ -1,5 +1,5 @@
 site_name: prio-processor
 nav:
   - Home: index.md
-  - CLI: cli-help.md
+  - Command Line Reference: cli-help.md
 theme: readthedocs

@@ -6,24 +6,37 @@
 # Usage:
 #   pip install .
 #   ./scripts/print-cli-help > docs/cli-help.md
-# 
+#
 
 set -euo pipefail
 
 function md_fence() {
-    echo '````bash'
+    echo '```bash'
     echo "${1}"
-    echo '````'
+    echo '```'
 }
 
-echo "# Prio CLI Help"
-echo ""
-md_fence "$(prio --help)"
+function command_help() {
+    local cmd=$1
+    echo "## ${cmd} help"
+    echo ""
+    md_fence "$($cmd --help)"
 
-commands=$(prio --help | sed "1,/Commands:/d" | awk '{print $1}')
-for command in ${commands}; do
-    echo ""
-    echo "## prio ${command}"
-    echo ""
-    md_fence "$(prio "${command}" --help)"
-done
+    commands=$($cmd --help | sed "1,/Commands:/d" | grep "^  \w" | awk '{print $1}')
+    for command in ${commands}; do
+        echo ""
+        echo "### \`$cmd ${command}\`"
+        echo ""
+        md_fence "$($cmd "${command}" --help)"
+    done
+}
+
+cat <<EOF
+# Command Line Reference
+
+$(command_help prio)
+
+$(command_help prio-spark)
+
+$(command_help prio-processor)
+EOF
