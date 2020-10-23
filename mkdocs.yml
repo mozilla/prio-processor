@@ -1,5 +1,7 @@
 site_name: prio-processor
 nav:
-  - Home: index.md
+  - Home: README.md
+  - Guide: guide.md
   - Command Line Reference: cli-help.md
+  - Code of Conduct: link/CODE_OF_CONDUCT.md
 theme: readthedocs
