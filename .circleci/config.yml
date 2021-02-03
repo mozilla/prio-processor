@@ -117,8 +117,8 @@ jobs:
           name: Deploy to Dockerhub
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            # deploy master
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            # deploy main
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
               docker tag prio:latest ${DOCKERHUB_REPO}:latest
               docker push ${DOCKERHUB_REPO}:latest
             elif  [ ! -z "${CIRCLE_TAG}" ]; then
