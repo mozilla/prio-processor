@@ -25,7 +25,8 @@ services:
       - .:/root/
 
   app:
-    image: mozilla/prio-processor:latest
+    build:
+      context: ../../..
     working_dir: /app
     command: "true"
     volumes:
