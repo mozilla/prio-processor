@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  s3.minio:
+    # https://docs.min.io/docs/minio-docker-quickstart-guide
+    # https://docs.min.io/docs/minio-multi-user-quickstart-guide.html
+    # https://github.com/boto/boto/issues/2623
+    image: minio/minio:latest
+    command: server --address :80 /data
+    ports:
+      - 80:80
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+
+  # This is run to set up policies on the buckets
+  bootstrap:
+    image: minio/mc:latest
+    depends_on:
+      - s3.minio
+    working_dir: /root
+    entrypoint: sh
+    command: bootstrap-minio.sh
+    volumes:
+      - .:/root/
+
+  app:
+    image: mozilla/prio-processor:latest
+    working_dir: /app
+    command: "true"
+    volumes:
+      - .boto:/tmp/boto
+    environment:
+      - APP_NAME=test-app
+      - DATA_CONFIG=/app/config/content.json
+      - SERVER_ID=B
+      - SHARED_SECRET
+      - PRIVATE_KEY_HEX
+      - PUBLIC_KEY_HEX_INTERNAL
+      - PUBLIC_KEY_HEX_EXTERNAL
+      - BUCKET_INTERNAL_PRIVATE
+      - BUCKET_INTERNAL_SHARED
+      - BUCKET_EXTERNAL_SHARED
+      - BUCKET_PREFIX
+      - SUBMISSION_DATE
+      - GOOGLE_APPLICATION_CREDENTIALS
+      - BOTO_CONFIG=/tmp/boto
