@@ -17,6 +17,7 @@ RUN yum install -y epel-release \
         parallel \
         which \
         tree \
+        wget \
         && yum clean all \
         && rm -rf /var/cache/yum
 
@@ -44,6 +45,8 @@ ENV PYSPARK_PYTHON=python3
 # runtime.
 # https://cloud.google.com/dataproc/docs/concepts/connectors/cloud-storage
 RUN gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop2-latest.jar "${SPARK_HOME}/jars"
+RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar
+RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar
 
 ADD . /app
 
