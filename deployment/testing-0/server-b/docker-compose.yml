@@ -1,14 +1,14 @@
 version: "3"
 
 services:
-  s3.minio:
+  minio:
     # https://docs.min.io/docs/minio-docker-quickstart-guide
     # https://docs.min.io/docs/minio-multi-user-quickstart-guide.html
     # https://github.com/boto/boto/issues/2623
     image: minio/minio:latest
-    command: server --address :80 /data
+    command: server /data
     ports:
-      - 80:80
+      - 9000:9000
     environment:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password
@@ -17,12 +17,22 @@ services:
   bootstrap:
     image: minio/mc:latest
     depends_on:
-      - s3.minio
+      - minio
+      - proxy
     working_dir: /root
     entrypoint: sh
     command: bootstrap-minio.sh
     volumes:
       - .:/root/
+
+  proxy:
+    image: nginx:stable
+    restart: always
+    volumes:
+      - ./:/app
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
 
   app:
     build:
