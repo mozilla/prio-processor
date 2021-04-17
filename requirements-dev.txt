@@ -4,29 +4,62 @@
 #
 #    pip-compile requirements-dev.in
 #
-attrs==19.3.0             # via pytest
-click==7.1.2              # via mkdocs, nltk
-future==0.18.2            # via lunr
-importlib-metadata==1.7.0  # via markdown, pluggy, pytest
-iniconfig==1.0.1          # via pytest
-jinja2==2.11.2            # via mkdocs
-joblib==0.17.0            # via nltk
-livereload==2.6.3         # via mkdocs
-lunr[languages]==0.5.8    # via mkdocs
-markdown==3.3.2           # via mkdocs
-markupsafe==1.1.1         # via jinja2
+attrs==19.3.0
+    # via
+    #   -c requirements.txt
+    #   pytest
+click==7.1.2
+    # via
+    #   -c requirements.txt
+    #   mkdocs
+    #   nltk
+future==0.18.2
+    # via lunr
+iniconfig==1.0.1
+    # via pytest
+jinja2==2.11.2
+    # via mkdocs
+joblib==0.17.0
+    # via nltk
+livereload==2.6.3
+    # via mkdocs
+lunr[languages]==0.5.8
+    # via mkdocs
+markdown==3.3.2
+    # via mkdocs
+markupsafe==1.1.1
+    # via jinja2
 mkdocs==1.1.2
-more-itertools==8.4.0     # via pytest
-nltk==3.5                 # via lunr
-packaging==20.4           # via pytest
-pluggy==0.13.1            # via pytest
-py==1.9.0                 # via pytest
-pyparsing==2.4.7          # via packaging
+    # via -r requirements-dev.in
+more-itertools==8.4.0
+    # via pytest
+nltk==3.5
+    # via lunr
+packaging==20.4
+    # via pytest
+pluggy==0.13.1
+    # via pytest
+py==1.9.0
+    # via pytest
+pyparsing==2.4.7
+    # via packaging
 pytest==6.0.1
-pyyaml==5.3.1             # via mkdocs
-regex==2020.10.23         # via nltk
-six==1.15.0               # via livereload, lunr, packaging
-toml==0.10.1              # via pytest
-tornado==6.0.4            # via livereload, mkdocs
-tqdm==4.50.2              # via nltk
-zipp==3.1.0               # via importlib-metadata
+    # via -r requirements-dev.in
+pyyaml==5.3.1
+    # via mkdocs
+regex==2020.10.23
+    # via nltk
+six==1.15.0
+    # via
+    #   -c requirements.txt
+    #   livereload
+    #   lunr
+    #   packaging
+toml==0.10.1
+    # via pytest
+tornado==6.0.4
+    # via
+    #   livereload
+    #   mkdocs
+tqdm==4.50.2
+    # via nltk
