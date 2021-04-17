@@ -14,13 +14,16 @@ the port of the s3 enpoint must be either 80 or 443. This is a requirement
 
 ```
 # test that the minio server is online
-gsutil ls s3://
-gsutil ls s3://server-b-internal/
-# copy the a file for testing the s3a adapter
-gsutil cp config/test-small.json s3://server-b-internal
+mc alias set minio http://minio:9000 server-b password
 
-docker-compose run --rm
-df = spark.read.json("s3a://server-b-internal/part-00000-492acb28-1232-4af1-bec9-ee66056545b0.c000.json")
+mc ls minio
+mc ls minio/server-b-internal
+
+# copy the a file for testing the s3a adapter
+mc cp config/test-small.json minio/server-b-internal
+
+pyspark
+df = spark.read.json("s3a://server-b-internal/test-small.json", multiLine=True)
 ```
 
 https://docs.min.io/docs/deploy-minio-on-docker-compose.html

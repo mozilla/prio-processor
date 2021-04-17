@@ -18,26 +18,11 @@ services:
     image: minio/mc:latest
     depends_on:
       - minio
-      - proxy
     working_dir: /root
     entrypoint: sh
     command: bootstrap-minio.sh
     volumes:
       - .:/root/
-
-  proxy:
-    image: nginx:stable
-    restart: always
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      default:
-        aliases:
-          - s3.proxy
-          - server-b-internal.s3.proxy
-          - server-b-external.s3.proxy
-    ports:
-      - "80:80"
 
   app:
     build:
@@ -46,6 +31,7 @@ services:
     command: "true"
     volumes:
       - .boto:/tmp/boto
+      - ../../../config:/app/config
     environment:
       - APP_NAME=test-app
       - DATA_CONFIG=/app/config/content.json

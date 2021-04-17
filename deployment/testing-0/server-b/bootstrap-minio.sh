@@ -5,7 +5,7 @@ set -x
 
 TARGET="minio"
 
-mc config host add $TARGET http://proxy:80 admin password
+mc config host add $TARGET http://minio:9000 admin password
 mc mb $TARGET/server-b-internal
 mc mb $TARGET/server-b-external
 
