@@ -17,7 +17,8 @@ setup(
     },
     install_requires=[
         "click",
-        "pyspark[sql] >= 3.0.0",
+        # starting pyspark 3.1, the default hadoop distribution is 3.2
+        "pyspark[sql] ~= 3.1",
         "jsonschema",
         "prio >= 1.1",
         "pandas",

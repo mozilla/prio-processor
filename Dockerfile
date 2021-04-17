@@ -32,7 +32,7 @@ COPY requirements.txt requirements-dev.txt ./
 
 ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && \
-        pip3 install --upgrade pip && \
+        pip3 install --upgrade pip wheel && \
         pip3 install -r requirements.txt -r requirements-dev.txt
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
@@ -44,9 +44,13 @@ ENV PYSPARK_PYTHON=python3
 # may be more appropriate to add to the image build instead of fetching at
 # runtime.
 # https://cloud.google.com/dataproc/docs/concepts/connectors/cloud-storage
-RUN gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop2-latest.jar "${SPARK_HOME}/jars"
-RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar
-RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar
+RUN gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar "${SPARK_HOME}/jars"
+RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.0/hadoop-aws-3.2.0.jar
+RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.375/aws-java-sdk-bundle-1.11.375.jar
+
+# Use the MinIO client for cross platform behavior, even with self-hosting
+RUN wget --directory-prefix /usr/local/bin https://dl.min.io/client/mc/release/linux-amd64/mc
+RUN chmod +x /usr/local/bin/mc
 
 ADD . /app
 
