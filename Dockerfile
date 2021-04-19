@@ -17,6 +17,7 @@ RUN yum install -y epel-release \
         parallel \
         which \
         tree \
+        wget \
         && yum clean all \
         && rm -rf /var/cache/yum
 
@@ -31,19 +32,23 @@ COPY requirements.txt requirements-dev.txt ./
 
 ENV PATH="$PATH:~/.local/bin"
 RUN python3 -m ensurepip && \
-        pip3 install --upgrade pip && \
+        pip3 install --upgrade pip wheel && \
         pip3 install -r requirements.txt -r requirements-dev.txt
 
 ENV SPARK_HOME=/usr/local/lib/python3.6/site-packages/pyspark
 ENV PYSPARK_PYTHON=python3
 
-# Install libraries for interacting with cloud storage.
-# NOTE: this is only necessary when running outside of dataproc to use GCS
-# directly. A similar approach would need to be done to acommodate s3a. This
-# may be more appropriate to add to the image build instead of fetching at
-# runtime.
+# Install libraries for interacting with cloud storage. We utilize the s3a
+# adaptor for cross-cloud compatibility, but use of the gcs connector may be
+# more performant when running directly in GCP.
 # https://cloud.google.com/dataproc/docs/concepts/connectors/cloud-storage
-RUN gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop2-latest.jar "${SPARK_HOME}/jars"
+RUN gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar "${SPARK_HOME}/jars"
+RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.0/hadoop-aws-3.2.0.jar
+RUN wget --directory-prefix $SPARK_HOME/jars/ https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.375/aws-java-sdk-bundle-1.11.375.jar
+
+# Use the MinIO client for cross platform behavior, even with self-hosting
+RUN wget --directory-prefix /usr/local/bin https://dl.min.io/client/mc/release/linux-amd64/mc
+RUN chmod +x /usr/local/bin/mc
 
 ADD . /app
 

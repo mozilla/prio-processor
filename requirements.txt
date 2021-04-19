@@ -4,19 +4,39 @@
 #
 #    pip-compile
 #
-attrs==19.3.0             # via jsonschema
-click==7.1.2              # via prio_processor (setup.py)
-jsonschema==3.2.0         # via prio_processor (setup.py)
-numpy==1.19.1             # via pandas, pyarrow
-pandas==1.1.0             # via prio_processor (setup.py), pyspark
-prio==1.1                 # via prio_processor (setup.py)
-py4j==0.10.9              # via pyspark
-pyarrow==1.0.0            # via pyspark
-pyrsistent==0.16.0        # via jsonschema
-pyspark[sql]==3.0.0       # via prio_processor (setup.py)
-python-dateutil==2.8.1    # via pandas
-pytz==2020.1              # via pandas
-six==1.15.0               # via jsonschema, pyrsistent, python-dateutil
+attrs==19.3.0
+    # via jsonschema
+click==7.1.2
+    # via prio_processor (setup.py)
+jsonschema==3.2.0
+    # via prio_processor (setup.py)
+numpy==1.19.1
+    # via
+    #   pandas
+    #   pyarrow
+pandas==1.1.0
+    # via
+    #   prio_processor (setup.py)
+    #   pyspark
+prio==1.1
+    # via prio_processor (setup.py)
+py4j==0.10.9
+    # via pyspark
+pyarrow==1.0.0
+    # via pyspark
+pyrsistent==0.16.0
+    # via jsonschema
+pyspark[sql]==3.1.1
+    # via prio_processor (setup.py)
+python-dateutil==2.8.1
+    # via pandas
+pytz==2020.1
+    # via pandas
+six==1.15.0
+    # via
+    #   jsonschema
+    #   pyrsistent
+    #   python-dateutil
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

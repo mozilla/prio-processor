@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="prio_processor",
-    version="3.0.1",
+    version="3.1.0",
     description="A processing engine for prio data",
     long_description_content_type="text/markdown",
     author="Anthony Miyaguchi",
@@ -17,7 +17,8 @@ setup(
     },
     install_requires=[
         "click",
-        "pyspark[sql] >= 3.0.0",
+        # starting pyspark 3.1, the default hadoop distribution is 3.2
+        "pyspark[sql] ~= 3.1",
         "jsonschema",
         "prio >= 1.1",
         "pandas",
