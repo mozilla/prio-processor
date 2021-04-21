@@ -21,3 +21,6 @@ working/
 venv/
 .mc
 .ash_history
+
+.terraform/
+.bash_history
