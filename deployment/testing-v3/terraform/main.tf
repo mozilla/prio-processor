@@ -1,4 +1,6 @@
 terraform {
+  // When forking this configuration, set the configuration appropriately. A
+  // remote backend is a good choice since it can be shared across a team.
   backend "gcs" {
     bucket = "amiyaguchi-prio-processor-v3"
     prefix = "tf-state"
