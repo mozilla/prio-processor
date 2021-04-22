@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   app:
-    image: mozilla/prio-processor:v3.0.1
+    image: mozilla/prio-processor:v3.1.1
     working_dir: /app
     command: bin/process
     volumes:
