@@ -56,6 +56,11 @@ BUCKET_INTERNAL_PRIVATE=$(get-bucket a-private)
 
 PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$keys_b" public_key)
 BUCKET_EXTERNAL_PRIVATE=$(get-bucket b-private)
+
+DATASET=telemetry
+TABLE=content_blocking
+BQ_REPLACE=true
+CLOUDSDK_CORE_PROJECT=$PROJECT
 EOF
 cp compose/admin/.env.template compose/admin/.env
 

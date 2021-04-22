@@ -16,9 +16,8 @@ services:
       - BUCKET_INTERNAL_PRIVATE
       - BUCKET_EXTERNAL_PRIVATE
       - BUCKET_PREFIX
-      - DATASET=telemetry
-      - TABLE=content_blocking_dev
-      - BQ_REPLACE=true
-      # Set the default project for inserting rows
+      - DATASET
+      - TABLE
+      - BQ_REPLACE
       - CLOUDSDK_CORE_PROJECT
       - SUBMISSION_DATE

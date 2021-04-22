@@ -132,3 +132,19 @@ module "bucket-permissions-b" {
   service_account_internal = google_service_account.service-account-b.email
   service_account_external = google_service_account.service-account-a.email
 }
+
+// testing whether origin telemetry inserts into BigQuery correctly
+resource "google_project_service" "bigquery" {
+  service = "bigquery.googleapis.com"
+}
+
+resource "google_bigquery_dataset" "telemetry" {
+  dataset_id = "telemetry"
+  location   = "US"
+}
+
+// Grant access to the admin service account
+resource "google_project_iam_member" "bigquery-admin" {
+  role = "roles/bigquery.admin"
+  member = "serviceAccount:${google_service_account.service-account-admin.email}"
+}
