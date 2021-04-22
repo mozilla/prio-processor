@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# Generate dotenv files for each of the compose configurations
+
+set -e
+
+PROJECT=${PROJECT:-amiyaguchi-prio-processor-v3}
+TAG=${TAG:-mozilla/prio-processor:v3.0.0}
+
+if [[ $(gcloud config get-value project) != "$PROJECT" ]]; then 
+    echo "project is not set correctly; run 'gcloud config set project $PROJECT'"
+    exit 1
+fi
+
+function get-key {
+    local json=$1
+    local key=$2
+    echo "$json" | jq -r ".$key"
+}
+
+# reuse results from a single gsutil call
+_results=$(gsutil ls)
+function get-bucket {
+    local pattern=$1
+    echo "$_results" | grep "$pattern"
+}
+
+# work from the parent directory
+cd "$(dirname "$0")/.."
+
+keys_a=$(docker run -it "$TAG" prio keygen)
+keys_b=$(docker run -it "$TAG" prio keygen)
+seed=$(docker run -it "$TAG" prio shared-seed)
+
+# list out all the variables we might need...
+app_name="test-app"
+bucket_prefix="$app_name/v1"
+data_config="/app/config/content.json"
+origin_config="/app/config/telemetry_origin_data_inc.json"
+
+cat << EOF > compose/admin/.env.template
+APP_NAME=$app_name
+DATA_CONFIG=$data_config
+ORIGIN_CONFIG=$origin_config
+
+PUBLIC_KEY_HEX_INTERNAL=$(get-key "$keys_a" public_key)
+PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$keys_b" public_key)
+
+BUCKET_PREFIX=$bucket_prefix
+BUCKET_INTERNAL_PRIVATE=$(get-bucket a-private)
+BUCKET_EXTERNAL_PRIVATE=$(get-bucket b-private)
+EOF
+
+function server-env {
+    local server_id=$1
+    local internal_key=$2
+    local external_key=$3
+    local other_id;
+    other_id=$(if [[ $server_id == a ]]; then echo b; else echo a; fi)
+    cat << EOF > "compose/server-$server_id/.env.template"
+APP_NAME=$app_name
+DATA_CONFIG=$data_config
+SERVER_ID=$(echo "$server_id" | tr '[:lower:]' '[:upper:]')
+SHARED_SECRET=$(get-key "$seed" shared_seed)
+
+PRIVATE_KEY_HEX=$(get-key "$internal_key" private_key)
+PUBLIC_KEY_HEX_INTERNAL=$(get-key "$internal_key" public_key)
+PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$external_key" public_key)
+
+BUCKET_PREFIX=$bucket_prefix
+BUCKET_INTERNAL_PRIVATE=$(get-bucket "${server_id}-private")
+BUCKET_INTERNAL_SHARED=$(get-bucket "${server_id}-shared")
+BUCKET_EXTERNAL_SHARED=$(get-bucket "${other_id}-shared")
+EOF
+}
+
+server-env a "$keys_a" "$keys_b"
+server-env b "$keys_b" "$keys_a"
+
