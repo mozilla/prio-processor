@@ -21,7 +21,9 @@ function get-key {
 _results=$(gsutil ls)
 function get-bucket {
     local pattern=$1
-    echo "$_results" | grep "$pattern"
+    path=$(echo "$_results" | grep "$pattern")
+    # strip any trailing slashes
+    echo ${path%/}
 }
 
 # work from the parent directory
