@@ -85,17 +85,17 @@ resource "google_storage_bucket" "b-shared" {
 }
 
 // Create the service accounts for the tests
-resource "google_service_account" "service-account-admin" {
+resource "google_service_account" "admin" {
   account_id   = "service-account-admin"
   display_name = "Service account for the administrator"
 }
 
-resource "google_service_account" "service-account-a" {
+resource "google_service_account" "a" {
   account_id   = "service-account-a"
   display_name = "Service account for server A"
 }
 
-resource "google_service_account" "service-account-b" {
+resource "google_service_account" "b" {
   account_id   = "service-account-b"
   display_name = "Service account for server B"
 }
@@ -108,29 +108,29 @@ resource "google_service_account" "service-account-b" {
 resource "google_storage_bucket_iam_member" "admin-a-private" {
   bucket = google_storage_bucket.a-private.name
   role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.service-account-admin.email}"
+  member = "serviceAccount:${google_service_account.admin.email}"
 }
 
 resource "google_storage_bucket_iam_member" "admin-b-private" {
   bucket = google_storage_bucket.b-private.name
   role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.service-account-admin.email}"
+  member = "serviceAccount:${google_service_account.admin.email}"
 }
 
 module "bucket-permissions-a" {
   source                   = "./modules/bucket-permissions"
   bucket_private           = google_storage_bucket.a-private.name
   bucket_shared            = google_storage_bucket.a-shared.name
-  service_account_internal = google_service_account.service-account-a.email
-  service_account_external = google_service_account.service-account-b.email
+  service_account_internal = google_service_account.a.email
+  service_account_external = google_service_account.b.email
 }
 
 module "bucket-permissions-b" {
   source                   = "./modules/bucket-permissions"
   bucket_private           = google_storage_bucket.b-private.name
   bucket_shared            = google_storage_bucket.b-shared.name
-  service_account_internal = google_service_account.service-account-b.email
-  service_account_external = google_service_account.service-account-a.email
+  service_account_internal = google_service_account.b.email
+  service_account_external = google_service_account.a.email
 }
 
 // testing whether origin telemetry inserts into BigQuery correctly
@@ -145,6 +145,6 @@ resource "google_bigquery_dataset" "telemetry" {
 
 // Grant access to the admin service account
 resource "google_project_iam_member" "bigquery-admin" {
-  role = "roles/bigquery.admin"
-  member = "serviceAccount:${google_service_account.service-account-admin.email}"
+  role   = "roles/bigquery.admin"
+  member = "serviceAccount:${google_service_account.admin.email}"
 }
