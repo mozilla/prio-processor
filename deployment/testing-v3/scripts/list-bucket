@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+: << EOF
+To use this script, run the following command:
+
+scripts/list-bucket > LISTING.md
+EOF
+
+set -e
+
+PROJECT=${PROJECT:-amiyaguchi-prio-processor-v3}
+
+if [[ $(gcloud config get-value project) != "$PROJECT" ]]; then 
+    echo "project is not set correctly; run 'gcloud config set project $PROJECT'"
+    exit 1
+fi
+
+function sort_recursive_listing {
+    local bucket=$1
+    # remove lines that end with /:, empty lines, or the summary line
+    gsutil ls -lr $bucket | grep -v :$ | grep -v ^$ | grep -v ^TOTAL | sort -k2
+}
+
+cat << EOF
+# Directory listing
+
+This listing was generated from \`scripts/list-bucket\`. It is a list of all
+objects stored across the the two servers.
+
+## Server A buckets
+
+EOF
+
+buckets=$(gsutil ls | sort)
+for bucket in $(echo $buckets | grep a-); do
+cat << EOF
+### \`$bucket\`
+
+\`\`\`
+$(sort_recursive_listing $bucket)
+\`\`\`
+
+EOF
+done
+
+echo "## Server B buckets"
+echo ""
+
+for bucket in $(echo $buckets | grep b-); do
+cat << EOF
+### \`$bucket\`
+
+\`\`\`
+$(sort_recursive_listing $bucket)
+\`\`\`
+
+EOF
+done

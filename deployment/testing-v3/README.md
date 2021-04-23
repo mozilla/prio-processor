@@ -16,3 +16,20 @@ terraform init
 # apply any changes
 terraform apply
 ```
+
+To run the tests:
+
+```bash
+# There is a maximum of 10 keys per service account. This script doesn't
+# handle key rotations, so disable old keys as necessary.
+scripts/generate-service-account-keys
+
+# generate new keys (or alternatively copy .env.template files to their .env locations)
+scripts/generate-dotenv
+
+# run the integration script
+scripts/integrate
+
+# clean up the buckets
+scripts/cleanup
+```
