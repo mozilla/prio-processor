@@ -44,17 +44,17 @@ module "bucket-b" {
 
 
 // Create the service accounts for the tests
-resource "google_service_account" "service-account-ingest" {
+resource "google_service_account" "ingest" {
   account_id   = "service-account-ingest"
   display_name = "Service account for the ingestion service"
 }
 
-resource "google_service_account" "service-account-a" {
+resource "google_service_account" "a" {
   account_id   = "service-account-a"
   display_name = "Service account for server A"
 }
 
-resource "google_service_account" "service-account-b" {
+resource "google_service_account" "b" {
   account_id   = "service-account-b"
   display_name = "Service account for server B"
 }
@@ -65,16 +65,20 @@ module "bucket-permissions-a" {
   source                   = "./modules/bucket-permissions"
   bucket_private           = module.bucket-a.private
   bucket_shared            = module.bucket-a.shared
-  service_account_internal = google_service_account.service-account-a.email
-  service_account_external = google_service_account.service-account-b.email
+  bucket_ingest            = module.bucket-a.ingest
+  service_account_internal = google_service_account.a.email
+  service_account_external = google_service_account.b.email
+  service_account_ingest   = google_service_account.ingest.email
 }
 
 module "bucket-permissions-b" {
   source                   = "./modules/bucket-permissions"
   bucket_private           = module.bucket-b.private
   bucket_shared            = module.bucket-b.shared
-  service_account_internal = google_service_account.service-account-b.email
-  service_account_external = google_service_account.service-account-a.email
+  bucket_ingest            = module.bucket-b.ingest
+  service_account_internal = google_service_account.b.email
+  service_account_external = google_service_account.a.email
+  service_account_ingest   = google_service_account.ingest.email
 }
 
 // testing whether origin telemetry inserts into BigQuery correctly
@@ -90,5 +94,5 @@ resource "google_bigquery_dataset" "telemetry" {
 // Grant access to the admin service account
 resource "google_project_iam_member" "bigquery-admin" {
   role   = "roles/bigquery.admin"
-  member = "serviceAccount:${google_service_account.service-account-ingest.email}"
+  member = "serviceAccount:${google_service_account.ingest.email}"
 }
