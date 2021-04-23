@@ -17,7 +17,7 @@ terraform init
 terraform apply
 ```
 
-To run the tests:
+To configure the tests:
 
 ```bash
 # There is a maximum of 10 keys per service account. This script doesn't
@@ -26,7 +26,11 @@ scripts/generate-service-account-keys
 
 # generate new keys (or alternatively copy .env.template files to their .env locations)
 scripts/generate-dotenv
+```
 
+The above commands only need to be run once. To run the tests:
+
+```bash
 # run the integration script
 scripts/integrate
 
