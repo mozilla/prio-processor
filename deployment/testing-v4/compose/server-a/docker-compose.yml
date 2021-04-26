@@ -1,8 +1,8 @@
-version: "3.4"
+version: "3.9"
 
 services:
   app:
-    image: mozilla/prio-processor:v3.1.1
+    build: ../../../..
     working_dir: /app
     command: bin/process
     volumes:
@@ -17,6 +17,7 @@ services:
       - PRIVATE_KEY_HEX
       - PUBLIC_KEY_HEX_INTERNAL
       - PUBLIC_KEY_HEX_EXTERNAL
+      - BUCKET_INTERNAL_INGEST
       - BUCKET_INTERNAL_PRIVATE
       - BUCKET_INTERNAL_SHARED
       - BUCKET_EXTERNAL_SHARED
