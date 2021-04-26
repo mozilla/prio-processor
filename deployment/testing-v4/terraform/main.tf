@@ -82,6 +82,15 @@ module "bucket-permissions-b" {
 }
 
 // testing whether origin telemetry inserts into BigQuery correctly
+
+// The ingest container will be used for coordination, and gets access to
+// server A's private bucket because they are operated by the same entity.
+resource "google_storage_bucket_iam_member" "ingest_internal_private" {
+  bucket = module.bucket-a.private
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.ingest.email}"
+}
+
 resource "google_project_service" "bigquery" {
   service = "bigquery.googleapis.com"
 }

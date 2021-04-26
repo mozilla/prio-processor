@@ -28,13 +28,13 @@ variable "service_account_ingest" {
   description = "The service account for the ingestor"
 }
 
-resource "google_storage_bucket_iam_binding" "private-internal" {
+resource "google_storage_bucket_iam_binding" "private" {
   bucket  = var.bucket_private
   role    = "roles/storage.objectAdmin"
   members = ["serviceAccount:${var.service_account_internal}"]
 }
 
-resource "google_storage_bucket_iam_binding" "shared-internal" {
+resource "google_storage_bucket_iam_binding" "shared" {
   bucket = var.bucket_shared
   role   = "roles/storage.objectAdmin"
   members = [
@@ -43,8 +43,8 @@ resource "google_storage_bucket_iam_binding" "shared-internal" {
   ]
 }
 
-resource "google_storage_bucket_iam_binding" "shared-ingest" {
-  bucket = var.bucket_shared
+resource "google_storage_bucket_iam_binding" "ingest" {
+  bucket = var.bucket_ingest
   role   = "roles/storage.objectAdmin"
   members = [
     "serviceAccount:${var.service_account_internal}",
