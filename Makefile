@@ -5,6 +5,3 @@ build:
 
 clean:
 	docker-compose down
-
-test:
-	bin/integrate
