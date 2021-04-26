@@ -52,10 +52,10 @@ BUCKET_PREFIX=$bucket_prefix
 GOOGLE_APPLICATION_CREDENTIALS="../../.service-account-keys/service-account-admin-private-key.json"
 
 PUBLIC_KEY_HEX_INTERNAL=$(get-key "$keys_a" public_key)
-BUCKET_INTERNAL_PRIVATE=$(get-bucket a-private)
+BUCKET_INTERNAL_INGEST=$(get-bucket a-ingest)
 
 PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$keys_b" public_key)
-BUCKET_EXTERNAL_PRIVATE=$(get-bucket b-private)
+BUCKET_EXTERNAL_INGEST=$(get-bucket b-ingest)
 
 DATASET=telemetry
 TABLE=content_blocking
@@ -85,6 +85,7 @@ GOOGLE_APPLICATION_CREDENTIALS="../../.service-account-keys/service-account-${se
 
 PRIVATE_KEY_HEX=$(get-key "$internal_key" private_key)
 PUBLIC_KEY_HEX_INTERNAL=$(get-key "$internal_key" public_key)
+BUCKET_INTERNAL_INGEST=$(get-bucket "${server_id}-ingest")
 BUCKET_INTERNAL_PRIVATE=$(get-bucket "${server_id}-private")
 BUCKET_INTERNAL_SHARED=$(get-bucket "${server_id}-shared")
 
