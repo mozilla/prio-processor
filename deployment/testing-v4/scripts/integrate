@@ -9,7 +9,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Copy data into the appropriate buckets
-pushd compose/admin
+pushd compose/ingest
 docker-compose run --rm app bin/generate
 popd
 
@@ -34,6 +34,6 @@ popd
 wait $server_a_pid
 wait $server_b_pid
 
-pushd compose/admin
+pushd compose/ingest
 docker-compose run --rm app bin/insert
 popd

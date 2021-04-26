@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-pushd compose/admin
+pushd compose/ingest
 docker-compose build
 popd
 
