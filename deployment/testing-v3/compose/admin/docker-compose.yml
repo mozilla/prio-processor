@@ -1,0 +1,24 @@
+version: "3.4"
+
+services:
+  app:
+    image: mozilla/prio-processor:v3.1.1
+    command: "true"
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
+      - ../../content.json:/app/config/content.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
+      - APP_NAME
+      - DATA_CONFIG
+      - ORIGIN_CONFIG
+      - PUBLIC_KEY_HEX_INTERNAL
+      - PUBLIC_KEY_HEX_EXTERNAL
+      - BUCKET_INTERNAL_PRIVATE
+      - BUCKET_EXTERNAL_PRIVATE
+      - BUCKET_PREFIX
+      - DATASET
+      - TABLE
+      - BQ_REPLACE
+      - CLOUDSDK_CORE_PROJECT
+      - SUBMISSION_DATE
