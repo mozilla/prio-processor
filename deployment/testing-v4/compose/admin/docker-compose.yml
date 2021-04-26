@@ -16,6 +16,8 @@ services:
       - PUBLIC_KEY_HEX_EXTERNAL
       - BUCKET_INTERNAL_INGEST
       - BUCKET_EXTERNAL_INGEST
+      # for submitting results to bigquery
+      - BUCKET_INTERNAL_PRIVATE
       - BUCKET_PREFIX
       - DATASET
       - TABLE

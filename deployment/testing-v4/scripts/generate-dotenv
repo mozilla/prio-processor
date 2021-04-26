@@ -49,7 +49,7 @@ ORIGIN_CONFIG=$origin_config
 BUCKET_PREFIX=$bucket_prefix
 
 # relative to the docker-compose file
-GOOGLE_APPLICATION_CREDENTIALS="../../.service-account-keys/service-account-admin-private-key.json"
+GOOGLE_APPLICATION_CREDENTIALS="../../.service-account-keys/service-account-ingest-private-key.json"
 
 PUBLIC_KEY_HEX_INTERNAL=$(get-key "$keys_a" public_key)
 BUCKET_INTERNAL_INGEST=$(get-bucket a-ingest)
@@ -57,6 +57,9 @@ BUCKET_INTERNAL_INGEST=$(get-bucket a-ingest)
 PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$keys_b" public_key)
 BUCKET_EXTERNAL_INGEST=$(get-bucket b-ingest)
 
+# The admin also gets access to the private internal bucket, because admin and
+# server A are operated by the same entity in the origin telemetry setup
+BUCKET_INTERNAL_PRIVATE=$(get-bucket a-private)
 DATASET=telemetry
 TABLE=content_blocking
 BQ_REPLACE=true
