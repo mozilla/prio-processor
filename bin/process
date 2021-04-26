@@ -24,6 +24,7 @@ export DATA_CONFIG=${DATA_CONFIG?}
 
 # Error if variables are unset.
 : "${APP_NAME?}"
+: "${BUCKET_INTERNAL_INGEST?}"
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
 : "${BUCKET_EXTERNAL_SHARED?}"
@@ -106,7 +107,7 @@ function config_get() {
 function verify1() {
     # Read the shares for this server and start verification with the external server.
 
-    local input="${BUCKET_INTERNAL_PRIVATE}/${INTERNAL_PREFIX}/raw/shares"
+    local input="${BUCKET_INTERNAL_INGEST}/${INTERNAL_PREFIX}/raw/shares"
     local output_internal="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/internal/verify1"
     local output_external="${BUCKET_EXTERNAL_SHARED}/${EXTERNAL_PREFIX}/intermediate/external/verify1"
 
@@ -136,7 +137,7 @@ function verify1() {
 function verify2() {
     # Verify that the shares are well-formed by proving a secret-shared non-interactive proof.
 
-    local input="${BUCKET_INTERNAL_PRIVATE}/${INTERNAL_PREFIX}/raw/shares"
+    local input="${BUCKET_INTERNAL_INGEST}/${INTERNAL_PREFIX}/raw/shares"
     local input_internal="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/internal/verify1"
     local input_external="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/external/verify1"
     local output_internal="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/internal/verify2"
@@ -166,7 +167,7 @@ function verify2() {
 function aggregate() {
     # Accumulate well-formed shares.
 
-    local input="${BUCKET_INTERNAL_PRIVATE}/${INTERNAL_PREFIX}/raw/shares"
+    local input="${BUCKET_INTERNAL_INGEST}/${INTERNAL_PREFIX}/raw/shares"
     local input_internal="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/internal/verify2"
     local input_external="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/external/verify2"
     local output_internal="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/internal/aggregate"

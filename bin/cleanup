@@ -6,13 +6,16 @@
 set -euo pipefail
 set -x
 
+: "${BUCKET_INTERNAL_INGEST?}"
 : "${BUCKET_INTERNAL_PRIVATE?}"
 : "${BUCKET_INTERNAL_SHARED?}"
 
 echo "Running cleanup..."
 
 "${BASH_SOURCE%/*}/authenticate"
+gsutil ls "${BUCKET_INTERNAL_INGEST}"
 gsutil ls "${BUCKET_INTERNAL_PRIVATE}"
 gsutil ls "${BUCKET_INTERNAL_SHARED}"
+(gsutil -m rm "${BUCKET_INTERNAL_INGEST}/**" || echo "nothing to delete")
 (gsutil -m rm "${BUCKET_INTERNAL_PRIVATE}/**" || echo "nothing to delete")
 (gsutil -m rm "${BUCKET_INTERNAL_SHARED}/**" || echo "nothing to delete")
