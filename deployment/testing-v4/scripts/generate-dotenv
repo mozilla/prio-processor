@@ -35,8 +35,8 @@ function hmac-template {
     # either internal or external
     local type=$1
     cat << EOF
-# $(upper "$type")_ACCESS_KEY=
-# $(upper "$type")_SECRET_KEY=
+# BUCKET_$(upper "$type")_ACCESS_KEY=
+# BUCKET_$(upper "$type")_SECRET_KEY=
 EOF
 }
 
@@ -48,8 +48,8 @@ function hmac {
     local key
     key=$(jq "." ".secrets/hmac-$server_id-$type.json")
     cat << EOF
-$(upper "$type")_ACCESS_KEY=$(echo "$key" | jq -r ".access_id")
-$(upper "$type")_SECRET_KEY=$(echo "$key" | jq -r ".secret")
+BUCKET_$(upper "$type")_ACCESS_KEY=$(echo "$key" | jq -r ".access_id")
+BUCKET_$(upper "$type")_SECRET_KEY=$(echo "$key" | jq -r ".secret")
 EOF
 }
 

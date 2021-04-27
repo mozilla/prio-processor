@@ -6,10 +6,8 @@ services:
     working_dir: /app
     command: bin/process
     volumes:
-      - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
       - ../../content.json:/app/config/content.json
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
       - APP_NAME
       - DATA_CONFIG
       - SERVER_ID
@@ -17,6 +15,10 @@ services:
       - PRIVATE_KEY_HEX
       - PUBLIC_KEY_HEX_INTERNAL
       - PUBLIC_KEY_HEX_EXTERNAL
+      - BUCKET_INTERNAL_ACCESS_KEY
+      - BUCKET_INTERNAL_SECRET_KEY
+      - BUCKET_EXTERNAL_ACCESS_KEY
+      - BUCKET_EXTERNAL_SECRET_KEY
       - BUCKET_INTERNAL_INGEST
       - BUCKET_INTERNAL_PRIVATE
       - BUCKET_INTERNAL_SHARED

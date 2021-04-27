@@ -14,9 +14,14 @@ services:
       - ORIGIN_CONFIG
       - PUBLIC_KEY_HEX_INTERNAL
       - PUBLIC_KEY_HEX_EXTERNAL
+      - BUCKET_INTERNAL_ACCESS_KEY
+      - BUCKET_INTERNAL_SECRET_KEY
+      - BUCKET_EXTERNAL_ACCESS_KEY
+      - BUCKET_EXTERNAL_SECRET_KEY
       - BUCKET_INTERNAL_INGEST
       - BUCKET_EXTERNAL_INGEST
-      # for submitting results to bigquery
+      # for submitting results to bigquery, granted access via GCP primitives
+      # instead of HMAC keys
       - BUCKET_INTERNAL_PRIVATE
       - BUCKET_PREFIX
       - DATASET
