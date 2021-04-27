@@ -218,14 +218,9 @@ The co-processors share data by using cloud storage. Each storage unit is
 separated by path hierarchy and permissions implemented by the filesystem. The
 path encodes various metadata.
 
-| Attribute       | Purpose                                                 |
-| --------------- | ------------------------------------------------------- |
-| submission-date | The date of the batch processing submission.            |
-| server-id       | The recipient of the flattened and partitioned shares.  |
-| batch-id        | Used to identify the encoding and size of the data.     |
-| part-id         | Identify a partition in an ordered range of partitions. |
-
-The overall view of the path hierarchy.
+At a high level, the directories represent a logical step in the processing
+pipeline. There is a directory for each communication that occurs between
+processors.
 
 ```bash
 filesystem
@@ -278,6 +273,113 @@ filesystem
             ├── verify1
             └── verify2
 ```
+
+In order to support general use-cases, the storage convention ends up taking a
+more intricate structure. Here, we'll look at the structure for an integration
+test looking from the perspective of server A.
+
+A bucket is a namespace in the file system chosen for this project (Amazon S3
+compatible stores). The directories are split across three buckets for granular
+permissions. The following buckets are configured:
+
+```bash
+BUCKET_INTERNAL_INGEST=a-ingest-d70d758a4b28a791
+BUCKET_INTERNAL_PRIVATE=a-private-d70d758a4b28a791
+BUCKET_INTERNAL_SHARED=a-shared-d70d758a4b28a791
+BUCKET_EXTERNAL_SHARE=b-shared-d70d758a4b28a791
+```
+
+The ingest bucket is shared between server A and an ingestion service that
+collects and partitions data. The private bucket is accessible only to server A.
+The internal shared bucket is used to receive data from server B. The external
+shared bucket is used to send data to server B.
+
+In addition, the following variables are configured:
+
+```bash
+APP_NAME=test-app
+BUCKET_PREFIX=test-app/v1
+PUBLIC_KEY_INTERNAL=E58761F983D681367F854C4DE70D2BFA7BE6CDE79422B57B4B850ABD7FCB6839
+PUBLIC_KEY_EXTERNAL=C629C221FBCF524FE2FC746A0E114749DF18013F893280B4203F20859CA7FC4B
+SUBMISSION_DATE=2021-04-27
+```
+
+Every transaction is prefixed with the following directory structure:
+
+```bash
+{BUCKET_PREFIX}/{PUBLIC_KEY_EXTERNAL}/{APP_NAME}/{SUBMISSION_DATE}
+```
+
+When sending data, the internal public key is encoded into the path for
+bookkeeping by the other server.
+
+This results in a hierarchy that takes the following shape:
+
+```bash
+a-ingest-d70d758a4b28a791
+└── test-app
+    └── v1
+        └── C629C221FBCF524FE2FC746A0E114749DF18013F893280B4203F20859CA7FC4B
+            └── test-app
+                └── 2021-04-27
+                    └── raw
+                        └── shares
+                            └── batch_id=content.blocking_blocked_TESTONLY-0
+a-private-d70d758a4b28a791
+└── test-app
+    └── v1
+        └── C629C221FBCF524FE2FC746A0E114749DF18013F893280B4203F20859CA7FC4B
+            └── test-app
+                └── 2021-04-27
+                    ├── intermediate
+                    │   └── internal
+                    │       ├── aggregate
+                    │       │   └── batch_id=content.blocking_blocked_TESTONLY-0
+                    │       ├── verify1
+                    │       │   └── batch_id=content.blocking_blocked_TESTONLY-0
+                    │       └── verify2
+                    │           └── batch_id=content.blocking_blocked_TESTONLY-0
+                    └── processed
+                        └── publish
+                            └── batch_id=content.blocking_blocked_TESTONLY-0
+a-shared-d70d758a4b28a791
+└── test-app
+    └── v1
+        └── C629C221FBCF524FE2FC746A0E114749DF18013F893280B4203F20859CA7FC4B
+            └── test-app
+                └── 2021-04-27
+                    └── intermediate
+                        └── external
+                            ├── aggregate
+                            │   └── batch_id=content.blocking_blocked_TESTONLY-0
+                            ├── verify1
+                            │   └── batch_id=content.blocking_blocked_TESTONLY-0
+                            └── verify2
+                                └── batch_id=content.blocking_blocked_TESTONLY-0
+b-shared-d70d758a4b28a791
+└── test-app
+    └── v1
+        └── E58761F983D681367F854C4DE70D2BFA7BE6CDE79422B57B4B850ABD7FCB6839
+            └── test-app
+                └── 2021-04-27
+                    └── intermediate
+                        └── external
+                            ├── aggregate
+                            │   └── batch_id=content.blocking_blocked_TESTONLY-0
+                            ├── verify1
+                            │   └── batch_id=content.blocking_blocked_TESTONLY-0
+                            └── verify2
+                                └── batch_id=content.blocking_blocked_TESTONLY-0
+```
+
+There are few things to note:
+
+- There are no namespace clashes when overlaying the files in the three buckets.
+  This is intentional, for allowing the use of a single bucket in testing
+  scenarios.
+- Files are read and written using an HDFS connector, so parameters like the
+  `batch_id` are written using the `{key}={variable}` convention to specify new
+  partitions of data.
 
 #### Configuring cloud storage
 
