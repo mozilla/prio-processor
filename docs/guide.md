@@ -25,22 +25,14 @@ make build
 make test
 ```
 
-Set the following environment variables in a `.env` file in the current
-directory:
+Several integration tests are currently configured under the `deployments`
+directory. Choose a configuration that's relevant to your situation and the
+follow the instructions. Many of these will require provisioning infrastructure
+such as Google Cloud Platform resources.
 
-```bash
-GOOGLE_APPLICATION_CREDENTIALS_A=...
-GOOGLE_APPLICATION_CREDENTIALS_B=...
-GOOGLE_APPLICATION_CREDENTIALS_ADMIN=...
-```
-
-To simplify testing, resources for each container may be co-located in the same
-project. In this case, all three application credential variables may point to
-the same service account.
-
-The integration tests are currently configured for `prio-a-nonprod`,
-`prio-b-nonprod`, and `prio-admin-nonprod` under Google Cloud Platform. To
-request service account access, file a bug under [Data Platform and Tools ::
+Some functionality requires access to Mozilla's Data Platform e.g. reading from
+the Prio ping for Origin Telemetry data in BigQuery. To request service account
+access, file a bug under [Data Platform and Tools ::
 Operations](https://bugzilla.mozilla.org/enter_bug.cgi?product=Data%20Platform%20and%20Tools).
 
 ### Running the `staging` job
@@ -110,6 +102,9 @@ docker run \
     -e PRIVATE_KEY_HEX \
     -e PUBLIC_KEY_HEX_INTERNAL \
     -e PUBLIC_KEY_HEX_EXTERNAL \
+    -e APP_NAME \
+    -e BUCKET_PREFIX \
+    -e BUCKET_INTERNAL_INGEST \
     -e BUCKET_INTERNAL_PRIVATE \
     -e BUCKET_INTERNAL_SHARED \
     -e BUCKET_EXTERNAL_SHARED \
@@ -123,7 +118,8 @@ docker run \
     processor/bin/process
 ```
 
-Once data has been detected under `${BUCKET_INTERNAL_PRIVATE}/raw`, the server
+Once data has been detected under
+`${BUCKET_INTERNAL_INGEST}/{BUCKET_PREFIX}/{SUBMISSION_DATE}/raw`, the server
 will begin processing.
 
 ## Container application overview
@@ -141,7 +137,7 @@ docker pull mozilla/prio-processor:latest
 ### Configuring Environment Variables
 
 | Name                             | Purpose                                                                          |
-|----------------------------------|----------------------------------------------------------------------------------|
+| -------------------------------- | -------------------------------------------------------------------------------- |
 | `APP_NAME`                       | The name of the application, unique to a data config by convention.              |
 | `SUBMISSION_DATE`                | The date of data being processed. Defaults to today's date in ISO8601.           |
 | `DATA_CONFIG`                    | A JSON file containing the mapping of `batch-id` to `n-data`.                    |
@@ -150,6 +146,7 @@ docker pull mozilla/prio-processor:latest
 | `PRIVATE_KEY_HEX`                | The private key of the processor as a hex binary string.                         |
 | `PUBLIC_KEY_HEX_INTERNAL`        | The public key of the processor as a hex binary string.                          |
 | `PUBLIC_KEY_HEX_EXTERNAL`        | The public key of the co-processor as a hex binary string.                       |
+| `BUCKET_INTERNAL_INGEST`         | The bucket containing data from an ingestion server, triggers processing         |
 | `BUCKET_INTERNAL_PRIVATE`        | The bucket containing data that is viewable by the processor alone.              |
 | `BUCKET_INTERNAL_SHARED`         | The bucket containing data from the processor's previous stage.                  |
 | `BUCKET_EXTERNAL_SHARED`         | The bucket containing incoming data from the co-processor's previous stage.      |
@@ -222,7 +219,7 @@ separated by path hierarchy and permissions implemented by the filesystem. The
 path encodes various metadata.
 
 | Attribute       | Purpose                                                 |
-|-----------------|---------------------------------------------------------|
+| --------------- | ------------------------------------------------------- |
 | submission-date | The date of the batch processing submission.            |
 | server-id       | The recipient of the flattened and partitioned shares.  |
 | batch-id        | Used to identify the encoding and size of the data.     |
