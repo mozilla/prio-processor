@@ -49,7 +49,7 @@ ORIGIN_CONFIG=$origin_config
 BUCKET_PREFIX=$bucket_prefix
 
 # relative to the docker-compose file
-GOOGLE_APPLICATION_CREDENTIALS="../../.service-account-keys/service-account-ingest-private-key.json"
+GOOGLE_APPLICATION_CREDENTIALS="../../.secrets/service-account-ingest-private-key.json"
 
 PUBLIC_KEY_HEX_INTERNAL=$(get-key "$keys_a" public_key)
 BUCKET_INTERNAL_INGEST=$(get-bucket a-ingest)
@@ -84,7 +84,7 @@ SERVER_ID=$(echo "$server_id" | tr '[:lower:]' '[:upper:]')
 SHARED_SECRET=$(get-key "$seed" shared_seed)
 
 # relative to the docker-compose file
-GOOGLE_APPLICATION_CREDENTIALS="../../.service-account-keys/service-account-${server_id}-private-key.json"
+GOOGLE_APPLICATION_CREDENTIALS="../../.secrets/service-account-${server_id}-private-key.json"
 
 PRIVATE_KEY_HEX=$(get-key "$internal_key" private_key)
 PUBLIC_KEY_HEX_INTERNAL=$(get-key "$internal_key" public_key)
