@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Extract HMAC keys from the terraform config. The HMAC keys for each service
+# account is managed in the terraform state file. This extracts the values using
+# JQ so they can be injected # into config files. These are sensitive -- please
+# rotate if exposed.
+
+set -e
+
+# check that tools are installed
+terraform -v &> /dev/null
+jq --version &> /dev/null
+
+cd "$(dirname "$0")/.."
+
+# store the value in memory -- do not print or save directly to disk since it
+# exposes sensitive values
+_state=$(terraform -chdir=terraform show -json)
+function get_hmac_key {
+    local address=$1
+    echo "$_state" | jq "
+        .. | 
+        select(.address? != null) | 
+        select(.address == \"$address\").values | 
+        {access_id: .access_id, secret: .secret}"
+}
+
+for server_id in a b; do
+    for entity in internal external ingest; do
+        address="module.hmac-${server_id}.google_storage_hmac_key.${entity}"
+        output=".secrets/hmac-${server_id}-${entity}.json"
+        get_hmac_key $address > $output
+    done
+done
