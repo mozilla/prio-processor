@@ -17,8 +17,8 @@ today=$(python3 -c "from datetime import datetime as dt; print(dt.utcnow().isofo
 : "${DATA_CONFIG?}"
 : "${PUBLIC_KEY_HEX_INTERNAL?}"
 : "${PUBLIC_KEY_HEX_EXTERNAL?}"
-: "${BUCKET_INTERNAL_PRIVATE?}"
-: "${BUCKET_EXTERNAL_PRIVATE?}"
+: "${BUCKET_INTERNAL_INGEST?}"
+: "${BUCKET_EXTERNAL_INGEST?}"
 
 function rsync_delete() {
     local src=$1
@@ -61,11 +61,11 @@ function main() {
     # The public key of the partner server is used as a prefix
     rsync_delete \
         "${output}/server_id=a" \
-        "${BUCKET_INTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
+        "${BUCKET_INTERNAL_INGEST}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
 
     rsync_delete \
         "${output}/server_id=b" \
-        "${BUCKET_EXTERNAL_PRIVATE}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
+        "${BUCKET_EXTERNAL_INGEST}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

@@ -65,6 +65,7 @@ Each project should have a service account that contains authorization to the
 appropriate storage buckets that are used in this project. In particular, the
 following environment variables are set per server:
 
+- `BUCKET_INTERNAL_INGEST` - The bucket configured for ingesting data
 - `BUCKET_INTERNAL_PRIVATE` - The bucket containing private data for the server
 - `BUCKET_INTERNAL_SHARED` - The bucket containing incoming messages
 - `BUCKET_EXTERNAL_SHARED` - The bucket containing outgoing messages

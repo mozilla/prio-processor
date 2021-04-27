@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# This script controls the docker-compose workflow for integration testing. The
+# containers are defined in the docker-compose.yml, but are orchestrated through
+# this script for verification.
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+# Copy data into the appropriate buckets
+pushd compose/ingest
+docker-compose run --rm app bin/generate
+popd
+
+# Start server A
+pushd compose/server-a
+docker-compose run --rm app bin/process &
+server_a_pid=$!
+popd
+
+# offset the start times by a short amount for proper authentication against GCP
+sleep 2
+
+# Start server B
+pushd compose/server-b
+docker-compose run --rm app bin/process &
+server_b_pid=$!
+popd
+
+# Return the exit code of the backgrounded docker-compose container. Since
+# `wait` is a blocking function, a failure in server B will not be detected
+# until timeout in server A.
+wait $server_a_pid
+wait $server_b_pid
+
+pushd compose/ingest
+docker-compose run --rm app bin/insert
+popd

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Delegate cleanup of buckets to the appropriate service account
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+pushd compose/server-a
+docker-compose run --rm app bin/cleanup
+popd
+
+pushd compose/server-b
+docker-compose run --rm app bin/cleanup
+popd
