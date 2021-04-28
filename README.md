@@ -27,7 +27,7 @@ development work.
 docker-compose run -v $PWD:/app prio_processor bash
 ```
 
-## Adding new Python dependencies
+## Adding new dependencies
 
 To add new Python dependencies to the container, use `pip-tools` to manage the
 `requirements.txt`.
@@ -42,38 +42,14 @@ pip-compile
 pip-compile requirements-dev.in
 ```
 
-## Prio Processor Runtime
+Any new system dependencies should be added to the `Dockerfile` at the root of
+the repository. These will be available during runtime.
 
-The processor folder contains all of the components that are necessary for
-running a Mozilla-compatible Prio server. The back-ends can be replaced for
-different deployment configurations.
-
-### Overview
-
-The bin folder contains scripts for data processing in Google Cloud Platform
-(GCP).
-
-- `cleanup` - Resets the private and shared buckets to a clean state
-- `generate` - Generate testing data and sync into private buckets
-- `process` - Process multiple partitions of data in parallel, blocking on each
-  step as necessary.
-- `integrate` - Coordinate data generation and processing servers in a local
-  docker-compose workflow.
-
-Running integration tests will require setting up two separate GCP projects.
-Each project should have a service account that contains authorization to the
-appropriate storage buckets that are used in this project. In particular, the
-following environment variables are set per server:
-
-- `BUCKET_INTERNAL_INGEST` - The bucket configured for ingesting data
-- `BUCKET_INTERNAL_PRIVATE` - The bucket containing private data for the server
-- `BUCKET_INTERNAL_SHARED` - The bucket containing incoming messages
-- `BUCKET_EXTERNAL_SHARED` - The bucket containing outgoing messages
-- `GOOGLE_APPLICATION_CREDENTIALS` - The location of the JSON google application
-  credentials
-
-### Deployment Configuration
+## Deployment Configuration
 
 See the `deployment` directory for examples of configuration that can be used to
 aid deployment. These may also be run as integration tests to determine whether
-resources are configured properly.
+resources are configured properly. These will typically assume Google Cloud
+Platform (GCP) as a resource provider.
+
+See the [guide](docs/guide.md) for more details.
