@@ -81,20 +81,6 @@ module "bucket-permissions-b" {
   service_account_ingest   = google_service_account.ingest.email
 }
 
-module "hmac-a" {
-  source                   = "./modules/hmac"
-  service_account_internal = google_service_account.a.email
-  service_account_external = google_service_account.b.email
-  service_account_ingest   = google_service_account.ingest.email
-}
-
-module "hmac-b" {
-  source                   = "./modules/hmac"
-  service_account_internal = google_service_account.b.email
-  service_account_external = google_service_account.a.email
-  service_account_ingest   = google_service_account.ingest.email
-}
-
 // testing whether origin telemetry inserts into BigQuery correctly
 
 // The ingest container will be used for coordination, and gets access to
