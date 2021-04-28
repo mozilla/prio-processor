@@ -24,13 +24,6 @@ function rsync_delete() {
     local src=$1
     local dst=$2
 
-    # If we are working with the local filesystem, we need to create all parent
-    # folders. Copying a temporary object will create recursively create all
-    # parent folders on a file-system, and otherwise materialize the prefix in
-    # an object store.
-    touch _TEMP
-    mc cp _TEMP "${dst}/_TEMP"
-
     # NOTE: this deletes files on the recieving end
     mc mirror --remove --overwrite "${src}/" "${dst}/"
     touch _SUCCESS

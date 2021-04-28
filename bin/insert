@@ -3,7 +3,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-# Script to map aggregates to origins and insert the results into BigQuery.
+# Script to map aggregates to origins and insert the results into BigQuery. Note
+# that this script expects direct access to a GCS bucket for processing instead
+# of using a MinIO gateway.
 
 set -euo pipefail
 set -x
@@ -74,7 +76,7 @@ function main() {
     "${BASH_SOURCE%/*}/authenticate"
 
     prefix=${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}
-    gsutil -m cp -r "${BUCKET_INTERNAL_PRIVATE}/${prefix}/processed/publish" "${data_in}"
+    gsutil -m cp -r "gs://${BUCKET_INTERNAL_PRIVATE}/${prefix}/processed/publish" "${data_in}"
     index "${data_in}" "${data_out}"
 
     insert "${data_out}"/*.json "${DATASET}" "${TABLE}"

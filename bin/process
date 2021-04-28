@@ -60,14 +60,9 @@ function rsync_delete() {
     local src=$1
     local dst=$2
 
-    # If we are working with a local directory, we generate the parent tree
-    # by copying a tempory file into the prefix.
-    touch _TEMP
-    gsutil cp _TEMP "${dst}/_TEMP"
-
-    gsutil -m rsync -d -r "${src}/" "${dst}/"
+    mc mirror --remove --overwrite "${src}/" "${dst}/"
     touch _SUCCESS
-    gsutil cp _SUCCESS "${dst}/"
+    mc cp _SUCCESS "${dst}/"
 }
 
 function wait_for_data() {
@@ -82,7 +77,7 @@ function wait_for_data() {
     local retries=0
     local backoff=${RETRY_DELAY}
     set +e
-    while ! gsutil -q stat "${path}"; do
+    while ! mc stat "${path}" &> /dev/null; do
         sleep ${backoff}
         ((backoff *= RETRY_BACKOFF_EXPONENT))
         ((retries++))
@@ -111,7 +106,7 @@ function verify1() {
     local output_internal="${BUCKET_INTERNAL_PRIVATE}/${INTERNAL_PREFIX}/intermediate/internal/verify1"
     local output_external="${BUCKET_EXTERNAL_SHARED}/${EXTERNAL_PREFIX}/intermediate/external/verify1"
 
-    wait_for_data "${input}/_SUCCESS"
+    wait_for_data "internal/${input}/_SUCCESS"
 
     # TODO: move batch_id into Spark logic. The reason that this isn't
     # implemnted currently is because the potential for a batch_ids to belong to
@@ -120,18 +115,18 @@ function verify1() {
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
-        if ! gsutil -q stat "${input}/${prefix}/*"; then
+        if ! mc stat "internal/${input}/${prefix}" &> /dev/null; then
             echo "data for ${batch_id} does not exist, skipping..."
             continue
         fi
         spark_submit verify1 \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
-            --input "${input}/${prefix}" \
-            --output "${output_internal}/${prefix}"
+            --input "s3a://${input}/${prefix}" \
+            --output "s3a://${output_internal}/${prefix}"
     done
 
-    rsync_delete "${output_internal}" "${output_external}"
+    rsync_delete "internal/${output_internal}" "external/${output_external}"
 }
 
 function verify2() {
@@ -143,25 +138,25 @@ function verify2() {
     local output_internal="${BUCKET_INTERNAL_PRIVATE}/${INTERNAL_PREFIX}/intermediate/internal/verify2"
     local output_external="${BUCKET_EXTERNAL_SHARED}/${EXTERNAL_PREFIX}/intermediate/external/verify2"
 
-    wait_for_data "${input_external}/_SUCCESS"
+    wait_for_data "internal/${input_external}/_SUCCESS"
 
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
-        if ! gsutil -q stat "${input_external}/${prefix}/*"; then
+        if ! mc stat "internal/${input_external}/${prefix}" &> /dev/null; then
             echo "data for ${batch_id} does not exist, skipping..."
             continue
         fi
         spark_submit verify2 \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
-            --input "${input}/${prefix}" \
-            --input-internal "${input_internal}/${prefix}" \
-            --input-external "${input_external}/${prefix}" \
-            --output "${output_internal}/${prefix}"
+            --input "s3a://${input}/${prefix}" \
+            --input-internal "s3a://${input_internal}/${prefix}" \
+            --input-external "s3a://${input_external}/${prefix}" \
+            --output "s3a://${output_internal}/${prefix}"
     done
 
-    rsync_delete "${output_internal}" "${output_external}"
+    rsync_delete "internal/${output_internal}" "external/${output_external}"
 }
 
 function aggregate() {
@@ -173,25 +168,25 @@ function aggregate() {
     local output_internal="${BUCKET_INTERNAL_PRIVATE}/${INTERNAL_PREFIX}/intermediate/internal/aggregate"
     local output_external="${BUCKET_EXTERNAL_SHARED}/${EXTERNAL_PREFIX}/intermediate/external/aggregate"
 
-    wait_for_data "${input_external}/_SUCCESS"
+    wait_for_data "internal/${input_external}/_SUCCESS"
 
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
-        if ! gsutil -q stat "${input_external}/${prefix}/*"; then
+        if ! mc stat "internal/${input_external}/${prefix}" &> /dev/null; then
             echo "data for ${batch_id} does not exist, skipping..."
             continue
         fi
         spark_submit aggregate \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
-            --input "${input}/${prefix}" \
-            --input-internal "${input_internal}/${prefix}" \
-            --input-external "${input_external}/${prefix}" \
-            --output "${output_internal}/${prefix}"
+            --input "s3a://${input}/${prefix}" \
+            --input-internal "s3a://${input_internal}/${prefix}" \
+            --input-external "s3a://${input_external}/${prefix}" \
+            --output "s3a://${output_internal}/${prefix}"
     done
 
-    rsync_delete "${output_internal}" "${output_external}"
+    rsync_delete "internal/${output_internal}" "external/${output_external}"
 }
 
 function publish() {
@@ -201,26 +196,27 @@ function publish() {
     local input_external="${BUCKET_INTERNAL_SHARED}/${INTERNAL_PREFIX}/intermediate/external/aggregate"
     local output="${BUCKET_INTERNAL_PRIVATE}/${INTERNAL_PREFIX}/processed/publish"
 
-    wait_for_data "${input_external}/_SUCCESS"
+    wait_for_data "internal/${input_external}/_SUCCESS"
 
     for batch_id in $(jq -r '.[].batch_id' "${DATA_CONFIG}"); do
         prefix="batch_id=${batch_id}"
         n_data=$(config_get "${batch_id}" "n_data")
-        if ! gsutil -q stat "${input_external}/${prefix}/*"; then
+        if ! mc stat "internal/${input_external}/${prefix}" &> /dev/null; then
             echo "data for ${batch_id} does not exist, skipping..."
             continue
         fi
         spark_submit publish \
             --batch-id "${batch_id}" \
             --n-data "${n_data}" \
-            --input-internal "${input_internal}/${prefix}" \
-            --input-external "${input_external}/${prefix}" \
-            --output "${output}/${prefix}"
+            --input-internal "s3a://${input_internal}/${prefix}" \
+            --input-external "s3a://${input_external}/${prefix}" \
+            --output "s3a://${output}/${prefix}"
     done
 }
 
 function main() {
-    "${BASH_SOURCE%/*}/authenticate"
+    "${BASH_SOURCE%/*}/configure-mc"
+    "${BASH_SOURCE%/*}/configure-spark-conf"
     source "${BASH_SOURCE%/*}/dataproc"
     SUBMODULE="spark" bootstrap "${BOOTSTRAP_BUCKET}"
 

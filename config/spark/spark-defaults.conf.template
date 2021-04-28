@@ -1,0 +1,37 @@
+# Default parameters for spark while using minio. We'll also assume that the
+# performance is generally acceptable for GCS too using the same connector.
+# see https://docs.min.io/docs/disaggregated-spark-and-hadoop-hive-with-minio.html
+
+# Ensure these values are set before running spark
+# spark.hadoop.fs.s3a.access.key <ACCESS_KEY>
+# spark.hadoop.fs.s3a.secret.key <SECRET_KEY>
+# spark.hadoop.fs.s3a.endpoint http://minio:9000
+
+spark.hadoop.fs.s3a.path.style.access true
+spark.hadoop.fs.s3a.block.size 512M
+spark.hadoop.fs.s3a.buffer.dir ${hadoop.tmp.dir}/s3a
+spark.hadoop.fs.s3a.committer.magic.enabled false
+spark.hadoop.fs.s3a.committer.name directory
+spark.hadoop.fs.s3a.committer.staging.abort.pending.uploads true
+spark.hadoop.fs.s3a.committer.staging.conflict-mode append
+spark.hadoop.fs.s3a.committer.staging.tmp.path /tmp/staging
+spark.hadoop.fs.s3a.committer.staging.unique-filenames true
+ # number of threads writing to MinIO
+spark.hadoop.fs.s3a.committer.threads 2048
+spark.hadoop.fs.s3a.connection.establish.timeout 5000
+ # maximum number of concurrent conns
+spark.hadoop.fs.s3a.connection.maximum 8192
+spark.hadoop.fs.s3a.connection.ssl.enabled false
+spark.hadoop.fs.s3a.connection.timeout 200000
+# number of parallel uploads
+spark.hadoop.fs.s3a.fast.upload.active.blocks 2048
+# use disk as the buffer for uploads
+spark.hadoop.fs.s3a.fast.upload.buffer disk
+spark.hadoop.fs.s3a.fast.upload true
+ # maximum number of parallel tasks
+spark.hadoop.fs.s3a.max.total.tasks 2048
+# socket buffering hints
+spark.hadoop.fs.s3a.socket.recv.buffer 65536
+spark.hadoop.fs.s3a.socket.send.buffer 65536
+ # maximum number of threads for S3A
+spark.hadoop.fs.s3a.threads.max 2048
