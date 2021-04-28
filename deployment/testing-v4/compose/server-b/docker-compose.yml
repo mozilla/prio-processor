@@ -8,7 +8,7 @@ services:
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
     ports:
-      - 9000:9000
+      - 9003:9000
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
       - MINIO_ROOT_USER=$BUCKET_INTERNAL_ACCESS_KEY
