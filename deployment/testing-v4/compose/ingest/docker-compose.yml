@@ -1,12 +1,27 @@
 version: "3.9"
 
 services:
+  # https://docs.min.io/docs/minio-gateway-for-gcs.html
+  minio:
+    image: minio/minio:latest
+    command: gateway gcs ${CLOUDSDK_CORE_PROJECT}
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
+    ports:
+      - 9000:9000
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
+      - MINIO_ROOT_USER=$BUCKET_INTERNAL_ACCESS_KEY
+      - MINIO_ROOT_PASSWORD=$BUCKET_INTERNAL_SECRET_KEY
+
   app:
     build: ../../../..
     command: "true"
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
       - ../../content.json:/app/config/content.json
+    depends_on:
+      - minio
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
       - APP_NAME

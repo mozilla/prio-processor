@@ -46,7 +46,7 @@ function minio {
     cat << EOF
 BUCKET_$(upper "$type")_ACCESS_KEY=server-$server_id-access-key
 BUCKET_$(upper "$type")_SECRET_KEY=server-$server_id-secret-key
-BUCKET_$(upper "$type")_ENDPOINT=minio:9000
+BUCKET_$(upper "$type")_ENDPOINT=http://minio:9000
 EOF
 }
 
