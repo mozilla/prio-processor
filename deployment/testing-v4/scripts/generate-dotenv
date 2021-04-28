@@ -23,7 +23,10 @@ function get-bucket {
     local pattern=$1
     path=$(echo "$_results" | grep "$pattern")
     # strip any trailing slashes
-    echo "${path%/}"
+    trim="${path%/}"
+    # trim gs:// prefix
+    trim="${trim#gs://}"
+    echo $trim
 }
 
 function upper {
@@ -37,6 +40,7 @@ function hmac-template {
     cat << EOF
 # BUCKET_$(upper "$type")_ACCESS_KEY=
 # BUCKET_$(upper "$type")_SECRET_KEY=
+# BUCKET_$(upper "$type")_ENDPOINT=https://storage.googleapis.com
 EOF
 }
 
@@ -45,11 +49,14 @@ function hmac {
     local server_id=$1
     # either internal or external
     local type=$2
+    local key_type=${3:-$type}
     local key
-    key=$(jq "." ".secrets/hmac-$server_id-$type.json")
+    key=$(jq "." ".secrets/hmac-$server_id-$key_type.json")
+    # NOTE: only google cloud storage is currently configured
     cat << EOF
 BUCKET_$(upper "$type")_ACCESS_KEY=$(echo "$key" | jq -r ".access_id")
 BUCKET_$(upper "$type")_SECRET_KEY=$(echo "$key" | jq -r ".secret")
+BUCKET_$(upper "$type")_ENDPOINT=https://storage.googleapis.com
 EOF
 }
 
@@ -84,11 +91,11 @@ GOOGLE_APPLICATION_CREDENTIALS="../../.secrets/service-account-ingest-private-ke
 
 PUBLIC_KEY_HEX_INTERNAL=$(get-key "$keys_a" public_key)
 BUCKET_INTERNAL_INGEST=$(get-bucket a-ingest)
-$(if [[ $is_template == true ]]; then hmac-template internal; else hmac a internal; fi)
+$(if [[ $is_template == true ]]; then hmac-template internal; else hmac a internal ingest; fi)
 
 PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$keys_b" public_key)
 BUCKET_EXTERNAL_INGEST=$(get-bucket b-ingest)
-$(if [[ $is_template == true ]]; then hmac-template external; else hmac b external; fi)
+$(if [[ $is_template == true ]]; then hmac-template external; else hmac b external ingest; fi)
 
 # The ingest also gets access to the private internal bucket, because ingest and
 # server A are operated by the same entity in the origin telemetry setup

@@ -16,8 +16,10 @@ services:
       - PUBLIC_KEY_HEX_EXTERNAL
       - BUCKET_INTERNAL_ACCESS_KEY
       - BUCKET_INTERNAL_SECRET_KEY
+      - BUCKET_INTERNAL_ENDPOINT
       - BUCKET_EXTERNAL_ACCESS_KEY
       - BUCKET_EXTERNAL_SECRET_KEY
+      - BUCKET_EXTERNAL_ENDPOINT
       - BUCKET_INTERNAL_INGEST
       - BUCKET_EXTERNAL_INGEST
       # for submitting results to bigquery, granted access via GCP primitives
