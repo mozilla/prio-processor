@@ -45,4 +45,5 @@ popd
 
 pushd compose/ingest
 docker-compose run --rm app bin/insert
+docker-compose down
 popd
