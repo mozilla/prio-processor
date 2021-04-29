@@ -24,17 +24,10 @@ function rsync_delete() {
     local src=$1
     local dst=$2
 
-    # If we are working with the local filesystem, we need to create all parent
-    # folders. Copying a temporary object will create recursively create all
-    # parent folders on a file-system, and otherwise materialize the prefix in
-    # an object store.
-    touch _TEMP
-    gsutil cp _TEMP "${dst}/_TEMP"
-
     # NOTE: this deletes files on the recieving end
-    gsutil -m rsync -d -r "${src}/" "${dst}/"
+    mc mirror --remove --overwrite "${src}/" "${dst}/"
     touch _SUCCESS
-    gsutil cp _SUCCESS "${dst}"
+    mc cp _SUCCESS "${dst}"
 }
 
 function generate_dataset() {
@@ -53,7 +46,7 @@ function generate_dataset() {
 }
 
 function main() {
-    "${BASH_SOURCE%/*}/authenticate"
+    "${BASH_SOURCE%/*}/configure-mc"
 
     output="$(mktemp -d -t generate-XXX)"
     generate_dataset "${output}"
@@ -61,11 +54,11 @@ function main() {
     # The public key of the partner server is used as a prefix
     rsync_delete \
         "${output}/server_id=a" \
-        "${BUCKET_INTERNAL_INGEST}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
+        "internal/${BUCKET_INTERNAL_INGEST}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_EXTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
 
     rsync_delete \
         "${output}/server_id=b" \
-        "${BUCKET_EXTERNAL_INGEST}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
+        "external/${BUCKET_EXTERNAL_INGEST}/${BUCKET_PREFIX}/${PUBLIC_KEY_HEX_INTERNAL}/${APP_NAME}/${SUBMISSION_DATE}/raw/shares"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

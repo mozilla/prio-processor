@@ -11,6 +11,7 @@ cd "$(dirname "$0")/.."
 # Copy data into the appropriate buckets
 pushd compose/ingest
 docker-compose run --rm app bin/generate
+docker-compose down
 popd
 
 # Start server A
@@ -34,6 +35,15 @@ popd
 wait $server_a_pid
 wait $server_b_pid
 
+# clean up the containers
+pushd compose/server-a
+docker-compose down
+popd
+pushd compose/server-b
+docker-compose down
+popd
+
 pushd compose/ingest
 docker-compose run --rm app bin/insert
+docker-compose down
 popd

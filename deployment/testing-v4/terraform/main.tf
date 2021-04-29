@@ -87,7 +87,7 @@ module "bucket-permissions-b" {
 // server A's private bucket because they are operated by the same entity.
 resource "google_storage_bucket_iam_member" "ingest_internal_private" {
   bucket = module.bucket-a.private
-  role   = "roles/storage.objectAdmin"
+  role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.ingest.email}"
 }
 

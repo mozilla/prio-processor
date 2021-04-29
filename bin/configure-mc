@@ -1,0 +1,25 @@
+#!/bin/bash
+# Configure the MinIO command-line tool against the environment variables
+
+set -e
+# do *not* print commands here since they utilize sensitive environment variables
+set +x 
+
+: "${BUCKET_INTERNAL_ACCESS_KEY?}"
+: "${BUCKET_INTERNAL_SECRET_KEY?}"
+: "${BUCKET_INTERNAL_ENDPOINT?}"
+: "${BUCKET_EXTERNAL_SECRET_KEY?}"
+: "${BUCKET_EXTERNAL_ACCESS_KEY?}"
+: "${BUCKET_EXTERNAL_ENDPOINT?}"
+
+mc alias set internal \
+    $BUCKET_INTERNAL_ENDPOINT \
+    $BUCKET_INTERNAL_ACCESS_KEY \
+    $BUCKET_INTERNAL_SECRET_KEY \
+    --api S3v4
+
+mc alias set external \
+    $BUCKET_EXTERNAL_ENDPOINT \
+    $BUCKET_EXTERNAL_ACCESS_KEY \
+    $BUCKET_EXTERNAL_SECRET_KEY \
+    --api S3v4

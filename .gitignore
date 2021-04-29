@@ -24,3 +24,8 @@ venv/
 
 .terraform/
 .bash_history
+
+# we only want to keep the template and generate the actual config at runtime,
+# don't accidentally check values that may have sensitive values into
+# source-control
+config/spark/spark-defaults.conf

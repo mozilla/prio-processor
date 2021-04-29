@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Configure the spark defaults for use with the s3a adapter. Other settings may
+# be configured here too.
+
+set -e
+set +x
+
+: "${BUCKET_INTERNAL_ACCESS_KEY?}"
+: "${BUCKET_INTERNAL_SECRET_KEY?}"
+: "${BUCKET_INTERNAL_ENDPOINT?}"
+
+# work from the parent directory
+cd "$(dirname "$0")/.."
+
+# note that this directory may be mounted, so we've added this file to the
+# .gitignore
+output=config/spark/spark-defaults.conf
+cp config/spark/spark-defaults.conf.template $output
+
+# append our configuration
+cat << EOF >> $output
+
+spark.hadoop.fs.s3a.access.key $BUCKET_INTERNAL_ACCESS_KEY
+spark.hadoop.fs.s3a.secret.key $BUCKET_INTERNAL_SECRET_KEY
+spark.hadoop.fs.s3a.endpoint $BUCKET_INTERNAL_ENDPOINT
+EOF

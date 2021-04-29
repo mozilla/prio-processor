@@ -37,3 +37,13 @@ scripts/integrate
 # clean up the buckets
 scripts/cleanup
 ```
+
+In order to be agnostic to the storage provider, MinIO and `mc` are used for
+transferring data between the different parties. A GCS gateway is provisioned
+for each container that is associated with a service account. Each MinIO
+container has an HTTP entrypoint for browsing files that can be found on the
+following locations:
+
+- http://localhost:9001 for the ingestion server
+- http://localhost:9002 for server a
+- http://localhost:9003 for server b
