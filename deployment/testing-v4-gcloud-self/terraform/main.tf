@@ -2,14 +2,14 @@ terraform {
   // When forking this configuration, set the configuration appropriately. A
   // remote backend is a good choice since it can be shared across a team.
   backend "gcs" {
-    bucket = "amiyaguchi-prio-processor-v4"
+    bucket = "amiyaguchi-prio-processor-v4-1"
     prefix = "tf-state"
   }
 }
 
 variable "project" {
   type    = string
-  default = "amiyaguchi-prio-processor-v4"
+  default = "amiyaguchi-prio-processor-v4-1"
 }
 
 variable "region" {
@@ -36,13 +36,6 @@ module "bucket-a" {
   suffix    = random_id.project.hex
 }
 
-module "bucket-b" {
-  source    = "./modules/bucket"
-  server_id = "b"
-  suffix    = random_id.project.hex
-}
-
-
 // Create the service accounts for the tests
 resource "google_service_account" "ingest" {
   account_id   = "service-account-ingest"
@@ -68,16 +61,6 @@ module "bucket-permissions-a" {
   bucket_ingest            = module.bucket-a.ingest
   service_account_internal = google_service_account.a.email
   service_account_external = google_service_account.b.email
-  service_account_ingest   = google_service_account.ingest.email
-}
-
-module "bucket-permissions-b" {
-  source                   = "./modules/bucket-permissions"
-  bucket_private           = module.bucket-b.private
-  bucket_shared            = module.bucket-b.shared
-  bucket_ingest            = module.bucket-b.ingest
-  service_account_internal = google_service_account.b.email
-  service_account_external = google_service_account.a.email
   service_account_ingest   = google_service_account.ingest.email
 }
 

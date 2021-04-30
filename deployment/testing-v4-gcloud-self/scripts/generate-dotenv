@@ -3,7 +3,7 @@
 
 set -e
 
-PROJECT=${PROJECT:-amiyaguchi-prio-processor-v4}
+PROJECT=${PROJECT:-amiyaguchi-prio-processor-v4-1}
 TAG=${TAG:-mozilla/prio-processor:v3.0.0}
 
 if [[ $(gcloud config get-value project) != "$PROJECT" ]]; then 
