@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Delegate docker-compose build to each service
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+pushd compose/ingest
+docker-compose build
+popd
+
+pushd compose/server-a
+docker-compose build
+popd
+
+pushd compose/server-b
+docker-compose build
+popd

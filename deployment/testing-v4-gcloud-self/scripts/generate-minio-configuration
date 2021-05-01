@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""Generate MinIO configuration for server B."""
+from pathlib import Path
+import secrets
+import json
+
+ROOT = Path(__file__).parent.parent
+
+
+def policy(buckets):
+    return {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": ["s3:*"],
+                "Effect": "Allow",
+                "Resource": [f"arn:aws:s3:::{bucket}/*" for bucket in buckets],
+                "Sid": "",
+            }
+        ],
+    }
+
+
+def keypair(name):
+    return {"access_key": name, "secret_key": secrets.token_hex(32)}
+
+
+# create the relevant buckets
+def main():
+    salt = secrets.token_hex(8)
+    server_id = "b"
+    other_id = "a"
+
+    # generate the buckets
+    private = f"{server_id}-private-{salt}"
+    shared = f"{server_id}-shared-{salt}"
+    ingest = f"{server_id}-ingest-{salt}"
+
+    payload = {
+        "buckets": {"private": private, "shared": shared, "ingest": ingest},
+        "policy": {
+            "internal": policy([private, shared, ingest]),
+            "external": policy([shared]),
+            "ingest": policy([ingest]),
+        },
+        "keys": {
+            "internal": keypair(f"{server_id}-{salt}"),
+            "external": keypair(f"{other_id}-{salt}"),
+            "ingest": keypair(f"ingest-{salt}"),
+        },
+    }
+
+    dotsecrets = ROOT / ".secrets"
+    dotsecrets.mkdir(parents=True, exist_ok=True)
+    configfile = dotsecrets / "minio-config.json"
+    if configfile.exists():
+        raise FileExistsError(f"{configfile} already exists!")
+    configfile.write_text(json.dumps(payload, indent=2))
+
+
+if __name__ == "__main__":
+    main()
