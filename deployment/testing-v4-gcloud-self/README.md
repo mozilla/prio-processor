@@ -26,6 +26,9 @@ scripts/generate-service-account-keys
 
 # generate new keys (or alternatively copy .env.template files to their .env locations)
 scripts/generate-dotenv
+
+# generate minio configuration
+scripts/generate-minio-configuration
 ```
 
 The above commands only need to be run once. To run the tests:
