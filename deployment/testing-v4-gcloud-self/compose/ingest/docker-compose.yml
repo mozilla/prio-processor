@@ -1,8 +1,12 @@
 version: "3.9"
 
+networks:
+  testing-v4-gcloud-self-b_default:
+    external: true
+
 services:
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
-  minio:
+  gateway-ingest:
     image: minio/minio:latest
     command: gateway gcs ${CLOUDSDK_CORE_PROJECT}
     volumes:
@@ -21,8 +25,11 @@ services:
       - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
       - ../../content.json:/app/config/content.json
       - ../../../../bin:/app/bin
+    networks:
+      - default
+      - testing-v4-gcloud-self-b_default
     depends_on:
-      - minio
+      - gateway-ingest
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
       - APP_NAME

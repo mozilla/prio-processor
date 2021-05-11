@@ -73,13 +73,13 @@ BUCKET_INTERNAL_INGEST=$(get-bucket a-ingest)
 # shouldn't be accessible over the public internet.
 BUCKET_INTERNAL_ACCESS_KEY=$server_id-access-key
 BUCKET_INTERNAL_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-BUCKET_INTERNAL_ENDPOINT=http://gcs-gateway-ingest
+BUCKET_INTERNAL_ENDPOINT=http://gcs-gateway-ingest:9000
 
 PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$keys_b" public_key)
 BUCKET_EXTERNAL_INGEST=$(get-key "$minio" buckets.ingest)
 BUCKET_EXTERNAL_ACCESS_KEY=$(get-key "$minio" keys.ingest.access_key)
 BUCKET_EXTERNAL_SECRET_KEY=$(get-key "$minio" keys.ingest.secret_key)
-BUCKET_EXTERNAL_ENDPOINT=http://minio-b
+BUCKET_EXTERNAL_ENDPOINT=http://minio-b:9000
 
 # The ingest also gets access to the private internal bucket, because ingest and
 # server A are operated by the same entity in the origin telemetry setup
@@ -124,13 +124,13 @@ BUCKET_INTERNAL_SHARED=$(get-bucket "${server_id}-shared")
 # shouldn't be accessible over the public internet.
 BUCKET_INTERNAL_ACCESS_KEY=$server_id-access-key
 BUCKET_INTERNAL_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-BUCKET_INTERNAL_ENDPOINT=http://gcs-gateway-a
+BUCKET_INTERNAL_ENDPOINT=http://gcs-gateway-a:9000
 
 PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$external_key" public_key)
 BUCKET_EXTERNAL_SHARED=$(get-key "$minio" buckets.shared)
 BUCKET_EXTERNAL_ACCESS_KEY=$(get-key "$minio" keys.external.access_key)
 BUCKET_EXTERNAL_SECRET_KEY=$(get-key "$minio" keys.external.secret_key)
-BUCKET_EXTERNAL_ENDPOINT=http://minio-b
+BUCKET_EXTERNAL_ENDPOINT=http://minio-b:9000
 EOF
 }
 
@@ -165,7 +165,7 @@ BUCKET_INTERNAL_PRIVATE=$(get-key "$minio" buckets.private)
 BUCKET_INTERNAL_SHARED=$(get-key "$minio" buckets.shared)
 BUCKET_INTERNAL_ACCESS_KEY=$(get-key "$minio" keys.internal.access_key)
 BUCKET_INTERNAL_SECRET_KEY=$(get-key "$minio" keys.internal.secret_key)
-BUCKET_INTERNAL_ENDPOINT=http://minio-b
+BUCKET_INTERNAL_ENDPOINT=http://minio-b:9000
 
 # access to the external bucket is mediated by the gcs gateway, use the same
 # internal keys for gcs-gateway as for access to the normal minio instance.
@@ -173,7 +173,7 @@ PUBLIC_KEY_HEX_EXTERNAL=$(get-key "$external_key" public_key)
 BUCKET_EXTERNAL_SHARED=$(get-bucket "${other_id}-shared")
 BUCKET_EXTERNAL_ACCESS_KEY=$(get-key "$minio" keys.internal.access_key)
 BUCKET_EXTERNAL_SECRET_KEY=$(get-key "$minio" keys.internal.secret_key)
-BUCKET_EXTERNAL_ENDPOINT=http://gcs-gateway-b
+BUCKET_EXTERNAL_ENDPOINT=http://gcs-gateway-b:9000
 EOF
 }
 

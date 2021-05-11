@@ -1,8 +1,14 @@
 version: "3.9"
 
+# Only used when testing locally. When applied to an external host for server b,
+# use the public ip address of the node and remove this network dependency.
+networks:
+  testing-v4-gcloud-self-b_default:
+    external: true
+
 services:
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
-  minio:
+  gateway-a:
     image: minio/minio:latest
     command: gateway gcs
     volumes:
@@ -21,8 +27,11 @@ services:
     volumes:
       - ../../content.json:/app/config/content.json
       - ../../../../bin:/app/bin
+    networks:
+      - default
+      - testing-v4-gcloud-self-b_default
     depends_on:
-      - minio
+      - gateway-a
     environment:
       - APP_NAME
       - DATA_CONFIG

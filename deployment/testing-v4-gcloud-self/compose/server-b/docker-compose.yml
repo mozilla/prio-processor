@@ -1,8 +1,31 @@
 version: "3.9"
 
 services:
+  minio-b:
+    image: minio/minio:latest
+    command: server /data
+    ports:
+      - 9004:9000
+    environment:
+      - MINIO_ACCESS_KEY=$BUCKET_INTERNAL_ACCESS_KEY
+      - MINIO_SECRET_KEY=$BUCKET_INTERNAL_SECRET_KEY
+
+  # This is run to set up policies on the buckets
+  minio-bootstrap:
+    build: ../../../..
+    depends_on:
+      - minio-b
+    working_dir: /root
+    command: bash bootstrap.sh
+    volumes:
+      - .:/root/
+    environment:
+      - BUCKET_INTERNAL_ACCESS_KEY
+      - BUCKET_INTERNAL_SECRET_KEY
+      - BUCKET_INTERNAL_ENDPOINT
+
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
-  minio:
+  gateway-b:
     image: minio/minio:latest
     command: gateway gcs
     volumes:
@@ -22,7 +45,9 @@ services:
       - ../../content.json:/app/config/content.json
       - ../../../../bin:/app/bin
     depends_on:
-      - minio
+      - gateway-b
+      - minio-b
+      - minio-bootstrap
     environment:
       - APP_NAME
       - DATA_CONFIG
