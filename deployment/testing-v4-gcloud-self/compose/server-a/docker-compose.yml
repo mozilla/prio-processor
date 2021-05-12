@@ -8,7 +8,7 @@ networks:
 
 services:
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
-  gateway-a:
+  gcs-gateway-a:
     image: minio/minio:latest
     command: gateway gcs
     volumes:
@@ -31,7 +31,7 @@ services:
       - default
       - testing-v4-gcloud-self-b_default
     depends_on:
-      - gateway-a
+      - gcs-gateway-a
     environment:
       - APP_NAME
       - DATA_CONFIG

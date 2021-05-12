@@ -25,7 +25,7 @@ services:
       - BUCKET_INTERNAL_ENDPOINT
 
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
-  gateway-b:
+  gcs-gateway-b:
     image: minio/minio:latest
     command: gateway gcs
     volumes:
@@ -45,7 +45,7 @@ services:
       - ../../content.json:/app/config/content.json
       - ../../../../bin:/app/bin
     depends_on:
-      - gateway-b
+      - gcs-gateway-b
       - minio-b
       - minio-bootstrap
     environment:
@@ -68,3 +68,4 @@ services:
       - BUCKET_EXTERNAL_SHARED
       - BUCKET_PREFIX
       - SUBMISSION_DATE
+      - RETRY_LIMIT=10

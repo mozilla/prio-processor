@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Make a copy of the minio configuration in server b directory
+
+set -ex
+cp .secrets/minio-config.json compose/server-b

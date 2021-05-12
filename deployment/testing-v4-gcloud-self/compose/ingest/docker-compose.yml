@@ -6,7 +6,7 @@ networks:
 
 services:
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
-  gateway-ingest:
+  gcs-gateway-ingest:
     image: minio/minio:latest
     command: gateway gcs ${CLOUDSDK_CORE_PROJECT}
     volumes:
@@ -29,7 +29,7 @@ services:
       - default
       - testing-v4-gcloud-self-b_default
     depends_on:
-      - gateway-ingest
+      - gcs-gateway-ingest
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
       - APP_NAME
@@ -45,8 +45,6 @@ services:
       - BUCKET_EXTERNAL_ENDPOINT
       - BUCKET_INTERNAL_INGEST
       - BUCKET_EXTERNAL_INGEST
-      # for submitting results to bigquery, granted access via GCP primitives
-      # instead of HMAC keys
       - BUCKET_INTERNAL_PRIVATE
       - BUCKET_PREFIX
       - DATASET

@@ -71,7 +71,7 @@ PUBLIC_KEY_HEX_INTERNAL=$(get-key "$keys_a" public_key)
 BUCKET_INTERNAL_INGEST=$(get-bucket a-ingest)
 # The keys for the internal gateway don't particularly matter since it generally
 # shouldn't be accessible over the public internet.
-BUCKET_INTERNAL_ACCESS_KEY=$server_id-access-key
+BUCKET_INTERNAL_ACCESS_KEY=a-access-key
 BUCKET_INTERNAL_SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 BUCKET_INTERNAL_ENDPOINT=http://gcs-gateway-ingest:9000
 

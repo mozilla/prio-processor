@@ -8,6 +8,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+# Start server B with minio server
+pushd compose/server-b
+docker-compose run --rm app bin/process &
+server_b_pid=$!
+popd
+
 # Copy data into the appropriate buckets
 pushd compose/ingest
 docker-compose run --rm app bin/generate
@@ -20,15 +26,6 @@ docker-compose run --rm app bin/process &
 server_a_pid=$!
 popd
 
-# offset the start times by a short amount for proper authentication against GCP
-sleep 2
-
-# Start server B
-pushd compose/server-b
-docker-compose run --rm app bin/process &
-server_b_pid=$!
-popd
-
 # Return the exit code of the backgrounded docker-compose container. Since
 # `wait` is a blocking function, a failure in server B will not be detected
 # until timeout in server A.
@@ -39,11 +36,12 @@ wait $server_b_pid
 pushd compose/server-a
 docker-compose down
 popd
-pushd compose/server-b
-docker-compose down
-popd
 
 pushd compose/ingest
 docker-compose run --rm app bin/insert
+docker-compose down
+popd
+
+pushd compose/server-b
 docker-compose down
 popd
