@@ -14,6 +14,9 @@ docker-compose run --rm app bin/process &
 server_b_pid=$!
 popd
 
+# wait for the network to come online
+sleep 5
+
 # Copy data into the appropriate buckets
 pushd compose/ingest
 docker-compose run --rm app bin/generate
