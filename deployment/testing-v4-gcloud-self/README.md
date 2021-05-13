@@ -143,8 +143,8 @@ the application.
 Before providing variables for the external and ingestion services, ensure MinIO
 is available to the public internet. By default, the MinIO service is made
 available to the host on port 9004. Forward this port to and provide the
-following as the endpoint: `http://{host}:{port}`. It may be preferable to
-provide this via reverse-proxy ala NGINX.
+following as the endpoint: `http://{host}:{port}`. Alternatively, change port
+9004 to 80. It may be preferable to provide this via reverse-proxy ala NGINX.
 
 Then, provide the following variables for the ingestion service:
 
