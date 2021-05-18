@@ -1,0 +1,70 @@
+{
+  "buckets": {
+    "private": "b-private-032fc7c2cca96ddb",
+    "shared": "b-shared-032fc7c2cca96ddb",
+    "ingest": "b-ingest-032fc7c2cca96ddb"
+  },
+  "policy": {
+    "internal": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "s3:*"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:s3:::b-private-032fc7c2cca96ddb/*",
+            "arn:aws:s3:::b-shared-032fc7c2cca96ddb/*",
+            "arn:aws:s3:::b-ingest-032fc7c2cca96ddb/*"
+          ],
+          "Sid": ""
+        }
+      ]
+    },
+    "external": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "s3:*"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:s3:::b-shared-032fc7c2cca96ddb/*"
+          ],
+          "Sid": ""
+        }
+      ]
+    },
+    "ingest": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "s3:*"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:s3:::b-ingest-032fc7c2cca96ddb/*"
+          ],
+          "Sid": ""
+        }
+      ]
+    }
+  },
+  "keys": {
+    "internal": {
+      "access_key": "b-032fc7c2cca96ddb",
+      "secret_key": "a6b4094711a66498c561a8763b97d79087a989ab173ce84963c2247e7039fd74"
+    },
+    "external": {
+      "access_key": "a-032fc7c2cca96ddb",
+      "secret_key": "d3fe697dd6d4acc606d9a637e339ea5f04afeef55db14d8c4ad5321b31ae405f"
+    },
+    "ingest": {
+      "access_key": "ingest-032fc7c2cca96ddb",
+      "secret_key": "78aa4bb15f7571492472112dacb39a9760c5f4e46aba146813c6b5722478d81f"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+version: "3.9"
+
+# Only used when testing locally. When applied to an external host for server b,
+# use the public ip address of the node and remove this network dependency.
+networks:
+  testing-v4-gcloud-self-b_default:
+    external: true
+
+services:
+  # https://docs.min.io/docs/minio-gateway-for-gcs.html
+  gcs-gateway-a:
+    image: minio/minio:latest
+    command: gateway gcs
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
+    ports:
+      - 9002:9000
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.credentials
+      - MINIO_ROOT_USER=$BUCKET_INTERNAL_ACCESS_KEY
+      - MINIO_ROOT_PASSWORD=$BUCKET_INTERNAL_SECRET_KEY
+
+  app:
+    build: ../../../..
+    working_dir: /app
+    command: bin/process
+    volumes:
+      - ../../content.json:/app/config/content.json
+      - ../../../../bin:/app/bin
+    networks:
+      - default
+      - testing-v4-gcloud-self-b_default
+    depends_on:
+      - gcs-gateway-a
+    environment:
+      - APP_NAME
+      - DATA_CONFIG
+      - SERVER_ID
+      - SHARED_SECRET
+      - PRIVATE_KEY_HEX
+      - PUBLIC_KEY_HEX_INTERNAL
+      - PUBLIC_KEY_HEX_EXTERNAL
+      - BUCKET_INTERNAL_ACCESS_KEY
+      - BUCKET_INTERNAL_SECRET_KEY
+      - BUCKET_INTERNAL_ENDPOINT
+      - BUCKET_EXTERNAL_ACCESS_KEY
+      - BUCKET_EXTERNAL_SECRET_KEY
+      - BUCKET_EXTERNAL_ENDPOINT
+      - BUCKET_INTERNAL_INGEST
+      - BUCKET_INTERNAL_PRIVATE
+      - BUCKET_INTERNAL_SHARED
+      - BUCKET_EXTERNAL_SHARED
+      - BUCKET_PREFIX
+      - SUBMISSION_DATE

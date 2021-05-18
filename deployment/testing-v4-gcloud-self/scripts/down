@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# shut down docker containers
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+pushd compose/ingest
+docker-compose down
+popd
+
+pushd compose/server-a
+docker-compose down
+popd
+
+pushd compose/server-b
+docker-compose down
+popd
