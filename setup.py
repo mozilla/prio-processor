@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="prio_processor",
-    version="4.0.0",
+    version="4.1.0",
     description="A processing engine for prio data",
     long_description_content_type="text/markdown",
     author="Anthony Miyaguchi",
