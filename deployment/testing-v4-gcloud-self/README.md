@@ -3,9 +3,10 @@
 This directory contains terraform configuration to bring relevant resources for
 an integration test of the prio-processor v4.x containers.
 
-To create a new project that uses the same configuration, change the terraform
-backend appropriately. Here, the state is placed into a storage bucket that has
-been created beforehand. Ensure the project has also been created. Then:
+To create a new environment that uses the same configuration, change the
+terraform backend appropriately. Here, the state is placed into a storage bucket
+that has been created beforehand. Ensure the GCP project has also been created.
+Then run the terraform for the ingestion and server A resource:
 
 ```bash
 cd terraform

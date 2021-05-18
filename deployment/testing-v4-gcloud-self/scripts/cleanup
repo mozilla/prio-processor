@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Delegate cleanup of buckets to the appropriate service account
+# Run cleanup scripts for each server
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 pushd compose/server-b
 docker-compose run --rm app bin/cleanup
-# keep the container around...
+# keep the container around since the network depends on server b
 
 pushd ../../compose/server-a
 docker-compose run --rm app bin/cleanup
@@ -15,5 +15,3 @@ docker-compose down
 popd
 
 docker-compose down
-# unnecessary, but pop back into the root
-popd

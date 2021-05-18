@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Delegate docker-compose build to each service
+# Build each docker-compose service by changing directories
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
