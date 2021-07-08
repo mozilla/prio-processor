@@ -43,9 +43,60 @@ class ExtractPrioPing(ABC):
     def __init__(self, spark: SparkSession):
         self.spark = spark
 
+    @staticmethod
+    def estimate_num_partitions(
+        df: DataFrame, column: str = "prio", partition_size_mb: int = 250
+    ) -> int:
+        """Given a column in a dataframe, determine how many partitions to
+        create. The colum is assumed to comprise most of the size of the dataset
+        e.g. the share for server A is much greater than the metadata like the
+        uuid and batch_id.
+        """
+        size_b = df.select(F.sum(length(column)).alias("size")).collect()[0].size
+        return math.ceil(size_b * 1.0 / 10 ** 6 / partition_size_mb)
+
     @abstractmethod
     def extract(self, path: str, date: str) -> DataFrame:
         pass
+
+    def transform(self, data: DataFrame) -> DataFrame:
+        """Flatten nested prioData into a flattened dataframe that is optimally
+        partitioned for batched processing in a tool agnostic fashion.
+
+        The dataset is first partitioned by the batch_id, which determines the
+        dimension and encoding of the underlying shares. The flattened rows are
+        reassigned a new primary key for coordinating messages between servers. The
+        dataset is then partitioned by server_id. The partitions for each server
+        should contain the same set of join keys.
+        """
+        df = (
+            data
+            # NOTE: is it worth counting duplicates?
+            .dropDuplicates(["id"])
+            .withColumn("data", explode("prioData"))
+            # drop the id and assign a new one per encoding type
+            # this id is used as a join-key during the decoding process
+            .select(col("data.encoding").alias("batch_id"), "data.prio")
+            .withColumn(
+                "id", row_number().over(Window.partitionBy("batch_id").orderBy(lit(0)))
+            )
+        )
+
+        num_partitions = self.estimate_num_partitions(df, col("prio")["a"])
+
+        return (
+            df.repartitionByRange(num_partitions, "batch_id", "id")
+            # explode the values per server
+            .select("batch_id", "id", explode("prio").alias("server_id", "payload"))
+            # reorder the final columns
+            .select("batch_id", "server_id", "id", "payload")
+        )
+
+    def load(self, data: DataFrame, output: str, date: str):
+        """Write the results of the transformed data to storage."""
+        data.withColumn("submission_date", lit(date)).write.partitionBy(
+            "submission_date", "server_id", "batch_id"
+        ).json(output, mode="overwrite")
 
 
 class CloudStorageExtract(ExtractPrioPing):
@@ -105,53 +156,6 @@ class BigQueryStorageExtract(ExtractPrioPing):
         ).select("extracted.*")
 
 
-def estimate_num_partitions(
-    df: DataFrame, column: str = "prio", partition_size_mb: int = 250
-) -> int:
-    size_b = df.select(F.sum(length(column)).alias("size")).collect()[0].size
-    return math.ceil(size_b * 1.0 / 10 ** 6 / partition_size_mb)
-
-
-def transform(data: DataFrame) -> DataFrame:
-    """Flatten nested prioData into a flattened dataframe that is optimally
-    partitioned for batched processing in a tool agnostic fashion.
-
-    The dataset is first partitioned by the batch_id, which determines the
-    dimension and encoding of the underlying shares. The flattened rows are
-    reassigned a new primary key for coordinating messages between servers. The
-    dataset is then partitioned by server_id. The partitions for each server
-    should contain the same set of join keys.
-    """
-    df = (
-        data
-        # NOTE: is it worth counting duplicates?
-        .dropDuplicates(["id"])
-        .withColumn("data", explode("prioData"))
-        # drop the id and assign a new one per encoding type
-        # this id is used as a join-key during the decoding process
-        .select(col("data.encoding").alias("batch_id"), "data.prio")
-        .withColumn(
-            "id", row_number().over(Window.partitionBy("batch_id").orderBy(lit(0)))
-        )
-    )
-
-    num_partitions = estimate_num_partitions(df, col("prio")["a"])
-
-    return (
-        df.repartitionByRange(num_partitions, "batch_id", "id")
-        # explode the values per server
-        .select("batch_id", "id", explode("prio").alias("server_id", "payload"))
-        # reorder the final columns
-        .select("batch_id", "server_id", "id", "payload")
-    )
-
-
-def load(data: DataFrame, output: str, date: str):
-    data.withColumn("submission_date", lit(date)).write.partitionBy(
-        "submission_date", "server_id", "batch_id"
-    ).json(output, mode="overwrite")
-
-
 @click.command()
 @click.option(
     "--date",
@@ -188,9 +192,10 @@ def run(date, input, output, source, credentials):
 
     extract_method = {"gcs": CloudStorageExtract, "bigquery": BigQueryStorageExtract}
 
-    pings = extract_method[source](spark).extract(input, date)
-    processed = transform(pings)
-    load(processed, output, date)
+    transformer = extract_method[source](spark)
+    pings = transformer.extract(input, date)
+    processed = transformer.transform(pings)
+    transformer.load(processed, output, date)
 
 
 if __name__ == "__main__":
