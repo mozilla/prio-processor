@@ -156,6 +156,79 @@ class BigQueryStorageExtract(ExtractPrioPing):
         ).select("extracted.*")
 
 
+class BigQueryStorageExtractStructured(ExtractPrioPing):
+    def extract(self, table: str, date: str) -> DataFrame:
+        """Extract data from the structured ingestion BigQuery table."""
+        sql = f"""
+        WITH deduped AS (
+            SELECT
+                id,
+                array_agg(payload)[offset(0)] AS payload,
+            FROM
+                {table}
+            WHERE
+                date(submission_timestamp) = "{date}"
+            GROUP BY
+                1
+        ),
+        extracted AS (
+            SELECT
+                -- reassign the id for partitioning
+                sha256(prio_data.prio.a) as id,
+                prio_data.encoding AS batch_id,
+                prio_data.prio AS payload
+            FROM
+                deduped,
+                UNNEST(payload.prio_data) prio_data
+        ),
+        a AS (
+            SELECT
+                id,
+                batch_id,
+                "a" AS server_id,
+                payload.a AS payload
+            FROM
+                extracted
+        ),
+        b AS (
+            SELECT
+                id,
+                batch_id,
+                "b" AS server_id,
+                payload.b AS payload
+            FROM
+                extracted
+        ),
+        unioned AS (
+            SELECT * FROM a
+            UNION ALL
+            SELECT * FROM b
+        )
+        SELECT
+            id,
+            batch_id,
+            server_id,
+            payload
+        FROM
+            unioned
+        ORDER BY
+            batch_id,
+            server_id
+        """
+        df = self.spark.read.format("bigquery").load()
+
+    def transform(self, data: DataFrame) -> DataFrame:
+        num_partitions = self.estimate_num_partitions(df.where("server_id = 'a'"), "a")
+
+        return (
+            df.repartitionByRange(num_partitions, "batch_id", "id")
+            # explode the values per server
+            .select("batch_id", "id", explode("prio").alias("server_id", "payload"))
+            # reorder the final columns
+            .select("batch_id", "server_id", "id", "payload")
+        )
+
+
 @click.command()
 @click.option(
     "--date",
@@ -172,7 +245,7 @@ class BigQueryStorageExtract(ExtractPrioPing):
 @click.option("--output", type=str, required=True, help="Output path")
 @click.option(
     "--source",
-    type=click.Choice(["gcs", "bigquery"]),
+    type=click.Choice(["gcs", "bigquery", "bigquery-structured"]),
     default="gcs",
     help="The storage location for reading raw prio pings",
 )
@@ -190,7 +263,11 @@ def run(date, input, output, source, credentials):
     if credentials:
         spark.conf.set("credentialsFile", credentials)
 
-    extract_method = {"gcs": CloudStorageExtract, "bigquery": BigQueryStorageExtract}
+    extract_method = {
+        "gcs": CloudStorageExtract,
+        "bigquery": BigQueryStorageExtract,
+        "bigquery-structured": BigQueryStorageExtractStructured,
+    }
 
     transformer = extract_method[source](spark)
     pings = transformer.extract(input, date)
