@@ -40,8 +40,9 @@ class ExtractPrioPing(ABC):
         ]
     )
 
-    def __init__(self, spark: SparkSession):
+    def __init__(self, spark: SparkSession, materialization_project: str):
         self.spark = spark
+        self.materialization_project = materialization_project
 
     @staticmethod
     def estimate_num_partitions(
@@ -52,7 +53,7 @@ class ExtractPrioPing(ABC):
         e.g. the share for server A is much greater than the metadata like the
         uuid and batch_id.
         """
-        size_b = df.select(F.sum(length(column)).alias("size")).collect()[0].size
+        size_b = df.select(F.sum(length(column)).alias("size")).collect()[0].size or 0
         return math.ceil(size_b * 1.0 / 10 ** 6 / partition_size_mb)
 
     @abstractmethod
@@ -158,14 +159,24 @@ class BigQueryStorageExtract(ExtractPrioPing):
 
 class BigQueryStorageExtractStructured(ExtractPrioPing):
     def extract(self, table: str, date: str) -> DataFrame:
-        """Extract data from the structured ingestion BigQuery table."""
+        """Extract data from the structured ingestion BigQuery table.
+
+        This assumes the job runs in moz-fx-data-shared-prod or mozdata, where
+        there is a `tmp` dataset for miscellaneous queries like this.
+        """
+
+        self.spark.conf.set("viewsEnabled", "true")
+        self.spark.conf.set("materializationDataset", "tmp")
+        if self.materialization_project:
+            self.spark.conf.set("materializationProject", self.materialization_project)
+
         sql = f"""
         WITH deduped AS (
             SELECT
                 id,
                 array_agg(payload)[offset(0)] AS payload,
             FROM
-                {table}
+                `{table}`
             WHERE
                 date(submission_timestamp) = "{date}"
             GROUP BY
@@ -185,7 +196,7 @@ class BigQueryStorageExtractStructured(ExtractPrioPing):
             SELECT
                 id,
                 batch_id,
-                "a" AS server_id,
+                'a' AS server_id,
                 payload.a AS payload
             FROM
                 extracted
@@ -194,7 +205,7 @@ class BigQueryStorageExtractStructured(ExtractPrioPing):
             SELECT
                 id,
                 batch_id,
-                "b" AS server_id,
+                'b' AS server_id,
                 payload.b AS payload
             FROM
                 extracted
@@ -215,15 +226,22 @@ class BigQueryStorageExtractStructured(ExtractPrioPing):
             batch_id,
             server_id
         """
-        df = self.spark.read.format("bigquery").load()
+        print("Running query to be materialized:")
+        print(sql)
+        df = self.spark.read.format("bigquery").load(sql)
 
     def transform(self, data: DataFrame) -> DataFrame:
-        num_partitions = self.estimate_num_partitions(df.where("server_id = 'a'"), "a")
+        """Transform the data to be written out in ranged partitions.
+
+        The data has already been exploded where there is one unique identifier
+        for each share.
+        """
+        num_partitions = self.estimate_num_partitions(
+            data.where("server_id = 'a'"), "a"
+        )
 
         return (
-            df.repartitionByRange(num_partitions, "batch_id", "id")
-            # explode the values per server
-            .select("batch_id", "id", explode("prio").alias("server_id", "payload"))
+            data.repartitionByRange(num_partitions, "batch_id", "id")
             # reorder the final columns
             .select("batch_id", "server_id", "id", "payload")
         )
@@ -256,7 +274,12 @@ class BigQueryStorageExtractStructured(ExtractPrioPing):
     help="Path to google application credentials",
     required=False,
 )
-def run(date, input, output, source, credentials):
+@click.option(
+    "--materialization-project",
+    type=str,
+    help="Name of the project used for dataset materialization in BigQuery. Project should have a tmp dataset.",
+)
+def run(date, input, output, source, credentials, materialization_project):
     spark = SparkSession.builder.getOrCreate()
     spark.conf.set("fs.gs.implicit.dir.repair.enable", False)
     spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
@@ -269,7 +292,7 @@ def run(date, input, output, source, credentials):
         "bigquery-structured": BigQueryStorageExtractStructured,
     }
 
-    transformer = extract_method[source](spark)
+    transformer = extract_method[source](spark, materialization_project)
     pings = transformer.extract(input, date)
     processed = transformer.transform(pings)
     transformer.load(processed, output, date)
