@@ -126,9 +126,11 @@ In server B, to generate new buckets and access keys, run the following command:
 scripts/generate-minio-configuration
 ```
 
+#### Modifying internal environment variables
+
 This will create a new file called `.secrets/minio-config.json` with bucket
-names, policy files, and access keys. Replace the following variables with values
-from the configuration file:
+names, policy files, and access keys. Replace the following variables in the
+`.env` file with values from the configuration file:
 
 ```bash
 BUCKET_INTERNAL_INGEST=...      # .buckets.ingest
@@ -145,22 +147,31 @@ Before providing variables for the external and ingestion services, ensure MinIO
 is available to the public internet. By default, the MinIO service is made
 available to the host on port 9004. Forward this port to and provide the
 following as the endpoint: `http://{host}:{port}`. Alternatively, change port
-9004 to 80. It may be preferable to provide this via reverse-proxy ala NGINX.
+9004 to 80. It may be preferable to provide this [via reverse-proxy ala
+NGINX](https://docs.min.io/docs/setup-nginx-proxy-with-minio.html). If using a
+reverse proxy, [ensure that host
+headers](https://github.com/minio/minio/issues/7936) are being proxied
+correctly.
 
-Then, provide the following variables for the ingestion service:
+#### Providing external partners with environment variables
+
+The following environment variables are named from the perspective of the
+running server. Create a new text file with the following variables for the
+ingestion service and send them to the partner via a secured channel:
 
 ```bash
-PUBLIC_KEY_HEX_EXTERNAL=...     # public key
+PUBLIC_KEY_HEX_EXTERNAL=...     # public key of server B
 BUCKET_EXTERNAL_INGEST=...      # .buckets.ingest
 BUCKET_EXTERNAL_ACCESS_KEY=...  # .keys.ingest.access_key
 BUCKET_EXTERNAL_SECRET_KEY=...  # .keys.ingest.secret_key
 BUCKET_EXTERNAL_ENDPOINT=...    # endpoint computed above
 ```
 
-Provide the following variables for server a:
+Create a new text file with the following variables for server A and send them
+to the partner via a secured channel.
 
 ```bash
-PUBLIC_KEY_HEX_EXTERNAL=...     # public key
+PUBLIC_KEY_HEX_EXTERNAL=...     # public key of server B
 BUCKET_EXTERNAL_SHARED=...      # .buckets.shared
 BUCKET_EXTERNAL_ACCESS_KEY=...  # .keys.external.access_key
 BUCKET_EXTERNAL_SECRET_KEY=...  # .keys.external.secret_key
