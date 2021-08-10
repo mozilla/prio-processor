@@ -138,6 +138,12 @@ BUCKET_INTERNAL_PRIVATE=...     # .buckets.private
 BUCKET_INTERNAL_SHARED=...      # .buckets.shares
 BUCKET_INTERNAL_ACCESS_KEY=...  # .keys.internal.access_key
 BUCKET_INTERNAL_SECRET_KEY=...  # .keys.internal.secret_key
+
+# NOTE: the external keys are the same as the internal keys because access to
+# server A is being proxied through the minio instance. Therefore, the proxy
+# should be configured with a keypair known only to server B.
+BUCKET_EXTERNAL_ACCESS_KEY=...  # .keys.internal.access_key
+BUCKET_EXTERNAL_SECRET_KEY=...  # .keys.internal.secret_key
 ```
 
 The default endpoint of `http://minio-b:9000` will suffice for local access by
