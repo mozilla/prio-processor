@@ -7,7 +7,7 @@ networks:
 services:
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
   gcs-gateway-ingest:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2021-06-17T00-10-46Z
     command: gateway gcs ${CLOUDSDK_CORE_PROJECT}
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials

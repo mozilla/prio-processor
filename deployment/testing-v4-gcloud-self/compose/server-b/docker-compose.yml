@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   minio-b:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2021-06-17T00-10-46Z
     command: server /data
     ports:
       - 9004:9000
@@ -26,7 +26,7 @@ services:
 
   # https://docs.min.io/docs/minio-gateway-for-gcs.html
   gcs-gateway-b:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2021-06-17T00-10-46Z
     command: gateway gcs
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS?"missing credentials"}:/tmp/.credentials
@@ -68,4 +68,6 @@ services:
       - BUCKET_EXTERNAL_SHARED
       - BUCKET_PREFIX
       - SUBMISSION_DATE
-      - RETRY_LIMIT=10
+      - RETRY_LIMIT
+      - RETRY_DELAY
+      - RETRY_BACKOFF_EXPONENT
