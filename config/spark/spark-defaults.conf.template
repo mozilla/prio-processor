@@ -35,3 +35,8 @@ spark.hadoop.fs.s3a.socket.recv.buffer 65536
 spark.hadoop.fs.s3a.socket.send.buffer 65536
  # maximum number of threads for S3A
 spark.hadoop.fs.s3a.threads.max 2048
+
+# add the progress bar to update the console for Airflow timeouts (relevant
+# if running using the KubernetesPodOperator with Airflow: 
+# https://github.com/mozilla/telemetry-airflow/issues/844).
+spark.ui.showConsoleProgress true
