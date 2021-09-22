@@ -91,12 +91,14 @@ def test_extract(extracted):
 def test_estimate_num_partitions(spark):
     df = spark.createDataFrame([Row(prio="#" * 100)] * 100)
     # 10kb of data with 1k partitions => 10 partitions
-    num_partitions = staging.estimate_num_partitions(df, partition_size_mb=0.001)
+    num_partitions = staging.ExtractPrioPing.estimate_num_partitions(
+        df, partition_size_mb=0.001
+    )
     assert num_partitions == 10
 
 
-def test_transform(extracted):
-    df = staging.transform(extracted)
+def test_transform_bigquery_storage(spark, extracted):
+    df = staging.ExtractBigQueryStorage(spark).transform(extracted)
 
     assert df.columns == ["batch_id", "server_id", "id", "payload"]
 
@@ -209,7 +211,7 @@ def test_staging_run_fixed_partitions(moz_fx_data_stage_data, tmp_path, monkeypa
         return 4
 
     monkeypatch.setattr(
-        staging, "estimate_num_partitions", mock_estimate_num_partitions
+        staging.ExtractPrioPing, "estimate_num_partitions", mock_estimate_num_partitions
     )
 
     output = Path(tmp_path / "output")
