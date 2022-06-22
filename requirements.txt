@@ -10,7 +10,7 @@ click==7.1.2
     # via prio_processor (setup.py)
 jsonschema==3.2.0
     # via prio_processor (setup.py)
-numpy==1.19.1
+numpy==1.22.0
     # via
     #   pandas
     #   pyarrow
