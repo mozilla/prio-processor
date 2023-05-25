@@ -57,7 +57,7 @@ six==1.15.0
     #   packaging
 toml==0.10.1
     # via pytest
-tornado==6.0.4
+tornado==6.3.2
     # via
     #   livereload
     #   mkdocs
